@@ -1,0 +1,9 @@
+*.pyc
+*.py~
+*.json
+*~
+*.~lock*
+.spyderproject
+.spyderworkspace
+*.css
+*.html
