@@ -1,19 +1,18 @@
-% SOMA-WORKFLOW TUTORIAL
+# SOMA-WORKFLOW TUTORIAL
 
 ### HOW TO USE SOMA-WORKFLOW ?
 More information on [http://brainvisa.info/soma/soma-workflow/](http://brainvisa.info/soma/soma-workflow/)
+And [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow) 
 
 ### WHAT IS SOMA-WORKFLOW ?
-Soma-workflow is an interface to launch "jobs" on parallel computing resources.
-Here the parallel computing resource is a server (cluster) called Gabriel.
+Soma-workflow is an interface for submission, control and monitoring of jobs and workflows on parallel computing resources.
+Here, we are going to describe the case where you want to use the gabriel server available
+at Neurospin.
 The parallel computing resource could be your computer by using all processors.
 Jobs are launched in parallel and not one after the other.
 
 ### CREATE A COUNT
 See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
-
-
-
 
 ### HOW TO USE SOMA-WORKFLOW ?
 
@@ -40,7 +39,7 @@ Check into your .bashrc file you can launch /i2bm/local/Ubuntu-12.04-x86_64/brai
 -->
 
 ##### SERVER CONFIGURATION:
-The "server" refers to the resources called Gabriel:
+The "server" refers to the resource called Gabriel:
 [See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
 Connect to gabriel from your workstation:
@@ -147,13 +146,13 @@ Launch soma-workflow_gui
 
 
 ##### EXAMPLE WITH FREESURFER:
-A script of demonstration is available on the unicogfmri module in:</br>
+A script of demonstration is available on the unicog module in:</br>
 
     cd <somewhere>
-    git clone /neurospin/unicog/resources/git_server/UnicogFmri.git
-    cd <somewhere>/UnicogFmri
+    git clone https://github.com/neurospin/unicog.git
+    cd <somewhere>/unicog
     python setup.py install --user 
-    cd ./unicogfmri/utils_unicog/computing_resources/test
+    cd ./unicog/unicogfmri/utils_unicog/computing_resources/test
     more create_jobs_for_somaWF.py
     #create your own script from a copy
     cp create_jobs_for_somaWF.py create_jobs_for_somaWF_local.py
