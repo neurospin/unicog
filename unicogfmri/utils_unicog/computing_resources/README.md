@@ -12,7 +12,7 @@ Jobs are launched in parallel and not one after the other.
 ### CREATE A COUNT
 See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
-For forgotten password: support.gipsi@cea.fr
+
 
 
 ### HOW TO USE SOMA-WORKFLOW ?
