@@ -24,7 +24,7 @@ install it.
     
 ##### UPDATE THE GIT REPOSITORY
 From time to time, update the repository.
-So, use git pull and perform a new installation.
+For doing so, use git pull and perform a new installation.
 
     cd <my_repository>/unicog
     git pull

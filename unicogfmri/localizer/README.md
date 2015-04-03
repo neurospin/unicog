@@ -1,11 +1,10 @@
 # TUTORIAL LOCALIZER
 
-Here a tutorial to start in fMRI with the very known localizer data. The goal is 
-intented to show you how to import, to process and to visualize data by 
+Here is a tutorial to start in fMRI with the very well known localizer data. The goal is to show you how to import, to process and to visualize data by 
 using python scripts and the standalone SPM version (compiled version, without licence).
-In fact the standalone SPM is used for the preprocessing part, but the statistic levels 
+In fact, the standalone SPM is used for the preprocessing part, but the statistic levels 
 are based on nipy.
-We hope these scripts could cover a lot of cases. Other pipelines are available at 
+We hope these scripts cover a lot of cases. Other pipelines are available at 
 NeuroSpin, in particular in Capsul [http://nsap.intra.cea.fr/capsul-doc/index.html](http://nsap.intra.cea.fr/capsul-doc/index.html)
 or [https://github.com/neurospin/capsul](https://github.com/neurospin/capsul)
 
@@ -13,12 +12,12 @@ or [https://github.com/neurospin/capsul](https://github.com/neurospin/capsul)
 
 ### CONFIGURATION
 
-##### What python modules do you need ?
+##### Which python modules do you need ?
 
 ######unicog
 unicog is a git repository located at neurospin.
-You can use them like template with your own data.
-So first, don't forgot to clone or to update the repository if needed.
+You can use these scripts like templates with your own data.
+So, first, don't forget to clone or to update the repository if needed.
 
 See  [https://github.com/neurospin/unicog](https://github.com/neurospin/unicog) 
 
@@ -33,17 +32,17 @@ To ensure the pypreprocess module is available:
     pypreprocess.__file__ 
 
 If pypreprocess module is not installed, please refer to [https://github.com/neurospin/pypreprocess](https://github.com/neurospin/pypreprocess).
-Some additional python modules are available (numpy, nibabel ...). All information are available 
+Some additional python modules are available (numpy, nibabel ...). All information is available 
 on [https://github.com/neurospin/pypreprocess](https://github.com/neurospin/pypreprocess) page.
 
 ###STEPS FOR PROCESSING
 
-*Before to launch scripts, please check paths.*
+*Before running scripts, please check paths.*
 
 #### STEP1: DATA IMPORTATION
 
-To import data, 2 formats of description are possible: xsl or txt (the same format than previously).
-In order either to use xsl or txt format, just use init_xls or init_txt in the following script [<my_repository>/unicog/unicogfmri/localizer/1_import_data_txt.py](<my_repository>/importation_data/1_import_data_txt.py)
+To import data, 2 formats of description are possible: xls or txt (the same format than previously).
+In order either to use xls or txt format, just use init_xls or init_txt in the following script [https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer/importation_data/1_import_data_txt.py](https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer/importation_data/1_import_data_txt.py)
 In this example, we are going to use the txt format.
 You can indicate in the same script where data will be imported in the **main_dir** variable.
 
@@ -77,12 +76,12 @@ processing includes the preprocessing and the first-level.
 Before launching the processing, please take a look at the configuration file, 
 in order to check paths and options: 
     
-[&lt;my_repository&gt;/unicog/unicogfmri/volume_glm/Step1_config.ini](../volume_glm/Step1_config.ini)
+[https://github.com/neurospin/unicog/blob/master/unicogfmri/localizer/volume_glm/Step1_config.ini](https://github.com/neurospin/unicog/blob/master/unicogfmri/localizer/volume_glm/Step1_config.ini)
 
 
 ###### Run the preprocessing and first-level
-In this section, we launch the following python script and we indicate at the
-beginning of line the path in order to use the standalone SPM.
+In this section, we launch the following python script and we indicate, at the
+beginning of the line, the path to the standalone SPM to be used.
 
     cd <my_repository>/unicog/unicogfmri/localizer
     SPM_MCR=/i2bm/local/bin/spm8 python ./volume_glm/Step2_preprocess_1st_level.py
@@ -98,26 +97,25 @@ And the maps are located:
  * &lt;output_dir&gt;/results/&lt;name_subject&gt;/res_stats/variance_maps
  * &lt;output_dir&gt;/results/&lt;name_subject&gt;/res_stats/effects_maps
 
-Note: pypreprocess use a cached system, in other words, if you run again your script
-the steps which have already been processed, will be skip. Even if this system
-is very interesting, it can take a lot space.
+Note: pypreprocess uses a cached system, i.e. if you run again your script
+the steps which have already been processed, will be skipped. Even if this system
+is very interesting, it can take a lot of space.
 
-Note: the &lt;output_dir&gt; is indicated in [&lt;my_repository&gt;/unicog/unicogfmri/volume_glm/Step1_config.ini](../volume_glm/Step1_config.ini).
+Note: the &lt;output_dir&gt; is indicated in [https://github.com/neurospin/unicog/blob/master/unicogfmri/localizer/volume_glm/Step1_config.ini](https://github.com/neurospin/unicog/blob/master/unicogfmri/localizer/volume_glm/Step1_config.ini).
 
 ##### READ THE REPORT
 Thanks to pypreprocess, we have an automatic report on processing.
-We have a lot of information such as design matrix, onsets, name of conditions, 
-snapshots  ... and so on.
+We have a lot of information such as design matrix, onsets, names of conditions, 
+snapshots... and so on.
  
 Please refer to &lt;output_dir&gt;/&lt;name_subj&gt;/res_stats/report_stats.html
 
 
 #### STEP 3: VIEW CONTRASTS
-Now is time to visualize the maps. Here we use [Anatomist Software](http://brainvisa.info/doc/anatomist-4.4/ana_training/en/html/index.html#ana_training%book),
-but other solutions are possible. In our example, we filter for each subject, 
-all maps (z or t) with a list of contrasts of interest. See the python script : 
+Now it is time to visualize the maps. Here we use [Anatomist Software](http://brainvisa.info/doc/anatomist-4.4/ana_training/en/html/index.html#ana_training%book),
+but other solutions are possible. In our example, we select for each subject, a list of contrasts of interest (z or t maps). See the python script: 
 **../volume_glm/Step3_view_maps.py**. Note that before launching the script, 
-it is necessary to initialize correctly path for Anatomist with the first line.
+it is necessary to initialize correctly the path for Anatomist with the first line.
 
     source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
     cd <my_repository>/UnicogFmri/unicogfmri/localizer

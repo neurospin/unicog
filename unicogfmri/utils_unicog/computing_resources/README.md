@@ -2,13 +2,13 @@
 
 ### HOW TO USE SOMA-WORKFLOW ?
 More information on [http://brainvisa.info/soma/soma-workflow/](http://brainvisa.info/soma/soma-workflow/)
-And [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow) 
+and [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow) 
 
 ### WHAT IS SOMA-WORKFLOW ?
 Soma-workflow is an interface for submission, control and monitoring of jobs and workflows on parallel computing resources.
-Here, we are going to describe the case where you want to use the gabriel server available
-at Neurospin.
-The parallel computing resource could be your computer by using all processors.
+Here, we are going to describe the case where you want to use gabriel server, available
+at NeuroSpin.
+The parallel computing resource could be your own computer by using all processors.
 Jobs are launched in parallel and not one after the other.
 
 ### CREATE A COUNT
@@ -17,7 +17,7 @@ See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/Computatio
 ### HOW TO USE SOMA-WORKFLOW ?
 
 ##### CLIENT CONFIGURATION: 
-The "client" refers to your work_station. 
+The "client" refers to your workstation. 
 Create the **.soma-workflow.cfg** file on the client if needed:
 
     touch /home/your_logging/.soma-workflow.cfg
@@ -44,7 +44,7 @@ The "server" refers to the resource called Gabriel:
 
 Connect to gabriel from your workstation:
 
-    ssh  your_logging@gabriel.intra.cea.fr
+    ssh your_logging@gabriel.intra.cea.fr
 
 Create the **.soma-workflow.cfg** file on the server if needed:
 
@@ -109,7 +109,7 @@ And add the following lines:
     export DRMAA_LIBRARY_PATH=/i2bm/brainvisa/CentOS-5.3-x86_64/pbs_drmaa-1.0.13/lib/libdrmaa.so
 
 Optional step: If you want to launch brainvisa processes by using soma-workflow 
-directly from your workstation. Launch Brainvisa just once:
+directly from your workstation, then launch Brainvisa just once:
 
     #option -X to indicate the graphic mode just for this time    
     ssh  -X your_logging@gabriel.intra.cea.fr
@@ -129,7 +129,7 @@ Check if soma_workflow.start_database_server is started:
 
     ps -aux | grep your_logging
 
-If you have a line like below, the configuration is correct:
+If you have a line like the one below, the configuration is correct:
 
     python -m soma_workflow.start_database_server DSV_cluster_your_logging &
 
