@@ -6,7 +6,8 @@ from unicogfmri.utils_unicog.import_data import import_and_convert_dicom
 #path where you want to put data
 main_dir = '/volatile/test_localizer1/data3'
 #information for subjects
-data = '/neurospin/unicog/resources/git_depot/UnicogFmri/unicogfmri/localizer/importation_data/acquisitions_summary_localizer.xls'
+data = ('/neurospin/unicog/protocols/IRMf/Unicogfmri/localizer/importation_data'
+        '/acquisitions_summary_localizer.xls')
 scanner='3T'
 ###########################################################################
 
@@ -17,7 +18,7 @@ if not os.path.exists(main_dir):
 acquisitions = ""
 if os.path.isfile(data):
     acquisitions = import_and_convert_dicom.init_xls(data, scanner)
-    print acquisitions
+    #print acquisitions
   
 #importation and conversion    
 if acquisitions:   

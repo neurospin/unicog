@@ -149,7 +149,8 @@ def first_level(subject_dic):
 
 if __name__ == '__main__':
     #File containing configuration for preprocessing the data
-    jobfile="/neurospin/unicog/resources/git_depot/UnicogFmri/localizer/volume_glm/config.ini"
+    jobfile=('/neurospin/unicog/resources/git_depot/unicog/unicogfmri/localizer'
+             '/volume_glm/Step1_config.ini')
     list_subjects, params =  _generate_preproc_pipeline(jobfile) 
 
     #Preproc
