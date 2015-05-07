@@ -183,7 +183,6 @@ A script of demonstration is available on the unicog module in:</br>
     more example_somaWF_for_spm_batches.py
     #create your own script from a copy
     cp example_somaWF_for_spm_batches.py example_somaWF_for_spm_batches_local.py
-    #change what the paths and configure your freesurfer database 
     #init some variables with the following script if needed
     source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
     #launch the script
