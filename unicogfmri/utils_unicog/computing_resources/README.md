@@ -152,25 +152,46 @@ A script of demonstration is available on the unicog module in:</br>
     git clone https://github.com/neurospin/unicog.git
     cd <somewhere>/unicog
     python setup.py install --user 
-    cd ./unicog/unicogfmri/utils_unicog/computing_resources/test
-    more create_jobs_for_somaWF.py
+    cd ./unicog/unicogfmri/utils_unicog/computing_resources/example
+    more example_somaWF_for_freesurfer.py
     #create your own script from a copy
-    cp create_jobs_for_somaWF.py create_jobs_for_somaWF_local.py
+    cp example_somaWF_for_freesurfer.py example_somaWF_for_freesurfer_local.py
     #change what the paths and configure your freesurfer database 
-    #in create_jobs_for_somaWF_local.py
+    #in example_somaWF_for_freesurfer.py
     #init some variables with the following script
     source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
     #launch the script
-    python create_jobs_for_somaWF_local.py
+    python example_somaWF_for_freesurfer.py
 
 
 This script generates the blue files. The **soma_WF_JOBS** script must 
-be used in **soma-workflow_gui** for launching the jobs on the server.
+be used in **soma-workflow_gui** for launching the jobs on the server or
+on your own workstation (if many cores).
 
 
 ![](./somaWF_jobs.png "somaWF_jobs.png")
 
 
+##### EXAMPLE FOR SPM BATCHES:
+A script of demonstration is available on the unicog module in:</br>
+
+    cd <somewhere>
+    git clone https://github.com/neurospin/unicog.git
+    cd <somewhere>/unicog
+    python setup.py install --user 
+    cd ./unicog/unicogfmri/utils_unicog/computing_resources/example
+    more example_somaWF_for_spm_batches.py
+    #create your own script from a copy
+    cp example_somaWF_for_spm_batches.py example_somaWF_for_spm_batches_local.py
+    #change what the paths and configure your freesurfer database 
+    #init some variables with the following script if needed
+    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
+    #launch the script
+    python example_somaWF_for_spm_batches.py
+
+This must generate a file called **spm12_batches.somawf** which must be
+used in **soma-workflow_gui** for launching the jobs on the server or
+on your own workstation (if many cores).
 
 
 
