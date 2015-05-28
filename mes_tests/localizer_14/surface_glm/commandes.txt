@@ -1,0 +1,148 @@
+
+
+volume fmri contrats -> texure gii sur fsaverage
+issue de https://pysurfer.github.io/examples/plot_fmri_activation_volume.html
+
+FreeSurfer/id983365@is211816:/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps$ mri_vol2surf --mov /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps/subject01audio-video.nii.gz --hemi lh --regheader fsaverage --projfrac-avg 0 1 0.1 --surf-fwhm 0.5 --o ./conversion_gii_fsaverage/subject01audio-video.gii --out_type gii
+srcvol = /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps/subject01audio-video.nii.gz
+srcreg unspecified
+srcregold = 0
+srcwarp unspecified
+surf = white
+hemi = lh
+ProjFrac = 0.5
+thickness = thickness
+reshape = 0
+interp = nearest
+float2int = round
+GetProjMax = 0
+INFO: float2int code = 0
+niiRead(): NIFTI_UNITS_UNKNOWN, assuming mm
+Done loading volume
+Computing registration from header.
+  Using /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/fsaverage/mri/orig.mgz as target reference.
+Reading surface /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/fsaverage/surf/lh.white
+Done reading source surface
+Reading thickness /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/fsaverage/surf/lh.thickness
+Done
+Mapping Source Volume onto Source Subject Surface
+ 1 0 0 1
+using old
+ 2 0.1 0 1
+using old
+ 3 0.2 0 1
+using old
+ 4 0.3 0 1
+using old
+ 5 0.4 0 1
+using old
+ 6 0.5 0 1
+using old
+ 7 0.6 0 1
+using old
+ 8 0.7 0 1
+using old
+ 9 0.8 0 1
+using old
+10 0.9 0 1
+using old
+Done mapping volume to surface
+Number of source voxels hit = 10807
+Surface smoothing by fwhm = 0.5 (n=0)
+Writing to ./conversion_gii_fsaverage/subject01audio-video.gii
+Dim: 163842 1 1
+
+
+FreeSurfer/id983365@is211816:/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps$ mri_vol2surf --mov /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps/subject01computation.nii.gz --hemi lh --regheader fsaverage --projfrac-avg 0 1 0.1 --surf-fwhm 0.5 --o ./conversion_gii_fsaverage/subject01computation.gii --out_type gii
+srcvol = /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps/subject01computation.nii.gz
+srcreg unspecified
+srcregold = 0
+srcwarp unspecified
+surf = white
+hemi = lh
+ProjFrac = 0.5
+thickness = thickness
+reshape = 0
+interp = nearest
+float2int = round
+GetProjMax = 0
+INFO: float2int code = 0
+niiRead(): NIFTI_UNITS_UNKNOWN, assuming mm
+Done loading volume
+Computing registration from header.
+  Using /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/fsaverage/mri/orig.mgz as target reference.
+Reading surface /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/fsaverage/surf/lh.white
+Done reading source surface
+Reading thickness /neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/fsaverage/surf/lh.thickness
+Done
+Mapping Source Volume onto Source Subject Surface
+ 1 0 0 1
+using old
+ 2 0.1 0 1
+using old
+ 3 0.2 0 1
+using old
+ 4 0.3 0 1
+using old
+ 5 0.4 0 1
+using old
+ 6 0.5 0 1
+using old
+ 7 0.6 0 1
+using old
+ 8 0.7 0 1
+using old
+ 9 0.8 0 1
+using old
+10 0.9 0 1
+using old
+Done mapping volume to surface
+Number of source voxels hit = 10807
+Surface smoothing by fwhm = 0.5 (n=0)
+Writing to ./conversion_gii_fsaverage/subject01computation.gii
+Dim: 163842 1 1
+
+
+
+PYCORTEX
+pycortex use webOpenGL, vérifier que son navigateur
+supporte le webGL : http://get.webgl.org/
+freesurfer init
+cortex.freesurfer.import_subj('fsaverage')
+
+cortex.freesurfer.import_subj('sujet')
+le fichier filestore/db/subjet/anatomicals/raw.nii.gz 
+correspond au fichier fs_database/sujet/mri/T1.mgz
+importation des flats:
+cortex.freesurfer.import_flat('subject01_test_flat', 'full')
+a priori il faut les 2.
+Il cherche un lh.full.flat.patch.3d et un rh.full.flat.patch.3d
+
+IMPORTATION DES FLAT DEPUIS Freesurfer:
+1) renomer dans le dossier de freesurfer, pour chaque hemisphere
+cp rh.cortex.patch.flat rh.cortex.flat.patch.3d
+
+importer les dans le sujet fsaverage_1 de pycortex
+2) cortex.freesurfer.import_flat('fsaverage', 'cortex', 'fsaverage_1')
+
+générer flat
+cortex.freesurfer.flatten('subject01_test_flat', 'rh', 'full')
+cherche le surf/rh.full.patch.3d
+
+loadXfm is deprecated, use save_xfm instead located in database.py
+from cortex import database
+database.Database.save_xfm
+
+mask = db.get_mask(subj, xfmname, "thick")
+data = dataset.Volume(vol, subj, xfmname, cmap='RdBu_r', vmin=0, vmax=1)
+web = cortex.webgl.show(data)
+
+
+
+CONVERTIR FREESURFER MESH REF INTO AIMS REF MESH
+python -c from freesurfer.freesurferMeshToAimsMesh import freesurferMeshToAimsMesh as f; 
+f("/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/surfaces/wm_lh.gii", 
+"/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/anatomicals/raw.nii.gz", 
+"/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/wm_lh_aims.gii");
+
+python -c from freesurfer.freesurferMeshToAimsMesh import freesurferMeshToAimsMesh as f;f("/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/surfaces/flat_lh.gii", "/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/anatomicals/raw.nii.gz", "/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/flat_lh_aims.gii");
