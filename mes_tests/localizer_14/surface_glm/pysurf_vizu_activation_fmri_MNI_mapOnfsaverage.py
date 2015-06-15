@@ -31,9 +31,9 @@ reg_file = os.path.join(os.environ["FREESURFER_HOME"],
                         "average/mni152.register.dat")
 #print reg_file
 #print volume_file
-#zstat = project_volume_data(volume_file, "lh", reg_file)
-
-
+#tmp = "/neurospin/unicog/protocols/IRMf/Tests_Isa/tmp/tmp_reg.nii"
+zstat = project_volume_data(volume_file, "lh", reg_file)
+project_volume_data()
 
 """
 Note that the contours of the fsaverage surface don't perfectly match the
@@ -48,16 +48,19 @@ need to specify a registration file.
 By default, 3mm of smoothing is applied on the surface to clean up the overlay
 a bit, although the extent of smoothing can be controlled.
 """
-zstat = project_volume_data(volume_file, "lh",
-                            subject_id="fsaverage", smooth_fwhm=0.5)
+#volume_file = "/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/tmp/map_subject01_To_Fsaverage.nii"
+
+#zstat = project_volume_data(volume_file, "lh",
+#                            subject_id="fsaverage", smooth_fwhm=0.5)
 
 """
 Once you have the statistical data loaded into Python, you can simply pass it
 to the `add_overlay` method of the Brain object.
 """
 #/tmp/pysurfer-v2sRxmtk9.mgz
-brain.add_overlay('/tmp/pysurfer-v2sRxmtk9.mgz', min=2, max=12)
-#brain.add_overlay(zstat, min=2, max=12)
+#/tmp/pysurfer-v2sWqEIhe.mgz
+#brain.add_overlay('/tmp/pysurfer-v2s0PkvNj.mgz', min=2, max=12)
+brain.add_overlay(zstat, min=2, max=12)
 
 """
 It can also be a good idea to plot the inverse of the mask that was used in the
@@ -74,3 +77,9 @@ that you are projecting binary (0, 1) data.
 #               colormap="bone", alpha=.6, colorbar=False)
 
 #brain.show_view("medial")
+brain.show_view()
+path = "/neurospin/unicog/protocols/IRMf/Tests_Isa/git_depot/unicog/mes_tests/localizer_14/surface_glm/snapshot"
+brain.save_image(os.path.join(path, 'activation_map_audio_video.png'))
+
+
+

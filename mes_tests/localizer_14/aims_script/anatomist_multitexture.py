@@ -186,8 +186,8 @@ def multitexture_fusion(tex_surface_glm_file, tex_curv_file, mesh_flatten_file, 
     
     for side in ['lh']:
         tex_surface_glm = a.loadObject(tex_surface_glm_file.replace('?', side))
-        #tex_surface_glm.setPalette("tvalues100-100-100")
-        tex_surface_glm.setPalette("zfun-EosB", minVal=3, maxVal=8.6)
+        tex_surface_glm.setPalette("tvalues100-100-100")
+        #tex_surface_glm.setPalette("zfun-EosB", minVal=3, maxVal=8.6)
         tex_curv = a.loadObject(tex_curv_file.replace('?', side))
         tex_curv.setPalette("B-W LINEAR")
         mesh_flatten= a.loadObject(mesh_flatten_file.replace('?', side))
@@ -247,15 +247,15 @@ def multitexture_fusion(tex_surface_glm_file, tex_curv_file, mesh_flatten_file, 
     
 if __name__ == "__main__" :  
     
-#    tex_surface_glm = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/surface_glm/subject01/audio-video_z_map_?.gii'
-#    tex_curv = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/?.curv.gii'
-#    mesh_flatten = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/flat_?_aims.gii'
-#    mesh_inflated = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/inflated_?_aims.gii'
-#   
-    tex_surface_glm = '/neurospin/unicog/protocols/IRMf/mathematicians_Amalric_Dehaene2012/Surface_analysis/mathematicians/cf120444/fmri/results/math - nonmath_z_map_?.gii'
+    tex_surface_glm = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/surface_glm/subject01/audio-video_z_map_?.gii'
     tex_curv = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/?.curv.gii'
     mesh_flatten = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/flat_?_aims.gii'
     mesh_inflated = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/inflated_?_aims.gii'
+   
+#    tex_surface_glm = '/neurospin/unicog/protocols/IRMf/mathematicians_Amalric_Dehaene2012/Surface_analysis/mathematicians/cf120444/fmri/results/math - nonmath_z_map_?.gii'
+#    tex_curv = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/?.curv.gii'
+#    mesh_flatten = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/flat_?_aims.gii'
+#    mesh_inflated = '/volatile/depot_pycortex/pycortex/filestore/db/fsaverage/conversion_aims_ref/inflated_?_aims.gii'
   
   
     multitexture_fusion(tex_surface_glm, tex_curv, mesh_flatten, mesh_inflated)

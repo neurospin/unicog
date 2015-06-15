@@ -17,8 +17,8 @@ Get a path to the volume file.
 #volume_file = "example_data/zstat.nii.gz"
 #volume_file = "/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fmri_results/subject01/res_stats/z_maps/subject01audio-video.nii.gz"
 
-#texture_file = "/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/surface_glm/subject01/audio-video_z_map_lh.gii"
-texture_file = "audio-video_z_map.gii"
+texture_file = "/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/surface_glm/subject01/audio-video_z_map_lh.gii"
+#texture_file = "audio-video_z_map"
 
 """
 There are two options for specifying the registration between the volume and
@@ -30,8 +30,8 @@ Most of the time you will be plotting data that are in MNI152 space on the
 fsaverage brain. For this case, Freesurfer actually ships a registration matrix
 file to align your data with the surface.
 """
-reg_file = os.path.join(os.environ["FREESURFER_HOME"],
-                        "average/mni152.register.dat")
+#reg_file = os.path.join(os.environ["FREESURFER_HOME"],
+#                        "average/mni152.register.dat")
 #print reg_file
 #print volume_file
 #zstat = project_volume_data(volume_file, "lh", reg_file)
@@ -61,7 +61,26 @@ to the `add_overlay` method of the Brain object.
 #/tmp/pysurfer-v2sRxmtk9.mgz
 #brain.add_overlay('/tmp/pysurfer-v2sRxmtk9.mgz', min=2, max=12)
 #brain.add_overlay(zstat, min=2, max=12)
-brain.add_morphometry(texture_file)
+#brain.add_morphometry(texture_file)
+#brain.add_morphometry()
+#brain.add_data()
+
+from nibabel.freesurfer import read_geometry
+from nibabel.gifti import read as read_gifti
+
+text = read_gifti(texture_file)
+texture = text.darrays[0].data
+print text
+data = texture
+th_ = data < 5
+data[th_] = 0 
+#vertices = stc['vertices']
+
+#
+#brain.add_data(data, colormap="bone", vertices=vertices,
+#               hemi='lh')
+
+brain.add_data(data, colormap="hot", hemi='lh', alpha=.6)
 
 """
 It can also be a good idea to plot the inverse of the mask that was used in the
@@ -76,6 +95,12 @@ that you are projecting binary (0, 1) data.
 #mask = ~mask
 #brain.add_data(mask, min=0, max=10, thresh=.5,
 #               colormap="bone", alpha=.6, colorbar=False)
-
+#
 #brain.show_view("medial")
+brain.show_view("lateral")
+#import os
+#os.system("pause") 
+#input("Appuyez sur la touche ENTREE pour continuer...")
 
+#path = "/neurospin/unicog/protocols/IRMf/Tests_Isa/git_depot/unicog/mes_tests/localizer_14/surface_glm/snapshot"
+#brain.save_image(os.path.join(path, 'wo_filter_texture_audio_video.png'))

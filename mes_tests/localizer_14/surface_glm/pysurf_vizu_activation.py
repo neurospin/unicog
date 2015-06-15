@@ -37,3 +37,4 @@ the positive activations.
 """
 #brain.add_overlay(overlay_file, min=5, max=20, sign="pos")
 brain.add_overlay(overlay_file, min=2, max=12)
+brain.show_view('lateral')
