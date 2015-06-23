@@ -17,10 +17,10 @@ Jobs are launched in parallel and not one after the other.
 | On your own workstation         | On a cluster     |
 | --------------------------------|-----------------|
 |[For multiple core machine](#from-your-own-workstation-multiple-core-machine) &nbsp;&nbsp;&nbsp;| [See the access to a cluster](#on-a-cluster)|
-|Uncompiled MATLAB codes: Yes     | Uncompiled MATLAB codes: No*   |
+|Uncompiled MATLAB codes: Yes     | Uncompiled MATLAB codes: No (1)   |
 |Compiled MATLAB codes: Yes       | Compiled MATLAB codes: Yes   |
 
-* : a MATLAB compiler is available at NeuroSpin.  
+1 : a MATLAB compiler is available at NeuroSpin.  
 
 
 ### EXAMPLE WITH FREESURFER:
@@ -182,8 +182,7 @@ And add the following lines:
     source $build_dir/bin/bv_env.sh $build_dir
     export DRMAA_LIBRARY_PATH=/i2bm/brainvisa/CentOS-5.3-x86_64/pbs_drmaa-1.0.13/lib/libdrmaa.so
 
-Optional step: If you want to launch brainvisa processes by using soma-workflow 
-directly from your workstation, then launch Brainvisa just once:
+Additional step: launch Brainvisa just once:
 
     #option -X to indicate the graphic mode just for this time    
     ssh  -X your_logging@gabriel.intra.cea.fr
