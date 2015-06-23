@@ -1,1 +1,0 @@
-/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_surface_glm/data/fs_db/conversion_fsaverage$ mris_convert /i2bm/local/freesurfer/subjects/fsaverage/surf/rh.white ./rh.white.gii
