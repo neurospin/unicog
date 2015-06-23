@@ -8,15 +8,89 @@ and [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/so
 Soma-workflow is an interface for submission, control and monitoring of jobs and workflows on parallel computing resources.
 Here, we are going to describe the case where you want to use gabriel server, available
 at NeuroSpin.
-The parallel computing resource could be your own computer by using all processors.
+The parallel computing resource could be used your own computer by using all processors.
 Jobs are launched in parallel and not one after the other.
 
-### CREATE A COUNT
+
+### WHERE CAN I LAUNCH MY JOBS WITH SOMA WORKFLOW ?
+
+| On your own workstation         | On a cluster     |
+| --------------------------------|-----------------|
+|[For multiple core machine](#from-your-own-workstation-multiple-core-machine) &nbsp;&nbsp;&nbsp;| [See the access to a cluster](#on-a-cluster)|
+|Uncompiled MATLAB codes: Yes     | Uncompiled MATLAB codes: No*   |
+|Compiled MATLAB codes: Yes       | Compiled MATLAB codes: Yes   |
+
+* : a MATLAB compiler is available at NeuroSpin.  
+
+
+### EXAMPLE WITH FREESURFER:
+An example is available on the unicog module in:</br>
+
+    cd <somewhere>
+    git clone https://github.com/neurospin/unicog.git
+    cd <somewhere>/unicog
+    python setup.py install --user 
+    cd ./unicog/unicogfmri/utils_unicog/computing_resources/example
+    more example_somaWF_for_freesurfer.py
+    #create your own script from a copy
+    cp example_somaWF_for_freesurfer.py example_somaWF_for_freesurfer_local.py
+    #change what the paths and configure your freesurfer database 
+    #in example_somaWF_for_freesurfer.py
+    #init some variables with the following script
+    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
+    #launch the script
+    python example_somaWF_for_freesurfer.py
+
+
+This script generates the blue files. The **soma_WF_JOBS** script must 
+be used in **soma-workflow_gui** for launching the jobs on the server or
+on your own workstation (if many cores).
+
+
+![](./somaWF_jobs.png "somaWF_jobs.png")
+
+
+### EXAMPLE FOR SPM BATCHES:
+An example is available on the unicog module in:</br>
+
+    cd <somewhere>
+    git clone https://github.com/neurospin/unicog.git
+    cd <somewhere>/unicog
+    python setup.py install --user 
+    cd ./unicog/unicogfmri/utils_unicog/computing_resources/example
+    more example_somaWF_for_spm_batches.py
+    #create your own script from a copy
+    cp example_somaWF_for_spm_batches.py example_somaWF_for_spm_batches_local.py
+    #init some variables with the following script if needed
+    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
+    #launch the script
+    python example_somaWF_for_spm_batches.py
+
+This must generate a file called **spm12_batches.somawf** which must be
+used in **soma-workflow_gui** for launching the jobs on the server or
+on your own workstation (if many cores).
+
+
+### FROM YOUR OWN WORKSTATION (MULTIPLE CORE MACHINE):
+<a href="#PC">Launch brainvisa environment, if needed:</a>
+
+    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
+
+Launch soma-workflow_gui
+
+    soma-workflow_gui
+    add [DSV_cluster_your_logging] resource
+    submit the python file containing jobs
+
+More information for a [quick start on a multiple core machine](http://brainvisa.info/soma/soma-workflow/)
+
+### ON A CLUSTER
+#### CREATE AN ACCOUNT
 See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
-### HOW TO USE SOMA-WORKFLOW ?
+#### HOW TO USE SOMA-WORKFLOW ?
 
-##### CLIENT CONFIGURATION: 
+###### CLIENT CONFIGURATION: 
 The "client" refers to your workstation. 
 Create the **.soma-workflow.cfg** file on the client if needed:
 
@@ -38,7 +112,7 @@ Check into your .bashrc file you can launch /i2bm/local/Ubuntu-12.04-x86_64/brai
     alias brainvisa_pkg="source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh"
 -->
 
-##### SERVER CONFIGURATION:
+###### SERVER CONFIGURATION:
 The "server" refers to the resource called Gabriel:
 [See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
@@ -132,70 +206,3 @@ Check if soma_workflow.start_database_server is started:
 If you have a line like the one below, the configuration is correct:
 
     python -m soma_workflow.start_database_server DSV_cluster_your_logging &
-
-##### LAUNCH JOBS FROM YOUR WORKSTATION (=THE CLIENT):
-Launch brainvisa environment, if needed:
-
-    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
-
-Launch soma-workflow_gui
-
-    soma-workflow_gui
-    add [DSV_cluster_your_logging] resource
-    submit the python file containing jobs
-
-
-##### EXAMPLE WITH FREESURFER:
-A script of demonstration is available on the unicog module in:</br>
-
-    cd <somewhere>
-    git clone https://github.com/neurospin/unicog.git
-    cd <somewhere>/unicog
-    python setup.py install --user 
-    cd ./unicog/unicogfmri/utils_unicog/computing_resources/example
-    more example_somaWF_for_freesurfer.py
-    #create your own script from a copy
-    cp example_somaWF_for_freesurfer.py example_somaWF_for_freesurfer_local.py
-    #change what the paths and configure your freesurfer database 
-    #in example_somaWF_for_freesurfer.py
-    #init some variables with the following script
-    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
-    #launch the script
-    python example_somaWF_for_freesurfer.py
-
-
-This script generates the blue files. The **soma_WF_JOBS** script must 
-be used in **soma-workflow_gui** for launching the jobs on the server or
-on your own workstation (if many cores).
-
-
-![](./somaWF_jobs.png "somaWF_jobs.png")
-
-
-##### EXAMPLE FOR SPM BATCHES:
-A script of demonstration is available on the unicog module in:</br>
-
-    cd <somewhere>
-    git clone https://github.com/neurospin/unicog.git
-    cd <somewhere>/unicog
-    python setup.py install --user 
-    cd ./unicog/unicogfmri/utils_unicog/computing_resources/example
-    more example_somaWF_for_spm_batches.py
-    #create your own script from a copy
-    cp example_somaWF_for_spm_batches.py example_somaWF_for_spm_batches_local.py
-    #init some variables with the following script if needed
-    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
-    #launch the script
-    python example_somaWF_for_spm_batches.py
-
-This must generate a file called **spm12_batches.somawf** which must be
-used in **soma-workflow_gui** for launching the jobs on the server or
-on your own workstation (if many cores).
-
-
-
-
-
-
-
- 
