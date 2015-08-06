@@ -7,6 +7,7 @@ and using a first beta version of https://github.com/neurospin/pypreprocess.
 
 import time
 import os
+import sys
 
 import numpy as np
 from nipy.modalities.fmri.design_matrix import make_dmtx
@@ -149,8 +150,7 @@ def first_level(subject_dic):
 
 if __name__ == '__main__':
     #File containing configuration for preprocessing the data
-    jobfile=('/neurospin/unicog/resources/git_depot/unicog/unicogfmri/localizer'
-             '/volume_glm/Step1_config.ini')
+    jobfile=sys.argv[1]
     list_subjects, params =  _generate_preproc_pipeline(jobfile) 
 
     #Preproc
