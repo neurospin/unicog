@@ -49,7 +49,7 @@ Let us create a directory to run this tutorial, by issuing the following command
 
 And copy there the 'localizer/scripts' directory of unicogfmri
  
-       cp -a /tmp/unicogfmri/localizer/scripts $ROOTDIR
+       cp -a /tmp/unicog/unicogfmri/localizer/scripts $ROOTDIR
 
 (remark: if you installed the unicog git repository elsewhere than in /tmp, you will need to adjust the preceding line) 
 
@@ -83,13 +83,13 @@ The input consists of one line per participant:
 For this tutorial, we have already created the file.
 
       cd $ROOTDIR/scripts
-      cat localizer_scans.txt 
+      cat scan_list.txt
       subject01 20100628 tr070015 02 anat 09 func_1 
       subject02 20100701 ap100009 02 anat 09 func_1
 
 To start the importation, you just have to type:
 
-      python import_scans.py localizer_scans.txt
+      python import_scans.py scan_list.txt
 
 The scans should now reside in a directory 'raw_data'. You can check that with:
 
@@ -97,9 +97,12 @@ The scans should now reside in a directory 'raw_data'. You can check that with:
 
 ###### Preprocessing and first-level
 
-We are now going to use pypreprocess to run the preprocessing and the first level analysis in a single step. All the information resides in a configuration file, here *config.ini*. Read this file, then run:
+We are now going to use pypreprocess to run the preprocessing and the first level analysis in a single step. All the information resides in a configuration file, here *config.ini*. Read this file. The parameters are document on pypreprocess website. 
 
-      python preprocess_first_level.py config.ini
+
+Then, run:
+
+      python preprocess_and_1st_level.py config.ini
 
 
 If everything works well, reports have been create in html files which you can open, e.g., with firefox. 
