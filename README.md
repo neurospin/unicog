@@ -1,35 +1,35 @@
 # unicog
 
-### INSTALL THE UNICOG
+"unicog" is a set of tools (scripts, python modules, examples, ...)  to perform various tasks.  
 
-##### CLONE THE UNICOG GIT 
+The files are gathered in a git repository named "unicog" located on http://github.com
 
-unicog is a git repository located in the GITHUB server.
-In order to launch python scripts and copy them to create your
-own scripts, you have to clone the repository:
+### installation
 
-    #create a directory <my_repository>
-    mkdir <my_repository>
-    cd <my_repository>
+To install the tools, you first need to make a local copy on your computer, using the following command line:
+
     git clone https://github.com/neurospin/unicog.git
 
+This creates a folder 'unicog' which contains all the files:
 
-##### INSTALL THE UNICOG GIT
-The unicog git is also a python module (stored in a git repository) and in order to use it from python you have to 
-install it.
+    cd unicog
 
-    cd <my_repository>/unicog
+Then, to install the Python modules
+
     python setup.py install --user
     
-    
-##### UPDATE THE GIT REPOSITORY
-From time to time, update the repository.
-For doing so, use git pull and perform a new installation.
 
-    cd <my_repository>/unicog
+To check that everything is ok, try to load the unicogfmri 
+
+    python
+    import unicogfmri
+
+    
+### updating
+
+From time to time, to update you local copy of "unicog", got to the unicog folder and type:
+
     git pull
     python setup.py install --user
 
-Note : a new install is mandatory if you do a "git pull" or if you add
-new functions. But if you just use existing module or function, it won't
-need to do it.
+
