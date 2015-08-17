@@ -127,7 +127,7 @@ def first_level(subject_dic):
         fmri_glm.mask,
         threshold=2.3,
         cluster_th=15,
-        anat=anat_img.get_data(),
+        anat=anat_img,
         anat_affine=anat_img.get_affine(),
         design_matrices=design_matrix,
         subject_id="sub001",

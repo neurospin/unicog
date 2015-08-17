@@ -9,7 +9,8 @@ import glob
 from unicogfmri.utils_unicog.viewer import pyanatomist_viewer
 
 
-path_results = "/volatile/test_localizer/results"
+datadir = os.path.join(os.getenv('ROOTDIR'))
+path_results = os.path.join(datadir, "results")
 dic_maps = {}
 contrasts_of_interest = ['left-right', 'right-left',
                          'audio-video', 'video-audio']
