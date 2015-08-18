@@ -5,10 +5,10 @@ More information on [http://brainvisa.info/soma/soma-workflow/](http://brainvisa
 and [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow) 
 
 ### WHAT IS SOMA-WORKFLOW ?
-Soma-workflow is an interface for submission, control and monitoring of jobs and workflows on parallel computing resources.
+Soma-workflow is an interface for submission, control and monitoring of jobs on parallel computing resources.
 Here, we are going to describe the case where you want to use gabriel server, available
 at NeuroSpin.
-The parallel computing resource could be used your own computer by using all processors.
+One parallel computing resource could be your own computer by using all processors or a specific cluster like Gabriel at NeuroSpin.
 Jobs are launched in parallel and not one after the other.
 
 
@@ -170,17 +170,18 @@ Check the .bashrc with the following lines:
 
 And add the following lines:
 
-    bv_setup_devel
-    export PYTHONPATH=/i2bm/brainvisa/CentOS-5.3-x86_64/python-2.7.3/lib/python2.7:$PYTHONPATH
-    export PYTHONPATH=/i2bm/brainvisa/CentOS-5.3-x86_64/python-2.7.3/lib/python2.7/site-packages:$PYTHONPATH
-    export PATH=/i2bm/brainvisa/CentOS-5.3-x86_64/python-2.7.3/bin:$PATH
-    export LD_LIBRARY_PATH=/i2bm/brainvisa/CentOS-5.3-x86_64/python-2.7.3/lib:$LD_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/i2bm/brainvisa/CentOS-5.3-x86_64/pbs_drmaa-1.0.13/lib/:$LD_LIBRARY_PATH
-
+    export I2BM_OSID=CentOS-5.11-x86_64
+    
+    export PYTHONPATH=/i2bm/brainvisa/$I2BM_OSID/python-2.7.3/lib/python2.7:$PYTHONPATH
+    export PYTHONPATH=/i2bm/brainvisa/$I2BM_OSID/python-2.7.3/lib/python2.7/site-packages:$PYTHONPATH
+    export PATH=/i2bm/brainvisa/$I2BM_OSID/python-2.7.3/bin:$PATH
+    export LD_LIBRARY_PATH=/i2bm/brainvisa/$I2BM_OSID/python-2.7.3/lib:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/i2bm/brainvisa/$I2BM_OSID/pbs_drmaa-1.0.13/lib/:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib:${LD_LIBRARY_PATH}
-    build_dir=/neurospin/brainvisa/build/CentOS-5.3-x86_64/trunk
-    source $build_dir/bin/bv_env.sh $build_dir
-    export DRMAA_LIBRARY_PATH=/i2bm/brainvisa/CentOS-5.3-x86_64/pbs_drmaa-1.0.13/lib/libdrmaa.so
+    export DRMAA_LIBRARY_PATH=/i2bm/brainvisa/$I2BM_OSID/pbs_drmaa-1.0.13/lib/libdrmaa.so
+    
+    source /i2bm/brainvisa/$I2BM_OSID/brainvisa/bin/bv_env.sh /i2bm/brainvisa/$I2BM_OSID/brainvisa
+
 
 Additional step: launch Brainvisa just once:
 
