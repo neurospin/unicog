@@ -1,280 +1,12 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
 """
 Created on Fri Jul 31 09:12:50 2015
 
 @author: id983365
-
 """
 
-"""
-Event-related analysis
-
-TR
-
-INPUT / OUTPUT
-INPUT
-data :  raw data
-        beta
-        group level
-
-mask : roi
-       voxel
-
-onsets
-
-con
-
-OUTPUT
-
-average / sdt
-
-
-FUNCTIONS
-remove low frequence before
-analysis one condtion
-analysis grouping of conditions
-
-calculer les résidus
-
-ROI
-1) extraction of data into fmri data and compute the mean
-nscans * 1
-
-2) extraction beta values and compute the mean
-nscans * nb reg
-
-3) SPM.mat : extraction of SPM.xX.X
-nscans * nb reg
-
-4) compute the Y and Y
-case     Y = SPM.xX.X * beta;
-
-5) prepare the time axis
-
-6) prepare mean and sd
-for each run in runs
- for condition in conditions
-   test
-   mean : add the value
-   sdt : add the value
-
-
-Not yet implemented : Finterest
-Y = spm_FcUtil('Yc',SPM.xCon(Ic),SPM.xX.xKXs,beta);
-LIKE IN STANPLOT
-Finterest
-%%%% The argument Finterest (usually = 1) indicates which contrast in the SPM model
-%%%% refers to the F test of real interest. This F test usually has ones in columns for all
-%%%% variables of interest, and zero everywhere else, e.g. for movement
-%%%% regressors whose effects on the data must be subtracted out.
-%%%% Specify zero (0) if you have no contrast of interest. However, note
-%%%% that your plot may not be as nice as it could be (for instance, the
-%%%% effects of movement might be regressed out in the SPM stats, but not
-%%%% in your plot).
-
-TO CHECK
-
-bcov : to see
-
-FIR
-
-
-Reunion 28/07 
-
-Conversion du stanplot
-
-Input
-
-
-Output
-
-
-
-single subj
-groupe
-multigroup : comparaison groupes
-
-pb avec stanplot pour definr les groupes
-
-CAS single subj
-
-timeS : y
-cond / onset
--> selective avering ou FIR
-
-donc reucp Y ou y
-
-raw signal
-rawsignal avec var nuisance enlevés
-Y provenant du model FIT
-
--> implementaiton
-y = get_raw_data(funcfiles, ROI) -> cas du voxel à traiter
-(recréer une roi à partir d'une coord)
-y2 = remove_nuissance_variables
-onstes, conds = read_onset_onset_files (csv)
-plot_fir(y, conds, onsets)
-plot_avg(y, conds, onsets)
-
-get_model_fit(SPM_mat ou autres valeurs contenant )
-
-input
-
-output
-
-X : XiBi + xnBn + con 
-XnBn -> varaibles nuisance
-
-
-Attention affine qd extraction ROIs
-
-B  si plusieurs sessions > moyenne
-
-
-Comparaison des .dat
-
-
-Modules nistat
-nilearn : good
-nipy : premier prjet à la dérive
-nistat : new projet
-
-
-Même ROIs pour tous les sujets
-mais on peut faire l'instersection avec un masque du sujet
--> frederinko
-liste sujet
-liste locai
-liste scans (betas ou con)
-col roi, col suj, col signal(beta)
-input ; localiser : intersction localizer/ roi
-
-localizer puet etre un carte par ex de SPM_T
-SPMT con, -> seuill SPm_T à 10-3 par ex, 3.2
-intersection SPMt
-defaut sjt avec bcp de voxles et d'autres non
-etendu des activation sensibles aux seuils
--> donc pas bonne idee de choisi un seuil commun pour tous les sujets
-autre methodes :
-nvoxels (mm pour tous les sujets) les plus activées = p% de voxels activées env 20-25 %
-si plus grosse ROI, % plus bas
-
-code Christophe
--> cf code niftimasker ghtiutb nilearnissu
-v1 : 1iere methode
-v2 = seuil fix pour localizer
-v3 = methode avec %
-
-nop nifitmaps masker : serie images binaires
-
-git -> code de christophe
-
-qd  groupe
-
-stanplot que methode 1, ajout possibilté des methodes 2 et 3
-
-renomer les noms des methodes
-get raw_data utilisr le code christophe
-
-
-variables de nuissance
-voir nilearn, nibabel sous forme de fichier txt, 
-mm log que timeseries
-et voir aussi filtrage temporel
-
-
-comparaison de donner : simuler les données
-generer + ajout bruit
-
-
-read onset fmri -> martin
-
-
-groupement des conditions
-si grpmt et mis a zero -> part dans la baseline
-
-SOA 4 secondes = pics tous les 4 secondes
--> mélanges de conditions
--> FIR régression linéaire, contribution des différentes conditions
-
-FIR enlever l'effet de tous si on les mets tous ! [1 1 1 1 1] dans 
-le groupVar
-
-Utiliser nifitmasker qui vérifie l'affine
-
-Correction : passer les params de realignements à la fonction
-reader nibabel ou nilearn -> variables de nuisances
-
-spm_filter reader nilearn -> see the cutoff
-
--- 
-Bcp de basses fréquences 
-SPM : cutoff à 128 par défaut
-sin et cos de basse fréquence, 128s puis 2 fois, puis 4 fois 
-puis regarder les résidus
-
---
-pb autour de 0 -> baseline ?
-Baseline utile mais pas forcée
-
---
-Grp => cond, onsets
-plot_fmri
-noms des conditions, pas de labels avec des chiffres
-
-
-manip pour merge les conditions
-plot_fmri
-plot_avg
-
-d1 = dict(cd1=onset, cd2=onset)
-d2=["new"] = d1[cond] + d2[cond2]
-
-Localizer peut être 1 contraste de la manip principale,
-données 1 session et utiliser sur les autres sessions. 
- 
-SUMMARY :
-
-COMPARAISON OF:
-pour un single subj | pour un groupe | multigroup : comparaison groupes
-
-
-INPUT :
-Input_1 : signal, can be
- raw signal | rawsignal avec var nuisance enlevés | Y provenant du model FIT
-Input_2 : rois
-
-
-
-timeS : y
-cond / onset
--> selective avering ou FIR
-
-donc reucp Y ou y
-
-
-A VOIR:
-
-Quand utilisation de 'c04':3 :
-  File "/home/id983365/.local/lib/python2.7/site-packages/nitime/timeseries.py", line 977, in __getitem__
-    return self.data[key]  # time is the last dimension
-IndexError: index 177 is out of bounds for axis 1 with size 177
-
-NiftiMasker
-
-
-SCRIPT TO SHOW 
-
-INPUT
-
-OUTPUT :
-evented related plot for unfiltered fmri signal.
-
-
-
-"""
 # GENERIC MODULES
+from __future__ import division
 from glob import glob
 import os
 import os.path as op
@@ -285,7 +17,6 @@ import pandas as pd
 
 # SPECIFIC MODULES
 import nibabel
-
 from nitime import timeseries
 from nitime import analysis
 from nitime import viz
@@ -294,20 +25,14 @@ from nitime import viz
 import utils_rois
 
 
-
 ########################
 # SET THE PATHS
 ########################
-rootdir = ("/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/"
-           "test_data_antonio")
-os.environ['ROOTDIR'] = rootdir
-
-
 # GET THE DATADIR
 # datadir = utils_rois.get_rootdir()
-# OR
-datadir = os.path.join(os.getenv('ROOTDIR'))
 
+# OR
+datadir = os.getenv('ROOTDIR')
 save_analysis = op.join(datadir, "times_series_analysis")     
             
 ########################
@@ -340,8 +65,6 @@ list_subjs = ['AB130058']
 path_onsets = op.join(datadir, 'AB130058', 'onsets/ab130058_cLSF1_bis.dat')
 # conditions = {'T0':0, 'c01':1, 'c02':2, 'c04':3, 'c08':4, 'cM':5} #dic of conditions
 conditions = {'c01':1, 'c02':2, 'c04':3, 'c08':4} #dic of conditions
-# conditions = {'c08':4}
-# conditions = {'c01':1, 'c02':2, 'c08':4}
 
 ########################
 # PARAMS FOR THE ANALYZE
@@ -396,7 +119,7 @@ for r in list_rois :
             else:
                 ax = figure.get_axes()[0]
             
-            #need to divide by the _conversion_factor attribute added by nitime
+            # need to divide by the _conversion_factor attribute added by nitime
             time = np.array(analyzer.eta.time) / analyzer.eta.time._conversion_factor
             ax.xaxis.set_ticks(time)
             
@@ -417,7 +140,7 @@ for r in list_rois :
                 facecolor=plot_color.get_color())
             #ax.errorbar(time, analyzer.eta.data, yerr=error, linestyle="None", marker="None")
 
-            #add means  # could be used    
+            #add means  
 #            mean = np.mean(analyzer.eta.data)
 #            xlim = ax.get_xlim()
 #            ax.plot([xlim[0], xlim[1]], [mean, mean], plot_color.get_color())
@@ -437,12 +160,11 @@ for r in list_rois :
                                              'time', 
                                              'average',
                                              'standart_deviation'])
-                  
             df_to_save = df_to_save.append(df)
 
                               
-        # All plot are displayed
-        # Now add the title
+        # All plot are now displayed
+        # So, add the title
         conditions_name = ', '.join([key for key in conditions.iterkeys()])
         title = 'Plot of {s}, for {roi} and the {conditions_name}'.format(s=s, roi=r, conditions_name=conditions_name)
         figure.suptitle(title)      
