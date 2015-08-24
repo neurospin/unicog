@@ -24,8 +24,18 @@ from nitime import viz
 
 
 
+##################
+### MAIN FUCNTIONS
+##################
 
-### ADD THE ROOT DIR
+def get_rootdir():
+    rootdir = os.getenv('ROOTDIR')
+    if rootdir is None:
+        rootdir = rootdir
+    if not rootdir:
+        print "no rootdir initialized"
+    return rootdir
+
 
 ### Coming from get_data_from_rois #####################################
 """
@@ -129,13 +139,18 @@ def create_localizer_mask(roi_img, localizer_img, loc_threshold):
     locmask = binarize_img(localizer_img, loc_threshold)
     return intersect_masks((roi_img, locmask), threshold=1)
 
-### Three methods to extract data from ROIs
 
-def get_data_in_roi(roi, data):
-    #voxel values in temporal series    
-    values = []     
-    pass
-    #return values
+
+###################################
+# METHODS TO EXTRACT DATA FROM ROIs
+###################################
+
+def get_data_in_roi(path_roi, data_file):
+    """Using of the NiftiMapsMasker """
+    masker = NiftiMapsMasker([path_roi])
+    nifti_obj = nibabel.load(data_file)
+    data = masker.fit_transform(nifti_obj)
+    return data
     
 
 def get_data_in_rois_method1(ROIs, subjects, contrasts, condir):
@@ -254,8 +269,7 @@ def analyze_average(data, onsets,
                  offset = -2, 
                  y_label = "Bold signal",
                  time_unit = 's'):
-    
-    
+
     # Times series initialization
     ts = timeseries.TimeSeries(data,
                                sampling_interval=sampling_interval, 
@@ -263,9 +277,7 @@ def analyze_average(data, onsets,
     
     
     # Events initialization
-    print onsets
-    events = timeseries.Events(onsets, time_unit = 's')
-    
+    events = timeseries.Events(onsets, time_unit = time_unit)
     
     # Timeseries analysis 
     #len_et = numbre of TR what you want to see
@@ -275,56 +287,7 @@ def analyze_average(data, onsets,
     return analyzer
     
     
-def save_data_time_analysis(path_file, time, condition, label, values_avg, values_se):  
-    """
-    Write a csv to save the data of a time_series_analysis     
-    
-    Example of file:
-    #header1 : Name Subject - Name Condition - Name of ROI - Methode (Avg/FIR) 
-    Avg_value Se_Value Timepoint 
-    """
-    
-#    with open(path_file, 'wb') as outcsv:
-        #writer = csv.DictWriter(outcsv, delimiter='\t', fieldnames = [header])   
-#        writer = csv.DictWriter(outcsv, delimiter='\t', \
-#                                fieldnames = \
-#                                ['Condition', 'Label', "Avg_value", "Se_value", "Time_point"])
-#        writer.writeheader()
 
-    with open(path_file, 'w') as csv_file:
-        #reader = csv.reader(incsv)
-        writer = csv.writer(csv_file, delimiter='\t', \
-                                fieldnames = \
-                                ['Condition', 'Label', "Avg_value", "Se_value", "Time_point"])
-
-        #writer = csv.writer(csv_file)
-        writer.writeheader()
-        for i, val in enumerate(time):
-            print i
-            print time
-            writer.writerows(
-                {'Condition': condition,
-                'Label': label,
-                'Avg_value': values_avg[i], 
-                'Se_value' : values_se[i], 
-                'Time_point': time[i] })
-            print condition
-            print label
-            print values_avg[i]
-            print values_se[i]
-            print time[i]
-#            writer.writerows((
-#                condition,
-#                label,
-#                values_avg[i], 
-#                values_se[i], 
-#                time[i]))
-
-
-#    with open(path, "wb") as csv_file:
-#        writer = csv.writer(csv_file, delimiter=',')
-#        for line in data:
-#            writer.writerow(line)
 
 ##############
 
