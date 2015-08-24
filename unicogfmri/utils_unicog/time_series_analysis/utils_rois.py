@@ -24,8 +24,18 @@ from nitime import viz
 
 
 
+##################
+### MAIN FUCNTIONS
+##################
 
-### ADD THE ROOT DIR
+def get_rootdir():
+    rootdir = os.getenv('ROOTDIR')
+    if rootdir is None:
+        rootdir = rootdir
+    if not rootdir:
+        print "no rootdir initialized"
+    return rootdir
+
 
 ### Coming from get_data_from_rois #####################################
 """
@@ -129,13 +139,18 @@ def create_localizer_mask(roi_img, localizer_img, loc_threshold):
     locmask = binarize_img(localizer_img, loc_threshold)
     return intersect_masks((roi_img, locmask), threshold=1)
 
-### Three methods to extract data from ROIs
 
-def get_data_in_roi(roi, data):
-    #voxel values in temporal series    
-    values = []     
-    pass
-    #return values
+
+###################################
+# METHODS TO EXTRACT DATA FROM ROIs
+###################################
+
+def get_data_in_roi(path_roi, data_file):
+    """Using of the NiftiMapsMasker """
+    masker = NiftiMapsMasker([path_roi])
+    nifti_obj = nibabel.load(data_file[0])
+    data = masker.fit_transform(nifti_obj)
+    return data
     
 
 def get_data_in_rois_method1(ROIs, subjects, contrasts, condir):
@@ -264,7 +279,7 @@ def analyze_average(data, onsets,
     
     # Events initialization
     print onsets
-    events = timeseries.Events(onsets, time_unit = 's')
+    events = timeseries.Events(onsets, time_unit = time_unit)
     
     
     # Timeseries analysis 
