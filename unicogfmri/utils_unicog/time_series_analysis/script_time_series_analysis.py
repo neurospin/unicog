@@ -308,7 +308,7 @@ os.environ['ROOTDIR'] = rootdir
 #OR
 datadir = os.path.join(os.getenv('ROOTDIR'))
 
-save_analysis =  op.join(datadir, "times_series_analysis")     
+save_analysis = op.join(datadir, "times_series_analysis")     
             
 ########################
 # ROI(s) ANALYSIS
@@ -359,8 +359,11 @@ time_unit = 's'
 for r in list_rois :
     for s in list_subjs : 
         #Pattern to fetch data for each subj
-        data_file = glob(datadir + "/" + s + "/fMRI/acquisition1/"
-                                + "swaclsf1*.nii" )        
+        data_file = glob(datadir 
+                        + "/" 
+                        + s 
+                        + "/fMRI/acquisition1/"
+                        + "swaclsf1*.nii" )        
 
         #Many methods to extract data are available in utils_roi
         #Here using of NiftiMapsMasker
@@ -371,11 +374,7 @@ for r in list_rois :
         #data = data_filtered(data)
       
         #INTIALIZATION
-        et = []
         means = []
-#        list_data_avg = []
-#        list_data_se = []
-        list_cd = []
         figure = plt.figure()
      
         #SAVE THE VALUES INTO DATAFRAME
@@ -391,17 +390,15 @@ for r in list_rois :
             onsets = utils_rois.get_onsets(path_onsets, label)
 
             #methods available to plot data using ntime module
-            analyzer = utils_rois.analyze_average(data.ravel(), onsets, 
-                                       sampling_interval, 
-                                       time_unit = time_unit)
-#            print analyzer.eta
-            et.append(analyzer.eta) 
+            analyzer = utils_rois.analyze_average(
+                                    data.ravel(), 
+                                    onsets, 
+                                    sampling_interval, 
+                                    time_unit = time_unit)
+
             data_to_plot = (analyzer.eta.data)
 
-            list_cd.append(name_cond)
-#            list_data_avg.append = []
-#            list_data_se.append = []
-#            
+
             
             #fig02 = viz.plot_tseries(analyzer.FIR, ylabel='BOLD (% signal change)')            
             
@@ -436,13 +433,14 @@ for r in list_rois :
                     marker='+',
                     xdata= time
                     )
-            for_color = curve[0]
+            curve_color = curve[0]
             #add sd
         
             y = analyzer.eta.data
             error = analyzer.ets.data
             ax.fill_between(time, y-error, y+error,
-                alpha=0.03, edgecolor='#CC4F1B', facecolor=for_color.get_color())
+                alpha=0.03, edgecolor='#CC4F1B', 
+                facecolor=curve_color.get_color())
             #ax.errorbar(time, analyzer.eta.data, yerr=error, linestyle="None", marker="None")
 
         
@@ -464,10 +462,8 @@ for r in list_rois :
                                              'standart_deviation'])
                   
             df_to_save = df_to_save.append(df)
-            print df_to_save
 
-            
-            
+          
 #            utils_rois.save_data_time_analysis(file_csv, 
 #                                           time, 
 #                                           name_cond,
@@ -535,9 +531,14 @@ for r in list_rois :
         #matplotlib.pyplot.imsave
         conditions_name = '_'.join([key for key in conditions.iterkeys()])   
         file_name = '{s}_{roi}_{conditions_name}.png'.format(s=s, roi=r, conditions_name=conditions_name)
-        #print op.join(save_analysis, file_png)        
-        figure.savefig(op.join(save_analysis, '{file_name}.png'.format(file_name=file_name)))
-        df_to_save.to_csv((op.join(save_analysis, '{file_name}.csv'.format(file_name=file_name))))
+
+        save_analysis_file = op.join(save_analysis, '{file_name}.png'.format(file_name=file_name))
+        figure.savefig(save_analysis_file)
+        print "\nView the plots in {file_name}".format(file_name=save_analysis_file)        
+        
+        df_to_save_file = op.join(save_analysis, '{file_name}.csv'.format(file_name=file_name))
+        df_to_save.to_csv(df_to_save_file)
+        print "\nView the results in the dataframe located in {file_name}".format(file_name=df_to_save_file)
         plt.show() 
     
 
@@ -546,6 +547,7 @@ for r in list_rois :
         
 # save the figure to file
 plt.close(figure)    # close the figure
+
 
 #SAVE in pdf     
 #from matplotlib.backends.backend_pdf import PdfPages
