@@ -148,7 +148,7 @@ def create_localizer_mask(roi_img, localizer_img, loc_threshold):
 def get_data_in_roi(path_roi, data_file):
     """Using of the NiftiMapsMasker """
     masker = NiftiMapsMasker([path_roi])
-    nifti_obj = nibabel.load(data_file[0])
+    nifti_obj = nibabel.load(data_file)
     data = masker.fit_transform(nifti_obj)
     return data
     

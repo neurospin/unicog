@@ -274,7 +274,7 @@ evented related plot for unfiltered fmri signal.
 
 
 """
-#GENERIC MODULES
+# GENERIC MODULES
 from glob import glob
 import os
 import os.path as op
@@ -283,14 +283,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 
-#SPECIFIC MODULES
+# SPECIFIC MODULES
 import nibabel
 
 from nitime import timeseries
 from nitime import analysis
 from nitime import viz
 
-#UNICOG MODULES
+# UNICOG MODULES
 import utils_rois
 
 
@@ -303,9 +303,9 @@ rootdir = ("/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/"
 os.environ['ROOTDIR'] = rootdir
 
 
-#GET THE DATADIR
-#datadir = utils_rois.get_rootdir()
-#OR
+# GET THE DATADIR
+# datadir = utils_rois.get_rootdir()
+# OR
 datadir = os.path.join(os.getenv('ROOTDIR'))
 
 save_analysis = op.join(datadir, "times_series_analysis")     
@@ -313,12 +313,12 @@ save_analysis = op.join(datadir, "times_series_analysis")
 ########################
 # ROI(s) ANALYSIS
 ########################
-#CAS VOXEL COORDINATES 
-#if rois are voxels coordinates in MNI, convert them into volume
-#list_coord = []
-#list_rois = utils_roi.get_volume_from_coord(list_coord, path_rois)
+# CAS VOXEL COORDINATES 
+# if rois are voxels coordinates in MNI, convert them into volume
+# list_coord = []
+# list_rois = utils_roi.get_volume_from_coord(list_coord, path_rois)
 
-#CAS ROI NAMES
+#C AS ROI NAMES
 path_rois = op.join(datadir, "ROIs_analyses")
 list_rois = ['pSTS_Pallier_2011.nii']
 
@@ -338,46 +338,46 @@ list_subjs = ['AB130058']
 # 3 = c04
 # 4 = c08 (phrases de 8 signes)
 ########################
-#here read the onset from a .dat file
+# Here read the onset from a .dat file
 path_onsets = op.join(datadir, 'AB130058', 'onsets/ab130058_cLSF1_bis.dat')
-#conditions = {'T0':0, 'c01':1, 'c02':2, 'c04':3, 'c08':4, 'cM':5} #dic of conditions
+# conditions = {'T0':0, 'c01':1, 'c02':2, 'c04':3, 'c08':4, 'cM':5} #dic of conditions
 conditions = {'c01':1, 'c02':2, 'c04':3, 'c08':4} #dic of conditions
-#conditions = {'c08':4}
-#conditions = {'c01':1, 'c02':2, 'c08':4}
+# conditions = {'c08':4}
+# conditions = {'c01':1, 'c02':2, 'c08':4}
 
 
 ########################
 # PARAMS FOR THE ANALYZE
 ########################
-#sampling_interval = TR value
+# sampling_interval = TR value
 sampling_interval = 2.4
 time_unit = 's'
 
 
 
-#SUBJECT LEVEL ANALYSIS
+# SUBJECT LEVEL ANALYSIS
 for r in list_rois :
     for s in list_subjs : 
-        #Pattern to fetch data for each subj
+        # Pattern to fetch data for each subj
         data_file = glob(datadir 
                         + "/" 
                         + s 
                         + "/fMRI/acquisition1/"
                         + "swaclsf1*.nii" )        
 
-        #Many methods to extract data are available in utils_roi
-        #Here using of NiftiMapsMasker
+        # Many methods to extract data are available in utils_roi
+        # Here using of NiftiMapsMasker
         path_roi = op.join(path_rois, r)
         data = utils_rois.get_data_in_roi(path_roi, data_file[0]) 
 
-        #Filtered data ...
+        # Filtered data ...
         #data = data_filtered(data)
       
-        #INTIALIZATION
+        # INTIALIZATION
         means = []
         figure = plt.figure()
      
-        #SAVE THE VALUES INTO DATAFRAME
+        # SAVE THE VALUES INTO DATAFRAME
         columns = ['condition_name', 
                    'condition_label', 
                    'time', 
@@ -386,47 +386,28 @@ for r in list_rois :
         df_to_save = pd.DataFrame(columns=columns)
         
         for name_cond, label in conditions.iteritems():
-            #get the onsets for one condition
+            # get the onsets for one condition
             onsets = utils_rois.get_onsets(path_onsets, label)
 
-            #methods available to plot data using ntime module
+            # methods available to plot data using ntime module
             analyzer = utils_rois.analyze_average(
                                     data.ravel(), 
                                     onsets, 
                                     sampling_interval, 
-                                    time_unit = time_unit)
-
-            data_to_plot = (analyzer.eta.data)
-
-
+                                    time_unit = time_unit)       
             
-            #fig02 = viz.plot_tseries(analyzer.FIR, ylabel='BOLD (% signal change)')            
-            
-            means.append(np.mean(data))
-#            figure = viz.plot_tseries(
-#                timeseries.TimeSeries(analyzer.eta, sampling_rate=sampling_interval, 
-#                time_unit='s'), fig = figure, label=name_cond) 
-#            figure = viz.plot_tseries(
-#                timeseries.TimeSeries(analyzer.eta, 
-#                                      sampling_rate=sampling_interval,
-#                                      #time = analyzer.eta.time, 
-#                                      time_unit = 's'), 
-#                                      fig = figure, 
-#                                      label=name_cond, 
-#                                      linewidth=0.2, 
-#                                      marker='+',
-#                                      xdata= analyzer.eta.time
-#                                      )
+            means.append(np.mean(analyzer.eta.data))         # could be used
+
             if not figure.get_axes():
                 ax = figure.add_subplot(1, 1, 1)
             else:
                 ax = figure.get_axes()[0]
-#            #ax = figure.add_subplot()
             
             #need to divide by the _conversion_factor attribute added by nitime
             time = np.array(analyzer.eta.time) / analyzer.eta.time._conversion_factor
-
             ax.xaxis.set_ticks(time)
+            
+            # plot the data
             curve = ax.plot(time, analyzer.eta.data,
                     label=str(label) + ' : ' + name_cond, 
                     linewidth=0.2, 
@@ -485,16 +466,12 @@ for r in list_rois :
 #            print c
 #            list_data.append(et[i].data)
 
-#        data_to_plot=np.vstack(list_data)
-#        print data_to_plot
         
         #Plot the data
 #        figure = viz.plot_tseries(
 ##        timeseries.TimeSeries(data=np.vstack([et[3].data, et[4].data]),
 ##                  sampling_rate=et[3].sampling_rate, time_unit='s'))
-#        timeseries.TimeSeries(data_to_plot,
-#                              sampling_rate=sampling_interval, 
-#                                time_unit='s'), axis = '-4.8' )
+
    
 #        figure = plt.figure()
 #        for plot in list_data:
