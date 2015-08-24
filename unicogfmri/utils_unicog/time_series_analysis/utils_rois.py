@@ -269,8 +269,7 @@ def analyze_average(data, onsets,
                  offset = -2, 
                  y_label = "Bold signal",
                  time_unit = 's'):
-    
-    
+
     # Times series initialization
     ts = timeseries.TimeSeries(data,
                                sampling_interval=sampling_interval, 
@@ -278,9 +277,7 @@ def analyze_average(data, onsets,
     
     
     # Events initialization
-    print onsets
     events = timeseries.Events(onsets, time_unit = time_unit)
-    
     
     # Timeseries analysis 
     #len_et = numbre of TR what you want to see
@@ -290,56 +287,7 @@ def analyze_average(data, onsets,
     return analyzer
     
     
-def save_data_time_analysis(path_file, time, condition, label, values_avg, values_se):  
-    """
-    Write a csv to save the data of a time_series_analysis     
-    
-    Example of file:
-    #header1 : Name Subject - Name Condition - Name of ROI - Methode (Avg/FIR) 
-    Avg_value Se_Value Timepoint 
-    """
-    
-#    with open(path_file, 'wb') as outcsv:
-        #writer = csv.DictWriter(outcsv, delimiter='\t', fieldnames = [header])   
-#        writer = csv.DictWriter(outcsv, delimiter='\t', \
-#                                fieldnames = \
-#                                ['Condition', 'Label', "Avg_value", "Se_value", "Time_point"])
-#        writer.writeheader()
 
-    with open(path_file, 'w') as csv_file:
-        #reader = csv.reader(incsv)
-        writer = csv.writer(csv_file, delimiter='\t', \
-                                fieldnames = \
-                                ['Condition', 'Label', "Avg_value", "Se_value", "Time_point"])
-
-        #writer = csv.writer(csv_file)
-        writer.writeheader()
-        for i, val in enumerate(time):
-            print i
-            print time
-            writer.writerows(
-                {'Condition': condition,
-                'Label': label,
-                'Avg_value': values_avg[i], 
-                'Se_value' : values_se[i], 
-                'Time_point': time[i] })
-            print condition
-            print label
-            print values_avg[i]
-            print values_se[i]
-            print time[i]
-#            writer.writerows((
-#                condition,
-#                label,
-#                values_avg[i], 
-#                values_se[i], 
-#                time[i]))
-
-
-#    with open(path, "wb") as csv_file:
-#        writer = csv.writer(csv_file, delimiter=',')
-#        for line in data:
-#            writer.writerow(line)
 
 ##############
 

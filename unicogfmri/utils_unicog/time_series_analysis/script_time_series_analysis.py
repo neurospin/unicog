@@ -318,16 +318,14 @@ save_analysis = op.join(datadir, "times_series_analysis")
 # list_coord = []
 # list_rois = utils_roi.get_volume_from_coord(list_coord, path_rois)
 
-#C AS ROI NAMES
+# CAS ROI NAMES
 path_rois = op.join(datadir, "ROIs_analyses")
 list_rois = ['pSTS_Pallier_2011.nii']
-
 
 ########################
 # SUBJECT(s) SELECTION
 ########################
 list_subjs = ['AB130058']
-
 
 ########################
 # CONDITION(s) SELECTION
@@ -345,15 +343,12 @@ conditions = {'c01':1, 'c02':2, 'c04':3, 'c08':4} #dic of conditions
 # conditions = {'c08':4}
 # conditions = {'c01':1, 'c02':2, 'c08':4}
 
-
 ########################
 # PARAMS FOR THE ANALYZE
 ########################
 # sampling_interval = TR value
 sampling_interval = 2.4
 time_unit = 's'
-
-
 
 # SUBJECT LEVEL ANALYSIS
 for r in list_rois :
@@ -373,11 +368,11 @@ for r in list_rois :
         # Filtered data ...
         #data = data_filtered(data)
       
-        # INTIALIZATION
+        # Initialization
         means = []
         figure = plt.figure()
      
-        # SAVE THE VALUES INTO DATAFRAME
+        # Create the dataframe
         columns = ['condition_name', 
                    'condition_label', 
                    'time', 
@@ -396,8 +391,6 @@ for r in list_rois :
                                     sampling_interval, 
                                     time_unit = time_unit)       
             
-            means.append(np.mean(analyzer.eta.data))         # could be used
-
             if not figure.get_axes():
                 ax = figure.add_subplot(1, 1, 1)
             else:
@@ -408,29 +401,32 @@ for r in list_rois :
             ax.xaxis.set_ticks(time)
             
             # plot the data
-            curve = ax.plot(time, analyzer.eta.data,
+            plot = ax.plot(time, analyzer.eta.data,
                     label=str(label) + ' : ' + name_cond, 
                     linewidth=0.2, 
                     marker='+',
                     xdata= time
                     )
-            curve_color = curve[0]
-            #add sd
-        
+            plot_color = plot[0]
+            
+            #add sd              
             y = analyzer.eta.data
             error = analyzer.ets.data
             ax.fill_between(time, y-error, y+error,
                 alpha=0.03, edgecolor='#CC4F1B', 
-                facecolor=curve_color.get_color())
+                facecolor=plot_color.get_color())
             #ax.errorbar(time, analyzer.eta.data, yerr=error, linestyle="None", marker="None")
 
+            #add means  # could be used    
+#            mean = np.mean(analyzer.eta.data)
+#            xlim = ax.get_xlim()
+#            ax.plot([xlim[0], xlim[1]], [mean, mean], plot_color.get_color())
         
-        
+            # display the legend of the plot
             curve = figure.axes[0]
-#            curve.axis([-2, 6, 681,688])
             curve.legend()
             
-            #SAVE IN DATA_FRAME
+            # save in dataframe
             to_save ={'condition_name': [name_cond for i in range(len(time))],
                     'condition_label': [label for i in range(len(time))],
                     'time': time.tolist(),
@@ -444,68 +440,15 @@ for r in list_rois :
                   
             df_to_save = df_to_save.append(df)
 
-          
-#            utils_rois.save_data_time_analysis(file_csv, 
-#                                           time, 
-#                                           name_cond,
-#                                           label,
-#                                           analyzer.eta.data, 
-#                                           analyzer.ets.data)
-       
-            
-            
-        #plot the results: all condition for the same subj, the same rois
-        #legend 
-            
-        #figure = viz.plot_tseries(analyzer.eta, ylabel='Bold signal', time_unit='s')       
-
-        #select the condition for the display
-#        list_data = []
-#        for i, c in conditions.iteritems():
-#            print i
-#            print c
-#            list_data.append(et[i].data)
-
-        
-        #Plot the data
-#        figure = viz.plot_tseries(
-##        timeseries.TimeSeries(data=np.vstack([et[3].data, et[4].data]),
-##                  sampling_rate=et[3].sampling_rate, time_unit='s'))
-
-   
-#        figure = plt.figure()
-#        for plot in list_data:
-#            figure = viz.plot_tseries(
-#               timeseries.TimeSeries(plot, sampling_rate=sampling_interval, 
-#                time_unit='s'), fig = figure, label='toto')  
-#            curve = figure.axes[0]
-#            curve.legend()
-                                    
-                                
-                                
-        #figure = viz.plot_tseries(timeseries.TimeSeries(data=np.vstack([et[0].data, et[1].data])), ylabel='Bold signal', time_unit='s')
-#        print type(figure)
-        ax = figure.get_axes()[0]
-        xlim = ax.get_xlim()
-        
-        #add title
+                              
+        # All plot are displayed
+        # Now add the title
         conditions_name = ', '.join([key for key in conditions.iterkeys()])
-#        print conditions_name
         title = 'Plot of {s}, for {roi} and the {conditions_name}'.format(s=s, roi=r, conditions_name=conditions_name)
         figure.suptitle(title)      
         
-        #add legend
-        xlim = ax.get_xlim()
-#        print xlim
-        
-        #ax.plot([xlim[0], xlim[1]], [means[0], means[0]], 'b--')
-        #ax.plot([xlim[0], xlim[1]], [means[1], means[1]], 'g--')
-#        print figure.axes        
-#        for subplot in figure.axes :
-#            print subplot
-
-        #SAVE THE PLOTS
-        #matplotlib.pyplot.imsave
+        # Save the plots and values
+        print "\n### RESULTS"
         conditions_name = '_'.join([key for key in conditions.iterkeys()])   
         file_name = '{s}_{roi}_{conditions_name}.png'.format(s=s, roi=r, conditions_name=conditions_name)
 
@@ -518,23 +461,8 @@ for r in list_rois :
         print "\nView the results in the dataframe located in {file_name}".format(file_name=df_to_save_file)
         plt.show() 
     
-
-
-
-        
-# save the figure to file
-plt.close(figure)    # close the figure
-
-
-#SAVE in pdf     
-#from matplotlib.backends.backend_pdf import PdfPages
-#pp = PdfPages('multipage.pdf')
-#You can give the PdfPages object to savefig(), but you have to specify the format:
-#plt.savefig(pp, format='pdf')
-#An easier way is to call PdfPages.savefig:
-#pp.savefig()
-#Finally, the multipage pdf object has to be closed:
-#pp.close()
+        # Close the plots
+        plt.close(figure)
 
 
         
