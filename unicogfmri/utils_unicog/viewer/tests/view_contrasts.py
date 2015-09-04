@@ -9,7 +9,7 @@ In order to change the template, use the template_file option in fusion2D_map_ac
 
 1- Configure paths
 2- Select activation maps
-3- call the fusion2D_map_activation
+3- Call the fusion2D_map_activation
 
 
 In this example, we select a dictionary of contrasts across many subjects.
@@ -20,10 +20,10 @@ and add a loop too.
 
 """
 
-
-from unicogfmri.utils_unicog.viewer import pyanatomist_viewer
 import glob
 import os
+
+from unicogfmri.utils_unicog.viewer import pyanatomist_viewer
 
 ######  Parameters to change ###############################################
 
@@ -32,10 +32,10 @@ dic_maps = {}
 contrasts_of_interest = ['left-right', 'right-left',
                          'audio-video', 'video-audio']
 ############################################################################
-#Basic using
+# Basic using
 
 
-##glob files and add them to the dictionary
+## glob files and add them to the dictionary
 for c in contrasts_of_interest:
     #describe here your own pattern
     glob_files = glob.glob((path_results + "/*/" + '/res_stats/t_maps/*'
@@ -47,7 +47,7 @@ for c in contrasts_of_interest:
             #add in the dic {'name_fusion': file_name}
             dic_maps[name_fusion] = file_name
 
-#print dic_maps
-#call the function to display maps with the dictionary
+# print dic_maps
+# call the function to display maps with the dictionary
 pyanatomist_viewer.fusion2D_map_activation(dic_maps)
 

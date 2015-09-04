@@ -5,7 +5,6 @@ Created on Mon Jan 20 10:23:46 2014
 @author: id983365
 """
 
-# -*- coding: utf-8 -*-
 import sys
 import warnings
 import os
@@ -16,7 +15,9 @@ import glob
 try:
     from PyQt4 import QtGui, QtCore
 except:
-    warnings.warn('Qt not installed: the mdodule may not work properly, \
+    
+    
+#    warnings.warn('Qt not installed: the mdodule may not work properly, \
                    please investigate')
 
 # Anatomist

@@ -140,7 +140,7 @@ Server configuration of **.soma-workflow.cfg**:
     ENGINE_LOG_FORMAT = %(asctime)s => %(module)s line %(lineno)s: %(message)s %(threadName)s
     ENGINE_LOG_LEVEL  = ERROR
     PATH_TRANSLATION_FILES = brainvisa{/home/your_logging/.brainvisa/soma-workflow.translation}
-    MAX_JOB_IN_QUEUE = {15} run32{15} Global_long{10}
+    MAX_JOB_IN_QUEUE = {5} run32{5} Global_long{5}
 
 
 Create the following directories, if needed:
