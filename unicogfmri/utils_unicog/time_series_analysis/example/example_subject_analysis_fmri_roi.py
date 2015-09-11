@@ -16,23 +16,25 @@ import numpy as np
 import pandas as pd
 
 # SPECIFIC MODULES
+from nilearn.masking import apply_mask
 import nibabel
 from nitime import timeseries
 from nitime import analysis
 from nitime import viz
 
 # UNICOG MODULES
-import utils_rois
+from unicogfmri.utils_unicog.utils import utils
 
 
 ########################
 # SET THE PATHS
 ########################
 # GET THE DATADIR
-# datadir = utils_rois.get_rootdir()
+# datadir = utils.get_rootdir()
 
 # OR
 datadir = os.getenv('ROOTDIR')
+datadir = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio'
 save_analysis = op.join(datadir, "times_series_analysis")     
             
 ########################
@@ -41,11 +43,14 @@ save_analysis = op.join(datadir, "times_series_analysis")
 # CAS VOXEL COORDINATES 
 # if rois are voxels coordinates in MNI, convert them into volume
 # list_coord = []
-# list_rois = utils_roi.get_volume_from_coord(list_coord, path_rois)
+# list_rois = utils.get_volume_from_coord(list_coord, path_rois)
 
 # CAS ROI NAMES
 path_rois = op.join(datadir, "ROIs_analyses")
 list_rois = ['pSTS_Pallier_2011.nii']
+
+
+
 
 ########################
 # SUBJECT(s) SELECTION
@@ -83,10 +88,19 @@ for r in list_rois :
                         + "/fMRI/acquisition1/"
                         + "swaclsf1*.nii" )        
 
-        # Many methods to extract data are available in utils_roi
+        # Many methods to extract data are available in utils
         # Here using of NiftiMapsMasker
         path_roi = op.join(path_rois, r)
-        data = utils_rois.get_data_in_roi(path_roi, data_file[0]) 
+        data = utils.get_data_in_roi(path_roi, data_file[0]) 
+
+        data2= apply_mask(data_file[0], path_roi)
+
+        print "data"
+        print data[:10]
+        print "data2"
+        print data2[:10]
+        print data.shape
+        print data2.shape
 
         # Filtered data ...
         #data = data_filtered(data)
@@ -105,10 +119,10 @@ for r in list_rois :
         
         for name_cond, label in conditions.iteritems():
             # get the onsets for one condition
-            onsets = utils_rois.get_onsets(path_onsets, label)
+            onsets = utils.get_onsets(path_onsets, label)
 
             # methods available to plot data using ntime module
-            analyzer = utils_rois.analyze_average(
+            analyzer = utils.analyze_average(
                                     data.ravel(), 
                                     onsets, 
                                     sampling_interval, 
@@ -172,7 +186,7 @@ for r in list_rois :
         # Save the plots and values
         print "\n### RESULTS"
         conditions_name = '_'.join([key for key in conditions.iterkeys()])   
-        file_name = '{s}_{roi}_{conditions_name}.png'.format(s=s, roi=r, conditions_name=conditions_name)
+        file_name = '{s}_{roi}_{conditions_name}'.format(s=s, roi=r, conditions_name=conditions_name)
 
         save_analysis_file = op.join(save_analysis, '{file_name}.png'.format(file_name=file_name))
         figure.savefig(save_analysis_file)
