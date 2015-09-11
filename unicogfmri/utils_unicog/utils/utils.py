@@ -288,11 +288,11 @@ def voxel_to_mm(vol, voxel_coords):
     Get the coordinates in mm by using the affine
     
     Example 1:
-    utils_rois.voxel_to_mm('T1.nii', [0,0,0])
+    utils.voxel_to_mm('T1.nii', [0,0,0])
     array([  90., -126.,  -72.])
     
     Example 2:
-    utils_rois.voxel_to_mm('T1.nii', [[0,0,0], [0,0,1]]) 
+    utils.voxel_to_mm('T1.nii', [[0,0,0], [0,0,1]]) 
     array([[  90., -126.,  -72.],
            [  90., -126.,  -70.]])
 
@@ -306,7 +306,7 @@ def mm_to_voxel(vol, mm_coords):
     """
     Get the coordinates in voxel by using the inverse of affine
     Example :
-    utils_rois.mm_to_voxel("T1.nii", [[90., -126.,  -72.]])
+    utils.mm_to_voxel("T1.nii", [[90., -126.,  -72.]])
     array([ 0.,  0.,  0.])    
     """
     import numpy.linalg as npl
@@ -322,7 +322,7 @@ def get_value_in_mm(vol, mm_x, mm_y, mm_z):
     """
     Get the value of one voxel by giving the coord in mm
     Example :
-    utils_rois.get_value_in_mm("T1.nii", 90., -126.,  -72.)
+    utils.get_value_in_mm("T1.nii", 90., -126.,  -72.)
     0.013717801310122013
     """
     img = nibabel.load(vol)
