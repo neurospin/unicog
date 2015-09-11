@@ -1,5 +1,4 @@
-#! /usr/bin/env python
-# Time-stamp: <2015-07-10 13:50 christophe@pallier.org>
+# -*- coding: utf-8 -*-
 
 from glob import glob
 import os
@@ -11,6 +10,7 @@ import csv
 
 import numpy as np
 import nibabel
+from skimage import morphology
 from nilearn.input_data import NiftiMapsMasker
 from nilearn.masking import intersect_masks
 
@@ -25,7 +25,7 @@ from nitime import viz
 
 
 ##################
-### MAIN FUCNTIONS
+### MAIN FUNCTIONS
 ##################
 
 def get_rootdir():
@@ -37,7 +37,9 @@ def get_rootdir():
     return rootdir
 
 
-### Coming from get_data_from_rois #####################################
+##################
+### FUNCTIONS ON ROIS 
+##################
 """
 Extracts voxels from masks (ROIs) in a series of maps,
 creating one text file per mask
@@ -151,6 +153,7 @@ def get_data_in_roi(path_roi, data_file):
     nifti_obj = nibabel.load(data_file)
     data = masker.fit_transform(nifti_obj)
     return data
+
     
 
 def get_data_in_rois_method1(ROIs, subjects, contrasts, condir):
@@ -217,16 +220,9 @@ def ndarray2df(v):
     return df
 
 
-##############
-
-def convert_coord_into_volume(list_coord):
-    """
-    Convert MNI coordinates into a volume
-    return a list of volume paths
-    """
-    list_vol_path = []
-    pass
-    #return list_vol_path = []
+########
+# ONSETS
+########
 
 
 def get_onsets(path_onset, cond):
@@ -239,25 +235,12 @@ def get_onsets(path_onset, cond):
     subset = df [df[0] == cond ]
     onsest_values = subset[1]
     list_onsets = onsest_values.values.T.tolist()
-
-#            onsets = np.array([121.499000000000,
-#                       123.001000000000,
-#                       124.502000000000,
-#                       126.003000000000,
-#                       127.504000000000,
-#                       130.490000000000,
-#                       283.499000000000,
-#                       286.502000000000,
-#                       288.003000000000,
-#                       289.504000000000,
-#                       290.990000000000,
-#                       292.490000000000])
-
     return list_onsets
 
 
 ##############
 #PLOT DATA PART
+##############
 
 def plot_FRI():
     #not implemented yet
@@ -286,47 +269,129 @@ def analyze_average(data, onsets,
    
     return analyzer
     
-    
-
 
 ##############
+# COORDINATES
+##############
 
-#if __name__ == '__main__':
-# 
-##    rootdir = os.getenv('ROOTDIR')
-##    if rootdir is None:
-##        rootdir = '/neurospin/unicog/protocols/IRMf/SyntMov_Fabre_Pallier_2014/scripts/testdata/'
-#
-#    rootdir = '/volatile/test_time_analysis/testdata_ter'
-#
-#    # Subjects' paths
-#    subjdir = op.join(rootdir, 'subjects')
-#    subjects = sorted(glob(op.join(subjdir, 'subj*')))
-#
-#    # Contrast maps for each subject
-#    condir = 'analyse_smooth5/full_ancova_nbchar/'
-#    contrasts = ['scon_%04d.img' % x for x in (10, 11, 12, 13)]
-#
-#    # location of individual localizer T map
-#    localizerf = 'analyse_smooth5/localizer_3/spmT_0001.img'
-#    THR_loc = 3.1  # statistical threshold for localizer's T-map
-#
-#    # regions of interest (binary maps)
-#    roidir = op.join(rootdir, 'ROIs')
-#    ROIs = sorted(glob(op.join(roidir, '*.nii')))
-#
-#
-#    # extract data and save in csv files
-#    v1 = get_data_in_rois_method1(ROIs, subjects, contrasts, condir)
-#    df1 = ndarray2df(v1)
-#    df1.to_csv('/volatile/test_time_analysis/results/method1.csv')
-#
-##    v2 = get_data_in_rois_method2(ROIs, subjects, contrasts, condir, localizerf, THR_loc)
-##    df2 = ndarray2df(v2)
-##    df2.to_csv('method2.csv')
-##
-##    v3 = get_data_in_rois_method3(ROIs, subjects, contrasts, condir, localizerf, 10)
-##    df3 = ndarray2df(v3)
-##    df3.to_csv('method3.csv')
-#
-#    print 'you can now execture plot.R in R'
+def convert_coord_into_volume(list_coord):
+    """
+    Convert MNI coordinates into a volume
+    return a list of volume paths
+    """
+    #list_vol_path = []
+    #not implemented yet
+    pass
+
+def voxel_to_mm(vol, voxel_coords):
+    """
+    Get the coordinates in mm by using the affine
+    
+    Example 1:
+    utils_rois.voxel_to_mm('T1.nii', [0,0,0])
+    array([  90., -126.,  -72.])
+    
+    Example 2:
+    utils_rois.voxel_to_mm('T1.nii', [[0,0,0], [0,0,1]]) 
+    array([[  90., -126.,  -72.],
+           [  90., -126.,  -70.]])
+
+    """
+    img = nibabel.load(vol)
+    aff = img.get_affine()
+    mm_coords = nibabel.affines.apply_affine(aff, voxel_coords)
+    return mm_coords
+
+def mm_to_voxel(vol, mm_coords):
+    """
+    Get the coordinates in voxel by using the inverse of affine
+    Example :
+    utils_rois.mm_to_voxel("T1.nii", [[90., -126.,  -72.]])
+    array([ 0.,  0.,  0.])    
+    """
+    import numpy.linalg as npl
+    img = nibabel.load(vol)
+    aff = img.get_affine()
+    list_coord = []
+    for coord in mm_coords:
+        coords_voxel = nibabel.affines.apply_affine(npl.inv(aff), coord)
+        list_coord.append(coords_voxel)
+    return list_coord
+
+def get_value_in_mm(vol, mm_x, mm_y, mm_z):
+    """
+    Get the value of one voxel by giving the coord in mm
+    Example :
+    utils_rois.get_value_in_mm("T1.nii", 90., -126.,  -72.)
+    0.013717801310122013
+    """
+    img = nibabel.load(vol)
+    data = img.get_data()
+    coords_voxel = mm_to_voxel(vol, [[mm_x, mm_y, mm_z]])
+    value = data[coords_voxel[0][0], coords_voxel[0][1], coords_voxel[0][2]]
+    return value
+    
+    
+#######################
+### CREATE BASIC ROIS
+
+def cube(file_roi, vol, mm_x=0, mm_y=0, mm_z=0, width=3, dtype=np.uint8):
+#    img = nibabel.load(vol)
+#    v_x, v_y, v_z = mm_to_voxel(vol, [mm_x, mm_y, mm_z]) 
+#    data = img.get_data()
+#    roi = np.zeros(data.shape)
+#    roi[v_x-1:v_x+1,v_y-1:v_y+1, v_z-1:v_z+1 ] = 1
+#    roi_img = nibabel.Nifti1Image(roi, img.get_affine(),img.get_header() )
+#    nibabel.save(roi_img, file_roi)
+    pass
+#    #return np.ones((width, width, width), dtype=dtype)
+
+
+def sphere(file_roi, vol, mm_x=0, mm_y=0, mm_z=0, radius=4, dtype=np.uint8):
+    img = nibabel.load(vol)
+    header = img.get_header()
+    voxels_size= header.get_zooms()
+    coord_center_voxel = mm_to_voxel(vol, [[mm_x, mm_y, mm_z]])    
+    shape_x, shape_y, shape_z = img.shape[0], img.shape[1], img.shape[2]
+    roi = np.zeros((shape_x, shape_y, shape_z))
+    
+    radius = radius / voxels_size[0]
+    if radius > 1 :
+       radius -= 1 
+
+    first_x = coord_center_voxel[0][0] - radius
+    first_y = coord_center_voxel[0][1] - radius
+    first_z = coord_center_voxel[0][2] - radius
+
+    elem = morphology.ball(radius)
+    
+    #check voxel size is isotropic
+    #check radius is at least one voxel
+    for x in range(0,elem.shape[0]):
+            for y in range(0, elem.shape[1]):
+                    for z in range(0, elem.shape[2]):
+                        x_ = int(first_x) + x
+                        y_ = int(first_y) + y
+                        z_ = int(first_z) + z
+                        roi[x_, y_, z_] = elem[x,y,z]
+  
+    roi_img = nibabel.Nifti1Image(roi, img.get_affine(),img.get_header() )
+    nibabel.save(roi_img, file_roi)
+
+
+def voxel(file_roi, vol, mm_x=0, mm_y=0, mm_z=0):
+    img = nibabel.load(vol)
+    header = img.get_header()
+    voxels_size= header.get_zooms()
+    data = img.get_data()
+    coord_first_voxel = mm_to_voxel(vol, [[mm_x, mm_y, mm_z]])    
+    shape_x, shape_y, shape_z = img.shape[0], img.shape[1], img.shape[2]
+    roi = np.zeros((shape_x, shape_y, shape_z))
+    x_ = coord_first_voxel[0][0]
+    y_ = coord_first_voxel[0][1]
+    z_ = coord_first_voxel[0][2]
+    roi[int(x_) , int(y_), int(z_)] = 1
+    roi_img = nibabel.Nifti1Image(roi, img.get_affine(),img.get_header() )
+    nibabel.save(roi_img, file_roi)
+
+
