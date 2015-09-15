@@ -12,12 +12,12 @@ from surfer import Brain, io
 
 
 # Ini the subjects_dir paramater
-subjects_dir = "/neurospin/unicog/protocols/IRMf/Tests_Isa/dataBase_FS_brainvisa"
+subjects_dir = "/PATH/FREESURFER_DATABASE"
 os.environ['SUBECTS_DIR'] = subjects_dir
 
 # Get the datadir
-#datadir = utils.get_rootdir()
-datadir = "/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_pysurfer"
+datadir = utils.get_rootdir()
+
 
 
 # Glob the ROIs
@@ -52,7 +52,8 @@ for hemi in list_hemi:
     for r in sorted(rois):  
     #   Name of ROI 
         name_roi = os.path.splitext(os.path.basename(r))[0]
-        save_png= os.path.join(datadir, "{h}_{name_roi}".format(h=hemi, name_roi=name_roi))
+        #save_png= os.path.join(datadir, "{h}_{name_roi}".format(h=hemi, name_roi=name_roi))
+                
         
     #   Manage the color
         color = [val/255. for val in color_list[cpt_color]]
@@ -68,11 +69,10 @@ for hemi in list_hemi:
     #   If reg_file if needed: 
     #   surf_data = io.project_volume_data(r, "lh", reg_file)
     #   Projection parameters, see the docstring for more information
-        projmeth = "frac" # frac' methode, projection on a fraction of thickness
-        projsum = "max"   #the max value is projected
+        projmeth = "frac" # frac' method, projection on a fraction of thickness
+        projsum = "max"   # the max value is projected
         projarg = [0, 1, 0.1] # from 0 to 1 thickness fract every 0.1 step
         smooth_fwhm = 0       # no smoothing  
-        io.project_volume_data()
         surf_data = io.project_volume_data(r, hemi,
                                           projmeth=projmeth,
                                           projsum=projsum, 
@@ -88,8 +88,8 @@ for hemi in list_hemi:
         lut[0:255, 0:3] = color_list[cpt_color]
         overlay_roi.pos_bar.lut.table = lut
         
-    #   Save in png   
-        brain.save_imageset(save_png, ['lat'], 'png', colorbar=None)  
+#    #   Save in png   
+#        brain.save_imageset(save_png, ['lat'], 'png', colorbar=None)  
         
     #   Color cpt
         cpt_color += 1
@@ -98,5 +98,8 @@ for hemi in list_hemi:
     #   Remove for the next roi
 #        for overlay in brain.overlays_dict[name_overlay]:
 #            overlay.remove()  
-        
+    
+    #   Save in png  
+    save_png = os.path.join(datadir, "all_rois")  
+    brain.save_imageset(save_png, ['lat'], 'png', colorbar=None) 
     brain.close()
