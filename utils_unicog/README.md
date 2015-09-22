@@ -89,6 +89,7 @@ More information for a [quick start on a multiple core machine](http://brainvisa
 See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
 Note: to edit file directly into a terminal, use **vi** tool, for instance:
+
     vi <name_file>
 
 Then, use **Escape** and **i** keys to turn on the Insert mode.
