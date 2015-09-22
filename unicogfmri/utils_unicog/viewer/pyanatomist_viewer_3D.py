@@ -11,6 +11,7 @@ import os
 import subprocess
 import glob
 
+import nibabel
 
 try:
     from PyQt4 import QtGui, QtCore
@@ -23,6 +24,7 @@ except:
 # Anatomist
 try:
     import anatomist.api as ana
+    from soma import aims
     #import anatomist.direct.api as ana
 
     # needed here in oder to be compliant with AIMS
@@ -31,8 +33,10 @@ except:
     warnings.warn('Anatomist no installed: the mdodule may not work properly, \
                    please investigate')
 
+
+
 def fusion3D_map_activation(
-        dic_maps,
+        list_maps,
         template_file="/neurospin/unicog/protocols/IRMf/Tests_Isa/template/avg152T1.nii",
         dic_templates=""):
 
@@ -57,15 +61,17 @@ def fusion3D_map_activation(
 
     dic_templates_fusion = {}
 
-    if len(dic_templates) == 0:
-        template = a.loadObject(template_file)
-        #template = a.loadObject(file_name, objectName=objectName )
-        # load information from header for the template
-        template.loadReferentialFromHeader()
-        
-        # load referentials
-        ref_template = template.getReferential()
-        tmp_template = 'truth for ' + os.path.basename(template_file)
+
+    #load avg152_T1
+#    if len(dic_templates) == 0:
+    template = a.loadObject(template_file)
+    #template = a.loadObject(file_name, objectName=objectName )
+    # load information from header for the template
+    template.loadReferentialFromHeader()
+    
+    # load referentials
+    ref_template = template.getReferential()
+    tmp_template = 'truth for ' + os.path.basename(template_file)
 
 #        liste_ref = a.getReferentials()
 #        for ref in liste_ref:
@@ -78,8 +84,8 @@ def fusion3D_map_activation(
 #
 #        a.loadTransformation([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
 #                                     ref_template, mni_ref)                             
-        #dic_templates_fusion[name_contrast] = template 
-        dic_templates_fusion["template"] = template
+    #dic_templates_fusion[name_contrast] = template 
+    #dic_templates_fusion["template"] = template
 
 
     #load the mesh and assign the T1 referential
@@ -88,44 +94,53 @@ def fusion3D_map_activation(
     template_mesh.assignReferential(ref_template)
     dic_templates_fusion["template"] = template_mesh
         
-    if len(dic_templates) == len(dic_maps):
-        for name_contrast, file_name in dic_templates.items():
-            #template
-            objectName = "wanatFor_" + name_contrast
-            #template = a.loadObject(file_name)
-            template = a.loadObject(file_name, objectName=objectName )
-            # load information from header for the template
-            template.loadReferentialFromHeader()
-            
-            # load referentials
-            ref_template = template.getReferential()
-            tmp_template = 'truth for ' + os.path.basename(objectName)
-    
-            liste_ref = a.getReferentials()
-            for ref in liste_ref:
-                dict_ref = ref.getInfos()
-                if 'name' in dict_ref.keys():
-            #                if dict_ref['name'] == 'Talairach-MNI template-SPM':
-            #                    ref_mni_spm = ref
-                    if dict_ref['name'].find(tmp_template) != -1:
-                        ref_template = ref
-        
-            a.loadTransformation([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-                                         ref_template, mni_ref)                             
-            dic_templates_fusion[name_contrast] = template
-    else:
-        warnings.warn('The number of templates and constrasts are differents.')     
+##    if len(dic_templates) == len(dic_maps):
+#    for name_contrast, file_name in dic_templates_fusion.items():
+#        #template
+#        objectName = "wanatFor_" + name_contrast
+#        #template = a.loadObject(file_name)
+#        template = a.loadObject(file_name, objectName=objectName )
+#        # load information from header for the template
+#        template.loadReferentialFromHeader()
+#        
+#        # load referentials
+#        ref_template = template.getReferential()
+#        tmp_template = 'truth for ' + os.path.basename(objectName)
+#
+#        liste_ref = a.getReferentials()
+#        for ref in liste_ref:
+#            dict_ref = ref.getInfos()
+#            if 'name' in dict_ref.keys():
+#        #                if dict_ref['name'] == 'Talairach-MNI template-SPM':
+#        #                    ref_mni_spm = ref
+#                if dict_ref['name'].find(tmp_template) != -1:
+#                    ref_template = ref
+#    
+#        a.loadTransformation([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
+#                                     ref_template, mni_ref)                             
+#        dic_templates_fusion[name_contrast] = template
+##else:
+##    warnings.warn('The number of templates and constrasts are differents.')     
 
+    def create_palette(colors, name_palette):
+        palette = a.createPalette(name_palette)
+        palette.setColors(colors)
+        return  palette
 
     fusion_list = []   
     window_list = []                         
     list_map_activation = []
-    
-    #loop on maps 
-    for fusion_name, file_name in dic_maps.items():
-        map_activation = a.loadObject(file_name, fusion_name)
+    color_list = [[255, 255, 0], [255, 153, 18], [128, 42, 42],
+        [0, 255, 0], [61, 145, 64], [50, 205, 50],
+        [106, 90, 205], [19, 795, 0], [0, 10, 12], 
+        [0, 31, 37], [255, 64, 64], [0, 0, 255], 
+        [240, 35, 100], [74, 64, 250], [200, 150, 100] ]
+    cpt_color = 0       
+    #loop on maps to set correctly the referential 
+    for file_name in list_maps:
+        map_activation = a.loadObject(file_name)
         # load identity transformtion to mni_SPM
-        tmp_map = 'truth for ' + os.path.basename(fusion_name)
+        tmp_map = 'truth for ' + os.path.basename(file_name)
 
         # load information from header
         map_activation.loadReferentialFromHeader()
@@ -149,21 +164,34 @@ def fusion3D_map_activation(
                                  ref_map_activation, mni_ref)
         
         #palette and options
-        map_activation.setPalette("Rainbow1-fusion",
-                                  minVal=1,
-                                  absoluteMode=True)
-        # create the fusion object  
-        if dic_templates_fusion.has_key("template"):
-            fusion_map = a.fusionObjects([map_activation, 
-                                         dic_templates_fusion["template"]],
-                                         'Fusion3DMethod')       
-        else:
-            fusion_map = a.fusionObjects([map_activation, 
-                                         dic_templates_fusion[fusion_name]],
-                                         'Fusion3DMethod')                              
-                                 
-        fusion_list.append(fusion_map)
-        window_list.append(a.createWindow('Axial'))
+        name_palette = "palette_" + str(cpt_color)
+        colors = [255,255,255]*1 + color_list[cpt_color]*179
+        pal = create_palette(colors, name_palette)
+        cpt_color += 1
+        map_activation.setPalette(pal)
+#        map_activation.setPalette(palette,
+#                                  minVal=1,
+#                                  absoluteMode=True)      
+
+#        map_activation.setPalette("Rainbow1-fusion",
+#                                  minVal=1,
+#                                  absoluteMode=True)
+
+                         
+        #list of map_activation for the Fusion2DMethod
+        list_map_activation.append(map_activation)                          
+                                  
+#        if dic_templates_fusion.has_key("template"):
+#            fusion_map = a.fusionObjects([map_activation, 
+#                                         dic_templates_fusion["template"]],
+#                                         'Fusion3DMethod')       
+#        else:
+#            fusion_map = a.fusionObjects([map_activation, 
+#                                         dic_templates_fusion[fusion_name]],
+#                                         'Fusion3DMethod')                              
+#                                 
+#        fusion_list.append(fusion_map)
+#        window_list.append(a.createWindow('Axial'))
 #        print map_activation
 #        list_map_activation.append(map_activation)
 #    file_name = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/IFGorb_Pallier_2011.nii'
@@ -171,16 +199,33 @@ def fusion3D_map_activation(
 #    a =  a.loadObject('/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/IFGorb_Pallier_2011.nii')
 #    b =  a.loadObject('/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/BA_44op.nii')
 #     
+
+    #Fusion2DMethod for all maps    
+    fusion_map = a.fusionObjects(list_map_activation, 'Fusion2DMethod')
+    #fusion_map.setPalette(mixMethod='linear', linMixFactor=90)
+#    print fusion_map.getInfos()
     
-#    fusion_map = a.fusionObjects([a, b] , 'Fusion2DMethod') 
-#    win3=a.createWindow('Axial' )
-#    a.addObjects(fusion_map, win3)    
+    #Fusion3DMethod for all maps  + Mesh
+    fusion_mesh = a.fusionObjects([fusion_map, template_mesh], 'Fusion3DMethod') 
+    
+    #Put the Fusion3D into a 3D window
+    w_3d = a.createWindow('3D')
+    w_3d.assignReferential(mni_ref)
+    a.addObjects(fusion_mesh, w_3d)
     
     
-    for w,f in zip(window_list, fusion_list) :
-        # show the fusion
-        w.assignReferential(mni_ref)
-        a.addObjects(f, w)
+    #Fusion3DMethod for all maps  + T1
+    fusion_t1 = a.fusionObjects([fusion_map, template], 'Fusion2DMethod') 
+    
+    #Put the Fusion3D into a 3D window
+    w_ax = a.createWindow('Axial')
+    w_ax.assignReferential(mni_ref)
+    a.addObjects(fusion_t1, w_ax)
+    
+#    for w,f in zip(window_list, fusion_list) :
+#        # show the fusion
+#        w.assignReferential(mni_ref)
+#        a.addObjects(f, w)
         
 #        #changement de position du curseur   
 #        a.execute('LinkedCursor',
@@ -215,9 +260,16 @@ if __name__ == "__main__":
 #        glob_files = glob.glob((path_results + "/*/" + '/res_stats/t_maps/va*'
 #                            + c + '.nii.gz'))
 
-        path_rois = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses'                           
-        glob_files = glob.glob((path_rois + '/P*.nii'))  
-#        print glob_files                          
+        path_tmp = "/home/id983365/temp"
+        path_rois = "/neurospin/unicog/protocols/IRMf/SyntMov_Fabre_Pallier_2014/Group_analyses/full_ancova_nbchar.anova"
+
+        glob_files = glob.glob((path_rois + '/*T_0244.img')) + glob.glob((path_rois + '/*T_0245.img')) + glob.glob((path_rois + '/*T_0119.img'))
+
+#        path_rois = '/neurospin/unicog/protocols/IRMf/SyntMov_Fabre_Pallier_2014/masks_and_ROIs/ROIs_syntmov_def'
+#        path_rois = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses'                           
+#        glob_files = glob.glob((path_rois + '/*.nii'))  
+        print glob_files
+        print len(glob_files)                        
 #        if glob_files:
 #            for file_name in glob_files:
 #                name_fusion = os.path.basename(file_name)
@@ -227,4 +279,21 @@ if __name__ == "__main__":
     
     # print dic_maps
     # call the function to display maps with the dictionary
-    fusion3D_map_activation(list_maps)
+    
+    list_map_thres = []
+    for img in glob_files:
+        vol = nibabel.load(img)
+        data = vol.get_data()
+        data = data > 3.72
+        tmp = os.path.basename(img)
+#        voxels_size= header.get_zooms()
+        vol_thres = nibabel.Nifti1Image(data, vol.get_affine(), vol.get_header() )
+        name_file = os.path.split(img)[1]
+        tmp_name = 'threshold_3.72_' + os.path.splitext(name_file)[0] + '.nii'
+        tmp_name = os.path.join(path_tmp, tmp_name)
+        print tmp_name
+        nibabel.save(vol_thres, tmp_name)        
+        list_map_thres.append(tmp_name)
+        
+    
+    fusion3D_map_activation(list_map_thres)
