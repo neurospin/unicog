@@ -88,15 +88,23 @@ More information for a [quick start on a multiple core machine](http://brainvisa
 #### CREATE AN ACCOUNT
 See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
+Note: to edit file directly into a terminal, use **vi** tool, for instance:
+
+    vi <name_file>
+
+Then, use **Escape** and **i** keys to turn on the Insert mode.
+To save and quit, use **Escape** and **:wq**.
+ 
 #### HOW TO USE SOMA-WORKFLOW ?
 
 ###### CLIENT CONFIGURATION: 
 The "client" refers to your workstation. 
-Create the **.soma-workflow.cfg** file on the client if needed:
+Edit the **.soma-workflow.cfg** file on the client, if it doesn't exist, use **touch** command as below
+to create it automatically:
 
     touch /home/your_logging/.soma-workflow.cfg
 
-Client configuration of **.soma-workflow.cfg**:
+Add the following lines for the configuration of **.soma-workflow.cfg**:
 
     [DSV_cluster_your_logging]
     #remote access information
@@ -116,15 +124,16 @@ Check into your .bashrc file you can launch /i2bm/local/Ubuntu-12.04-x86_64/brai
 The "server" refers to the resource called Gabriel:
 [See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
-Connect to gabriel from your workstation:
+Connect to gabriel from your workstation with the login/pw given for gabriel  :
 
-    ssh your_logging@gabriel.intra.cea.fr
+    ssh your_logging_for_gabriel@gabriel.intra.cea.fr
 
-Create the **.soma-workflow.cfg** file on the server if needed:
+Edit the **.soma-workflow.cfg** file on the server, if it doesn't exist, use **touch** command as below
+to create it automatically:
 
     touch /home/your_logging/.soma-workflow.cfg
 
-Server configuration of **.soma-workflow.cfg**:
+Add the following lines for the configuration of **.soma-workflow.cfg**:
 
     [DSV_cluster_your_logging]
     NATIVE_SPECIFICATION = -l walltime=20:00:00
@@ -151,7 +160,7 @@ Create the following directories, if needed:
     mkdir /home/your_logging/soma-workflow/transfered-files
 
 
-Check the .bashrc with the following lines:
+Open the .bashrc file and check if the following lines exist, if not, add them:
 
     # .bashrc
     # Source global definitions
@@ -183,14 +192,13 @@ And add the following lines:
     source /i2bm/brainvisa/$I2BM_OSID/brainvisa/bin/bv_env.sh /i2bm/brainvisa/$I2BM_OSID/brainvisa
 
 
-Additional step: launch Brainvisa just once:
+In order to complete the configuration (initialisation of PATH_TRANSLATION_FILES in .soma-workflow.cfg),
+launch Brainvisa just once. So, quit the server side (gabriel), then relog with the option -X to indicate the graphic mode.
 
-    #option -X to indicate the graphic mode just for this time    
     ssh  -X your_logging@gabriel.intra.cea.fr
-    #you don't need to create a database, it's just to create automatically /home/your_logging/.brainvisa/soma-workflow.translation
     #launch brainvisa
     brainvisa
-    #then quit Brainvisa
+    #and just close the graphical interface of Brainvisa.
 
 
 Launch soma-workflow on Gabriel (if soma_workflow is not started on your gabriel count, 
