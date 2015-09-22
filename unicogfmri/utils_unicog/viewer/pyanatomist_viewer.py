@@ -17,7 +17,7 @@ try:
 except:
     
     
-#    warnings.warn('Qt not installed: the mdodule may not work properly, \
+    warnings.warn('Qt not installed: the mdodule may not work properly, \
                    please investigate')
 
 # Anatomist
