@@ -87,6 +87,7 @@ More information for a [quick start on a multiple core machine](http://brainvisa
 ### ON A CLUSTER
 #### CREATE AN ACCOUNT
 See on the [neurospin-wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
+
 Note: to edit file directly into a terminal, use **vi** tool, for instance:
     vi <name_file>
 
@@ -122,12 +123,13 @@ Check into your .bashrc file you can launch /i2bm/local/Ubuntu-12.04-x86_64/brai
 The "server" refers to the resource called Gabriel:
 [See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
-Connect to gabriel from your workstation with the login/pw giving for gabriel  :
+Connect to gabriel from your workstation with the login/pw given for gabriel  :
 
     ssh your_logging_for_gabriel@gabriel.intra.cea.fr
 
 Edit the **.soma-workflow.cfg** file on the server, if it doesn't exist, use **touch** command as below
 to create it automatically:
+
     touch /home/your_logging/.soma-workflow.cfg
 
 Add the following lines for the configuration of **.soma-workflow.cfg**:
@@ -190,7 +192,7 @@ And add the following lines:
 
 
 In order to complete the configuration (initialisation of PATH_TRANSLATION_FILES in .soma-workflow.cfg),
-launch Brainvisa just once. So, quit the server side (gabriel), the relog with the option -X to indicate the graphic mode.
+launch Brainvisa just once. So, quit the server side (gabriel), then relog with the option -X to indicate the graphic mode.
 
     ssh  -X your_logging@gabriel.intra.cea.fr
     #launch brainvisa
