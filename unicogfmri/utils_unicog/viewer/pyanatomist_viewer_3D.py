@@ -73,54 +73,12 @@ def fusion3D_map_activation(
     ref_template = template.getReferential()
     tmp_template = 'truth for ' + os.path.basename(template_file)
 
-#        liste_ref = a.getReferentials()
-#        for ref in liste_ref:
-#            dict_ref = ref.getInfos()
-#            if 'name' in dict_ref.keys():
-#        #                if dict_ref['name'] == 'Talairach-MNI template-SPM':
-#        #                    ref_mni_spm = ref
-#                if dict_ref['name'].find(tmp_template) != -1:
-#                    ref_template = ref
-#
-#        a.loadTransformation([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-#                                     ref_template, mni_ref)                             
-    #dic_templates_fusion[name_contrast] = template 
-    #dic_templates_fusion["template"] = template
-
-
     #load the mesh and assign the T1 referential
     path_mesh = "/neurospin/unicog/protocols/IRMf/Tests_Isa/template/mni152_05_brain.mesh"
     template_mesh = a.loadObject(path_mesh)
     template_mesh.assignReferential(ref_template)
     dic_templates_fusion["template"] = template_mesh
         
-##    if len(dic_templates) == len(dic_maps):
-#    for name_contrast, file_name in dic_templates_fusion.items():
-#        #template
-#        objectName = "wanatFor_" + name_contrast
-#        #template = a.loadObject(file_name)
-#        template = a.loadObject(file_name, objectName=objectName )
-#        # load information from header for the template
-#        template.loadReferentialFromHeader()
-#        
-#        # load referentials
-#        ref_template = template.getReferential()
-#        tmp_template = 'truth for ' + os.path.basename(objectName)
-#
-#        liste_ref = a.getReferentials()
-#        for ref in liste_ref:
-#            dict_ref = ref.getInfos()
-#            if 'name' in dict_ref.keys():
-#        #                if dict_ref['name'] == 'Talairach-MNI template-SPM':
-#        #                    ref_mni_spm = ref
-#                if dict_ref['name'].find(tmp_template) != -1:
-#                    ref_template = ref
-#    
-#        a.loadTransformation([0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1],
-#                                     ref_template, mni_ref)                             
-#        dic_templates_fusion[name_contrast] = template
-##else:
-##    warnings.warn('The number of templates and constrasts are differents.')     
 
     def create_palette(colors, name_palette):
         palette = a.createPalette(name_palette)
@@ -152,10 +110,6 @@ def fusion3D_map_activation(
         for ref in liste_ref:
             dict_ref = ref.getInfos()
             if 'name' in dict_ref.keys():
-    #                if dict_ref['name'] == 'Talairach-MNI template-SPM':
-    #                    ref_mni_spm = ref
-    #            if dict_ref['name'].find(tmp_template) != -1:
-    #                ref_template = ref
                 if dict_ref['name'].find(tmp_map)  != -1:
                     ref_map_activation= ref
         
@@ -169,9 +123,6 @@ def fusion3D_map_activation(
         pal = create_palette(colors, name_palette)
         cpt_color += 1
         map_activation.setPalette(pal)
-#        map_activation.setPalette(palette,
-#                                  minVal=1,
-#                                  absoluteMode=True)      
 
 #        map_activation.setPalette("Rainbow1-fusion",
 #                                  minVal=1,
@@ -181,39 +132,41 @@ def fusion3D_map_activation(
         #list of map_activation for the Fusion2DMethod
         list_map_activation.append(map_activation)                          
                                   
-#        if dic_templates_fusion.has_key("template"):
-#            fusion_map = a.fusionObjects([map_activation, 
-#                                         dic_templates_fusion["template"]],
-#                                         'Fusion3DMethod')       
-#        else:
-#            fusion_map = a.fusionObjects([map_activation, 
-#                                         dic_templates_fusion[fusion_name]],
-#                                         'Fusion3DMethod')                              
-#                                 
-#        fusion_list.append(fusion_map)
-#        window_list.append(a.createWindow('Axial'))
-#        print map_activation
-#        list_map_activation.append(map_activation)
-#    file_name = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/IFGorb_Pallier_2011.nii'
-#    a = a.loadObject(file_name)
-#    a =  a.loadObject('/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/IFGorb_Pallier_2011.nii')
-#    b =  a.loadObject('/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/BA_44op.nii')
-#     
 
-    #Fusion2DMethod for all maps    
+#    #Fusion2DMethod for all maps    
     fusion_map = a.fusionObjects(list_map_activation, 'Fusion2DMethod')
-    #fusion_map.setPalette(mixMethod='linear', linMixFactor=90)
-#    print fusion_map.getInfos()
+#    #fusion_map.setPalette(mixMethod='linear', linMixFactor=90)
+##    print fusion_map.getInfos()
+#    
+#    #Fusion3DMethod for all maps  + Mesh
+#    fusion_mesh = a.fusionObjects([fusion_map, template_mesh], 'Fusion3DMethod') 
     
-    #Fusion3DMethod for all maps  + Mesh
-    fusion_mesh = a.fusionObjects([fusion_map, template_mesh], 'Fusion3DMethod') 
+#    #Put the Fusion3D into a 3D window
+#    w_3d = a.createWindow('3D')
+#    w_3d.assignReferential(mni_ref)
+#    a.addObjects(fusion_mesh, w_3d)
     
-    #Put the Fusion3D into a 3D window
-    w_3d = a.createWindow('3D')
-    w_3d.assignReferential(mni_ref)
-    a.addObjects(fusion_mesh, w_3d)
+    # for each map, create a 3DFusion
+    fusion_list = []
+    window_list = []
+    for map_activation in list_map_activation:  
+        fusion_mesh = a.fusionObjects([map_activation, template_mesh], 'Fusion3DMethod')                    
+        fusion_list.append(fusion_mesh)
+        window_list.append(a.createWindow('3D'))
     
-    
+# 
+#    for w,f in zip(window_list, fusion_list) :
+#        # show the fusion
+#        w.assignReferential(mni_ref)
+#        a.addObjects(f, w)
+        
+    #now create a multitexture
+    fusion_multiTexture = a.fusionObjects(fusion_list, 'FusionMultiTextureMethod')
+    fusion_multiTexture_mesh = a.fusionObjects([fusion_multiTexture, template_mesh] , 'FusionTexSurfMethod')
+    w3D_multiTexture_mesh = a.createWindow('3D')
+    w3D_multiTexture_mesh.assignReferential(mni_ref)
+    a.addObjects(fusion_multiTexture_mesh, w3D_multiTexture_mesh)
+        
     #Fusion3DMethod for all maps  + T1
     fusion_t1 = a.fusionObjects([fusion_map, template], 'Fusion2DMethod') 
     
@@ -221,18 +174,6 @@ def fusion3D_map_activation(
     w_ax = a.createWindow('Axial')
     w_ax.assignReferential(mni_ref)
     a.addObjects(fusion_t1, w_ax)
-    
-#    for w,f in zip(window_list, fusion_list) :
-#        # show the fusion
-#        w.assignReferential(mni_ref)
-#        a.addObjects(f, w)
-        
-#        #changement de position du curseur   
-#        a.execute('LinkedCursor',
-#                  object=f,
-#                  mode="linear_on_defined",
-#                  rate=0.5,
-#                  position=[100, 100, 100, 0])
     
     file_name = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio/ROIs_analyses/IFGorb_Pallier_2011.nii'
     a = a.loadObject(file_name)
