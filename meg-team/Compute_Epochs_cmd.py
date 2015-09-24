@@ -18,27 +18,26 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from mne.minimum_norm import (make_inverse_operator, apply_inverse)
 
-os.chdir('/neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF/functions')
+cwd = os.path.dirname(os.path.abspath(__file__)) # go where the scripts are
+os.chdir(cwd)
 import recode_events as rc
-
-os.environ['SUBJECTS_DIR'] = '/neurospin/meg/meg_tmp/MTT_MEG_Baptiste/mri'
-os.environ['MNE_ROOT']     = '/neurospin/local/mne'
 
 ###############################################################################################
 ################################## SUBFUNCTIONS ###############################################
 ###############################################################################################
-def EPOCHING(wdir, Condition, Subject, Run):
+def EPOCHING(wdir, Condition, Subject):
 
-    # temp
-    tmin  = -0.3
-    tmax  = 1
-    decim = 4
-    reject = dict(grad=4000e-13, mag=4e-12)
+    # import parameters from configuration file
+    from configuration import ( tmin, tmax,
+                        		decim, reject,
+                        		fmin, fmax,
+                        		tmin_bsl, tmax_bsl,
+                        		ListRunPerSubject, ListTrigger)
     
     # load trans_sss data, low-pass filtering 45Hz
-    ListRun = [wdir + '/data/maxfilter/' + Subject + '/' + Subject + '_' + x + '_trans_sss_filt140_raw.fif' for x in Run]      
+    ListRun = [wdir + '/data/maxfilter/' + Subject + '/' + Subject + '_' + x + '_trans_sss_filt140_raw.fif' for x in ListRunPerSubject[Subject]]      
     raw           = mne.io.Raw(ListRun, preload = True)
-    raw.filter(l_freq = None, h_freq=45, method = 'iir', n_jobs=3)
+    raw.filter(l_freq = fmin, h_freq=fmax, method = 'iir', n_jobs=3)
     
     # define (mandatory) and recode events (optional)
     eventsb       = mne.find_events(raw,stim_channel ='STI101', shortest_event = 1)
@@ -49,7 +48,7 @@ def EPOCHING(wdir, Condition, Subject, Run):
     epochs  = []
     evokeds = [] 
     for i,cond in enumerate(Condition):
-        epochs.append(mne.Epochs(raw, events, Condition[cond], tmin, tmax, picks=picks, baseline = [tmin, 0], decim = decim, reject=reject, preload = True))
+        epochs.append(mne.Epochs(raw, events, ListTrigger[cond], tmin, tmax, picks=picks, baseline = [tmin_bsl, tmax_bsl], decim = decim, reject=reject, preload = True))
     
     # equalizing trial number across conditions
     mne.epochs.equalize_epoch_counts(epochs)
@@ -62,7 +61,10 @@ def EPOCHING(wdir, Condition, Subject, Run):
 
 ###############################################################################################
 ###############################################################################################
-def INVERSE(wdir, Subject, epoch, evokeds):
+def INVERSE(wdir, Subject, epoch_info, evokeds):
+
+    # import parameters from configuration file
+    from configuration import ( lambda2, method )
 
     # compute noise covariance from empty room data
     emptyroom_raw = mne.io.Raw(wdir + '/data/maxfilter/' + Subject + '/'+ Subject +'_empty_sss.fif')  
@@ -73,18 +75,15 @@ def INVERSE(wdir, Subject, epoch, evokeds):
     forward       = mne.read_forward_solution(fname_fwd, surf_ori=True)
     
     # create inverse operator
-    inverse_operator = make_inverse_operator(epoch.info, forward, noise_cov, loose=0.4, depth=0.8)
+    inverse_operator = make_inverse_operator(epoch_info, forward, noise_cov, loose=0.4, depth=0.8)
     
     # Compute inverse solution
-    snr = 3.0
-    lambda2 = 1.0 / snr ** 2
-    
     stcs = []
     for evoked in evokeds:
-        stcs.append(apply_inverse(evoked, inverse_operator, lambda2, method='dSPM', pick_ori = None))
+        stcs.append(apply_inverse(evoked, inverse_operator, lambda2, method=method, pick_ori = None))
     
     # save a covariance picture for visual inspection
-    mne.viz.plot_cov(noise_cov, epoch.info, colorbar=True, proj=True,show_svd=False,show=False)
+    mne.viz.plot_cov(noise_cov, epoch_info, colorbar=True, proj=True,show_svd=False,show=False)
     plt.savefig(wdir + "/plots/" + Subject + "_covmat")
     plt.close()
     
@@ -102,27 +101,21 @@ parser.add_argument('-wdir'   ,type=str , nargs='*')
 parser.add_argument('-subject',type=str , nargs='*')
 parser.add_argument('-cond1'  ,type=str , nargs='*')
 parser.add_argument('-cond2'  ,type=str , nargs='*')
-parser.add_argument('-trig1'  ,type=int , nargs='*')           
-parser.add_argument('-trig2'  ,type=int , nargs='*') 
-# here you can input arguments in series that will be concatenated in a list
-parser.add_argument('-runlist',metavar='runlist',type=str , nargs='+') 
 
 # inputed argument transformed in a dict-like structure
 args = vars(parser.parse_args())
 
 wdir      = args['wdir'][0]
 Subject   = args['subject'][0]
-Condition = {str(args['cond1']):args['trig1'],str(args['cond2']):args['trig2']}
-listRun   = args['runlist']
+Condition = [str(args['cond1'][0]),str(args['cond2'][0])]
 
 # to check the formatting and content of arguments
-print >> sys.stderr, listRun
 print >> sys.stderr, Subject
 print >> sys.stderr, wdir
 
 # call processing subfunctions
-epochs, evokeds = EPOCHING(wdir, Condition, Subject, listRun)
-stcs            = INVERSE(wdir, Subject, epochs[0], evokeds)
+epochs, evokeds = EPOCHING(wdir, Condition, Subject)
+stcs            = INVERSE(wdir, Subject, epochs[0].info, evokeds)
 
 # save final results
 for i, cond in enumerate(Condition):

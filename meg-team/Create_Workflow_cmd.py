@@ -13,50 +13,35 @@ Created on Mon Sep 14 14:09:44 2015
 # import libraries
 from soma_workflow.client import Job, Workflow, Helper
 import os
-os.chdir("/neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF")
+cwd = os.path.dirname(os.path.abspath(__file__)) # where the scripts are
+os.chdir(cwd)
+
+from configuration import ( wdir )
 
 #######################################################################
-# define parameters
-subjects_dir = "/neurospin/meg/meg_tmp/MTT_MEG_Baptiste/MEG"
-wdir         = "/neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF"
-
-ListSubject = ['pf120155','pe110338','cj100142','jm100042',
-               'jm100109','sb120316','tk130502','sl130503',
-               'rl130571','bd120417','rb130313','mp140019']
-                               
-ListRunPerSubject = [['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'            ],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase1bis','phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3'],
-                     ['phase1','phase2'   ,'phase3']] 
-
-ListCondition     = [['PSS_Vfirst' ,'PSS_Afirst' ],
-                     ['JND1_Vfirst','JND1_Afirst'],
-                     ['JND2_Vfirst','JND2_Afirst']]
-
-ListTrigger       = [[22, 21],
-                     [12, 11],
-                     [32, 31]]                     
+# List of parameters to parallelize
+ListSubject  = ['pf120155','pe110338','cj100142','jm100042','jm100109','sb120316',
+            'tk130502', 'sl130503', 'rl130571','bd120417','rb130313', 'mp140019']
+                 
+ListCondition = [['PSS_Vfirst', 'PSS_Afirst'],
+                 ['JND1_Vfirst', 'JND1_Afirst'],
+                 ['JND2_Vfirst', 'JND2_Afirst']]           
                   
 ############################################################################### 
 # the epoching script will be called in command line with arguments
 # get the full list of command lines to be send in parallel
+                  
+initbody = 'import sys \n'
+initbody = initbody + "sys.path.append(" + "'" + cwd + "')\n"
+initbody = initbody + 'import Compute_Epochs_fnc as CE\n'                  
+                  
+                  
 CMD = []
-CMD = [wdir + '/functions/Compute_Epochs_cmd.py'  
+CMD = [cwd + '/Compute_Epochs_cmd.py'  
        + ' -wdir '    + wdir 
        + ' -subject ' + sub 
        + ' -cond1 '   + str(ListCondition[c][0])
-       + ' -cond2 '   + str(ListCondition[c][1])
-       + ' -trig1 '   + str(ListTrigger[c][0])
-       + ' -trig2 '   + str(ListTrigger[c][1])
-       + ' -runlist ' + ' '.join(ListRunPerSubject[s])       
+       + ' -cond2 '   + str(ListCondition[c][1])    
        for s,sub in enumerate(ListSubject)
        for c,cond in enumerate(ListCondition)]     
 
@@ -66,10 +51,7 @@ CMDname = []
 CMDname = ['Compute_Epochs_cmd '  
        +  sub 
        + str(ListCondition[c][0])
-       + str(ListCondition[c][1])
-       + str(ListTrigger[c][0])
-       + str(ListTrigger[c][1])
-       + ' '.join(ListRunPerSubject[s])       
+       + str(ListCondition[c][1])    
        for s,sub in enumerate(ListSubject)
        for c,cond in enumerate(ListCondition)]
 
