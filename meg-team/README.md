@@ -3,7 +3,7 @@
 We provide some example scripts to illustrate how you can use soma_worklow to process differents subjects and conditions in parallel.
 We gathered canonical processing steps: epoching, averaging, inverse_operator and stc computation in a python function (*Compute_Epochs_~.py*).
 We then call a script that builds the workflow object (*Create_Workflow_~.py*).
-All the parameters used in the processing steps are gathered in a configuration.py file, systematically called in the scripts.
+All the parameters used in the processing steps are gathered in a *configuration.py* file, systematically called in the scripts.
 Additional functions can be used, as for instance *recode_event.py*, used to recode events from epochs object following relevant combinations of triggers.
 
 We provide two alternative ways to distribute your analysis in a serie of jobs that can be send in parallel.
