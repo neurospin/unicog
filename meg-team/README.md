@@ -45,7 +45,7 @@ Clone the git repository unicog in your repository and move to the scripts folde
     git clone https://github.com/neurospin/unicog.git
     cd unicog/meg-team
 
-Lauch the script *Create_Workflow_\*.py* to create the workflow. You can do it from an ipython interpreter.
+Lauch the script *Create_Workflow_~.py* to create the workflow. You can do it from an ipython interpreter.
 
     ipython
     %run Create_WorkFlow_cmd.py
