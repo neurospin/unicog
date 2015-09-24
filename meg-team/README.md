@@ -27,10 +27,10 @@ Each job is directly lauch via a command line.
 ##### Compute_Epochs_cmd
 It is the strict equivalent of *Compute_Epochs_fnc.py* except that it takes its arguments directly in a command line call thanks to the argument parser (module argparse).<br />
 Arguments: <br />
-  * wdir: working directory (for the example, */neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF/* )
-  * cond1: condition 1 (string)
-  * cond2: condition 2 (string)
-  * subject: subject name (string)
+  * -wdir: working directory (for the example, */neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF/* )
+  * -cond1: condition 1 (string)
+  * -cond2: condition 2 (string)
+  * -subject: subject name (string)
 
 ##### Create_Workflow_cmd
 It only creates the workflow, a text file containing the command line corresponding to each job.
