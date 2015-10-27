@@ -2,11 +2,11 @@ def Plot_groupERF_fnc(wdir, ListCond, ListSubj):
 
     ################################################
     # test input
-    wdir       = "/neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF"
-    ListSubject  = ['pf120155','pe110338','cj100142','jm100042','jm100109','sb120316',
-                'tk130502', 'sl130503', 'rl130571','bd120417','rb130313', 'mp140019']
-                     
-    ListCondition = ('PSS_Vfirst', 'PSS_Afirst')
+    #wdir       = "/neurospin/meg/meg_tmp/tools_tmp/MEG_DEMO_SOMAWF"
+    #ListSubject  = ['pf120155','pe110338','cj100142','jm100042','jm100109','sb120316',
+    #            'tk130502', 'sl130503', 'rl130571','bd120417','rb130313', 'mp140019']
+    #                 
+    #ListCondition = ('PSS_Vfirst', 'PSS_Afirst')
     ###############################################
     
     import os
