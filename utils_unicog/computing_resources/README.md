@@ -148,9 +148,12 @@ Add the following lines for the configuration of **.soma-workflow.cfg**:
     ENGINE_LOG_DIR    = /home/your_logging/soma-workflow/logs
     ENGINE_LOG_FORMAT = %(asctime)s => %(module)s line %(lineno)s: %(message)s %(threadName)s
     ENGINE_LOG_LEVEL  = ERROR
-    PATH_TRANSLATION_FILES = brainvisa{/home/your_logging/.brainvisa/soma-workflow.translation}
+    PATH_TRANSLATION_FILES =
     MAX_JOB_IN_QUEUE = {5} run32{5} Global_long{5}
 
+Note: if you use soma_workflow and BrainVISA, change the PATH_TRANSLATION_FILES parameter such as:
+
+    PATH_TRANSLATION_FILES = brainvisa{/home/your_logging/.brainvisa/soma-workflow.translation}
 
 Create the following directories, if needed:
 
