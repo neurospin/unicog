@@ -7,7 +7,7 @@ at NeuroSpin.
 One parallel computing resource could be your own computer by using all processors or a specific cluster like Gabriel at NeuroSpin.
 Jobs are launched in parallel and not one after the other.
 
-More information on [http://brainvisa.info/soma/soma-workflow/](http://brainvisa.info/soma/soma-workflow/)
+More information on [http://brainvisa.info/soma-workflow-2.8/sphinx/](http://brainvisa.info/soma-workflow-2.8/sphinx/)
 and [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow) 
 
 ## HOW CAN I LAUNCH MY JOBS WITH SOMA WORKFLOW ?
