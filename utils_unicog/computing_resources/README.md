@@ -178,7 +178,7 @@ Create a /tmp/create_somaWF_jobs.py python file to generate your soma_workflow_j
 	Helper.serialize('test_script_python.somawf', workflow)
 
 	
-This step create a /tmp/test_script_python.somawf file
+This step creates a /tmp/test_script_python.somawf file.
 
 STEP3:
 Launch the soma_workflow_gui
