@@ -147,14 +147,27 @@ def create_localizer_mask(roi_img, localizer_img, loc_threshold):
 # METHODS TO EXTRACT DATA FROM ROIs
 ###################################
 
+#def get_data_in_roi(path_roi, data_file):
+#    """Using of the NiftiMapsMasker """
+#    masker = NiftiMapsMasker([path_roi])
+#    nifti_obj = nibabel.load(data_file)
+#    data = masker.fit_transform(nifti_obj)
+#    return data
+
 def get_data_in_roi(path_roi, data_file):
     """Using of the NiftiMapsMasker """
     masker = NiftiMapsMasker([path_roi])
-    nifti_obj = nibabel.load(data_file)
-    data = masker.fit_transform(nifti_obj)
-    return data
+    array_datas = np.zeros((len(data_file), 177))
+    for e, d in enumerate(data_file):
+        nifti_obj = nibabel.load(d)
+        data = masker.fit_transform(d)
+        array_datas[e-1] = data.ravel()
+    return array_datas
 
-    
+
+#def get_mean_epi_masked(epi_files, roi):
+#    return np.mean(apply_mask(epi_files, roi), axis=1)
+
 
 def get_data_in_rois_method1(ROIs, subjects, contrasts, condir):
     """ returns the average contratst in each ROI and for each subject """
@@ -258,13 +271,14 @@ def analyze_average(data, onsets,
                                sampling_interval=sampling_interval, 
                                time_unit = time_unit)
     
-    
     # Events initialization
     events = timeseries.Events(onsets, time_unit = time_unit)
     
     # Timeseries analysis 
     #len_et = numbre of TR what you want to see
     #offset = number of offset including in len_et 
+#    print ts
+#    print events
     analyzer = analysis.EventRelatedAnalyzer(ts, events, len_et=len_et, offset=offset)
    
     return analyzer

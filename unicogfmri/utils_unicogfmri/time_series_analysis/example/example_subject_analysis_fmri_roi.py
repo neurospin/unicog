@@ -17,13 +17,14 @@ import pandas as pd
 
 # SPECIFIC MODULES
 from nilearn.masking import apply_mask
+from nilearn.image import mean_img
 import nibabel
 from nitime import timeseries
 from nitime import analysis
 from nitime import viz
 
 # UNICOG MODULES
-from unicogfmri.utils_unicog.utils import utils
+from unicogfmri.utils_unicogfmri.utils import utils
 
 
 ########################
@@ -35,7 +36,7 @@ from unicogfmri.utils_unicog.utils import utils
 # OR
 datadir = os.getenv('ROOTDIR')
 datadir = '/neurospin/unicog/protocols/IRMf/Tests_Isa/Test_nitime/test_data_antonio'
-save_analysis = op.join(datadir, "times_series_analysis")     
+save_analysis = op.join(datadir, "times_series_analysis_2")     
             
 ########################
 # ROI(s) ANALYSIS
@@ -82,28 +83,38 @@ time_unit = 's'
 for r in list_rois :
     for s in list_subjs : 
         # Pattern to fetch data for each subj
-        data_file = glob(datadir 
+        epi_files = glob(datadir 
                         + "/" 
                         + s 
                         + "/fMRI/acquisition1/"
-                        + "swaclsf1*.nii" )        
+                        + "swaclsf*.nii" )        
 
         # Many methods to extract data are available in utils
         # Here using of NiftiMapsMasker
         path_roi = op.join(path_rois, r)
-        data = utils.get_data_in_roi(path_roi, data_file[0]) 
+#        mean_imgs = mean_img(epi_files)
+#        data = utils.get_data_in_roi(path_roi, data_file[0]) 
+        array_datas = utils.get_data_in_roi(path_roi, epi_files)
+        print 'list_data'
+        print array_datas
+        mean_array_datas = np.mean(array_datas, axis=0)
+        print mean_array_datas
+        print mean_array_datas.shape
+#        list_data_mean = 
+#        data = utils.get_mean_epi_masked(epi_files, path_roi)
 
-        data2= apply_mask(data_file[0], path_roi)
+#
+#        data2= apply_mask(data_file[0], path_roi) ?
 
-        print "data"
-        print data[:10]
-        print "data2"
-        print data2[:10]
-        print data.shape
-        print data2.shape
+#        print "data"
+##        print data[:10]
+##        print "data2"
+##        print data2[:10]
+#        print data.shape
+#        print data2.shape
 
         # Filtered data ...
-        #data = data_filtered(data)
+        #mean_array_datas_filtered = data_filtered(dmean_array_datas)
       
         # Initialization
         means = []
@@ -120,10 +131,15 @@ for r in list_rois :
         for name_cond, label in conditions.iteritems():
             # get the onsets for one condition
             onsets = utils.get_onsets(path_onsets, label)
-
+            #detrend http://nilearn.github.io/manipulating_visualizing/data_preparation.html
+            print "onsets"            
+            print onsets
+            data_ts = data.ravel()
+            print data_ts
+            print data_ts.shape
             # methods available to plot data using ntime module
             analyzer = utils.analyze_average(
-                                    data.ravel(), 
+                                    mean_array_datas.ravel(), 
                                     onsets, 
                                     sampling_interval, 
                                     time_unit = time_unit)       
