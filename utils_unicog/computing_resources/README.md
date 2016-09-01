@@ -80,7 +80,7 @@ Add the following lines for the configuration:
     CLUSTER_ADDRESS     = gabriel.intra.cea.fr
     SUBMITTING_MACHINES = gabriel.intra.cea.fr
     #optional on client
-    QUEUES = run32 Global_long Global_short 
+    QUEUES = run32 Global_long Global_short Unicog_short Unicog_long Unicog_run2 Unicog_run4 Unicog_run8 Unicog_run16 Unicog_run32 
     #optional login for the GUI
     LOGIN = your_logging
 
