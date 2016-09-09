@@ -8,13 +8,13 @@ function physio_regressors_computation_tapas(data_local_dir, root_file_name, ord
 %
 % IMPORTANT: 
 %
-% 1) put all your data (.nii file, .log files) in a directory called "data"
-%    at the same level as this .m file
+% 1) put all your data (.nii file, .log files) in a same directory for 
+%    every subject and session
 %
 % 2) before using this fuction, run the local installation of SPM8 
 %    (necessary only the first time after opening Matlab). For example:
 %
-% addpath /home/am985309/matlab/spm8
+% addpath /home/yourlogin/matlab/spm8
 % spm('fmri')
 %
 % CAREFUL: This function only computes the regressors for one fMRI session 
@@ -35,7 +35,7 @@ function physio_regressors_computation_tapas(data_local_dir, root_file_name, ord
 %        - order of sum/difference of cardiac/respiratory phase expansion 
 %        (phase interaction) (e.g. 1)
 %        - verbose_level indicates the number of plots to display:
-%        0 = none; 1 = main plots (default);  2 = debugging plots, for 
+%        0 = none; 1 = main plots (default); 2 = debugging plots, for 
 %        setting up new study; 3 = all plots
 %
 % Output: file containing the physiological regressors, which is named with 

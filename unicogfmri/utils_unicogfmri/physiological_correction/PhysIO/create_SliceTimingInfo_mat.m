@@ -32,11 +32,11 @@ function [SliceTiming, TR, TE, SliceThickness, SpacingBetweenSlices, ...
 %            = create_SliceTimingInfo_mat(spm_path, list_file, output_dir)
 %
 % Example:
-% > spm_path = '/home/am985309/matlab/spm8'
-% > list_file = '/neurospin/unicog/protocols/IRMf/MeynielMoreno_NACONF_2016/tests_physiological_correction/analyzed_data/test_subj5/list_subjects.txt'
-% > output_dir = '/neurospin/unicog/protocols/IRMf/MeynielMoreno_NACONF_2016/tests_physiological_correction/analyzed_data/test_subj5/data'
+% > spm_path = '/home/yourlogin/matlab/spm8'
+% > list_file = '/yourworkingdirectory/list_subjects.txt'
+% > output_dir = '/yourworkingdirectory/subj1/data'
 % > create_SliceTimingInfo_mat(spm_path, list_file, output_dir)
- 
+
 % add spm in the path
 addpath(spm_path)
 
