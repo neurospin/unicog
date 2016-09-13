@@ -172,7 +172,7 @@ Create a /tmp/create_somaWF_jobs.py python file to generate your soma_workflow_j
 
 	jobs = []
 	for f in list_scripts:
-		jobs.append(Job(command=["python", os.path.abspath(f)], name=f)
+		jobs.append(Job(command=["python", os.path.abspath(f)], name=f))
 
 	workflow=Workflow(jobs)
 	Helper.serialize('test_script_python.somawf', workflow)
