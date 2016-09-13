@@ -89,7 +89,7 @@ More detailed information in the header of the function:
 
 Run function "physio_regressors_computation_tapas" with the appropriate parameters. For example :
 
-    physio_regressors_computation_tapas('fMRI','epi_sess1_bp160018_20160511_05',3,4,1,3)
+    physio_regressors_computation_tapas('epi_sess1_bp160018_20160511_05',3,4,1,3)
 
 **Attention**: this function only computes the regressors for ONE fMRI session (one .nii file)!
 
