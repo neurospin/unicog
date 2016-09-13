@@ -1,28 +1,34 @@
 # Physiological correction code
 
-The files in PhysIO are a tool for correct fMRI images using physiological data acquired during acquisition (pulse and respiration). This toolbox computes the regressors (with RETROICOR algorithm) to be included in your design. It is a version of the TAPAS toolbox adapted for the 3T MRI scanner in NeuroSpin, using fMRI acquisitions with Minneapolis sequences.
+PhysIO is a toolbox that can be used to correct fMRI images using physiological data acquired during acquisition (pulse and respiration). This toolbox computes the regressors (with RETROICOR algorithm) to be included in your design. It is a version of the [TAPAS toolbox](http://www.translationalneuromodeling.org/tnu-checkphysretroicor-toolbox/). It has been adapted for the 3T MRI scanner in NeuroSpin, using fMRI acquisitions with Minneapolis sequences.
 
 ### installation
 
-Copy all the directory "PhysIO" in your local Matlab-SPM-toolbox directory:
-    ~/matlab/spm8/toolbox/PhysIO/
+Copy all the directory "PhysIO". Then, you will have to add the path to it in Matlab:
+    addpath('/path_to_the_toolbox/PhysIO/')
 
 ### before using the toolbox
 
-1) Organize your data (.nii, .log files).
+1) Organize your data: .nii and .log files must be in the local "fMRI" directory for every subject.
 
-2) In Matlab, run your local installation of SPM8 (only necessary once for a Matlab session):
+2) In Matlab, add the directory containing the "PhysIO" toolbox and run SPM (only necessary once for a Matlab session):
 
-    addpath /home/yourlogin/matlab/spm8
+    addpath('/path_to_the_toolbox/PhysIO/')
     spm('fmri')
 
-3) You need to get some acquisition information from your data. For this, you can use the provided function "create_SliceTimingInfo_mat" that will create file SliceTiming.mat (in the directory of the .nii data) for every subject, by using file "list_subjects.txt" (the one used for importation).
+3) You need to get some acquisition information from your data. For this, you can use the provided function "create_SliceTimingInfo_mat" that will create file SliceTiming.mat (in the directory "fMRI" containing the .nii data) for every subject, by using file "list_subjects.txt" (the file used for importation).
+
+**Attention**: 
+
+* this function must be run in the directory where "list_file" is placed and where there are also the subjects directories.
+
+* data must be placed in a subdirectory called "fMRI" for every subject.
 
 More detailed information in the header of the function:
 
     function [SliceTiming, TR, TE, SliceThickness, SpacingBetweenSlices, ...
                 NumberOfSlices, PixelSpacing, total_readout_time_spm, total_readout_time_fsl] ...
-                = create_SliceTimingInfo_mat(spm_path, list_file, output_dir)
+                = create_SliceTimingInfo_mat(spm_path, list_file)
     
     % Adapted by A. Moreno (September 2016) from code created by F. Meyniel:
     % https://github.com/florentmeyniel/fmspm12batch/blob/PhysioCorrection/fmspm12batch_preproc_GetSliceTiming_NS.m
@@ -51,21 +57,39 @@ More detailed information in the header of the function:
     % Usage:
     % [SliceTiming, TR, TE, SliceThickness, SpacingBetweenSlices, ...
     %            NumberOfSlices, PixelSpacing, total_readout_time_spm, total_readout_time_fsl] ...
-    %            = create_SliceTimingInfo_mat(spm_path, list_file, output_dir)
+    %            = create_SliceTimingInfo_mat(spm_path, list_file)
+    %
+    % Attention: 
+    % - this function must be run in the directory where "list_file" is placed 
+    %   and where there are also the subjects directories.
+    % - data must be placed in a subdirectory called "fMRI" for every subject.
+    % 
+    % ---- list_subjects.txt 
+    %   |
+    %   |- subj01 --- anat
+    %   |          |- fMRI
+    %   |
+    %   |- subj02 --- anat
+    %   |          |- fMRI
+    %   |
+    %   |- subj03 --- anat
+    %   |          |- fMRI
+    %   |
+    %   |- RUN THIS FUNCTION HERE
+    % 
     %
     % Example:
-    % > spm_path = '/home/yourlogin/matlab/spm8'
-    % > list_file = '/yourworkingdirectory/list_subjects.txt'
-    % > output_dir = '/yourworkingdirectory/subj1/data'
-    % > create_SliceTimingInfo_mat(spm_path, list_file, output_dir)
+    % > spm_path = '/i2bm/local/spm8'
+    % > list_file = 'list_subjects.txt'
+    % > create_SliceTimingInfo_mat(spm_path, list_file)
  
 ### computing the regressors
 
 Run function "physio_regressors_computation_tapas" with the appropriate parameters. For example :
 
-    physio_regressors_computation_tapas('data','epi_sess1_bp160018_20160511_05',3,4,1,3)
+    physio_regressors_computation_tapas('fMRI','epi_sess1_bp160018_20160511_05',3,4,1,3)
 
-*Attention*: this function only computes the regressors for ONE fMRI session (one .nii file)!
+**Attention**: this function only computes the regressors for ONE fMRI session (one .nii file)!
 
 More detailed information in the header of the function:
 
