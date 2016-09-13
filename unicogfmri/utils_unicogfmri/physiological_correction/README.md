@@ -5,6 +5,7 @@ PhysIO is a toolbox that can be used to correct fMRI images using physiological 
 ### installation
 
 Copy all the directory "PhysIO". Then, you will have to add the path to it in Matlab:
+    
     addpath('/path_to_the_toolbox/PhysIO/')
 
 ### before using the toolbox
@@ -14,9 +15,10 @@ Copy all the directory "PhysIO". Then, you will have to add the path to it in Ma
 2) In Matlab, add the directory containing the "PhysIO" toolbox and run SPM (only necessary once for a Matlab session):
 
     addpath('/path_to_the_toolbox/PhysIO/')
+    spm8 # or other version
     spm('fmri')
 
-3) You need to get some acquisition information from your data. For this, you can use the provided function "create_SliceTimingInfo_mat" that will create file SliceTiming.mat (in the directory "fMRI" containing the .nii data) for every subject, by using file "list_subjects.txt" (the file used for importation).
+3) You need to get some acquisition information from your data. For this, you can use the provided function "create_SliceTimingInfo_mat" that will create file SliceTimingInfo.mat (in the directory "fMRI" containing the .nii data) for every subject, by using file "list_subjects.txt" (the file used for importation).
 
 **Attention**: 
 
@@ -93,7 +95,7 @@ Run function "physio_regressors_computation_tapas" with the appropriate paramete
 
 More detailed information in the header of the function:
 
-    function physio_regressors_computation_tapas(data_local_dir, root_file_name, order_c, order_r, order_cr, verbose_level)
+    function physio_regressors_computation_tapas(root_file_name, order_c, order_r, order_cr, verbose_level)
     %
     % Performs PhysIO-Regressor generation from Siemens Minneapolis sequence
     % logfiles
@@ -103,14 +105,18 @@ More detailed information in the header of the function:
     %
     % IMPORTANT: 
     %
-    % 1) put all your data (.nii file, .log files) in a same directory for 
-    %    every subject and session
+    % 1) organize your data: all .nii and .log files must be in the same local 
+    %    directory for every subject (for example "fMRI").
     %
-    % 2) before using this fuction, run the local installation of SPM8 
-    %    (necessary only the first time after opening Matlab). For example:
+    % 2) in Matlab, add the directory containing the "PhysIO" toolbox and run 
+    %    SPM (only necessary once for a Matlab session):
     %
-    % addpath /home/yourlogin/matlab/spm8
-    % spm('fmri')
+    %    addpath('/path_to_the_toolbox/PhysIO/')
+    %    spm8 # or other version
+    %    spm('fmri')
+    %
+    % 3) run this function in the directory of the subject containing the data
+    %    (.nii and .log files).
     %
     % CAREFUL: This function only computes the regressors for one fMRI session 
     %          (one .nii file)!
@@ -153,8 +159,10 @@ More detailed information in the header of the function:
     % (Birn et al., 2008; Chang et al., 2009)" 
     % -- from Handbook_PhysIO_Toolbox.pdf in TAPAS toolbox
     %
+    %
     % Example for running:
-    % > physio_regressors_computation_tapas('data','epi_sess2_bp160018_20160511_07',3,4,1,3)
+    % > physio_regressors_computation_tapas('epi_sess2_bp160018_20160511_07',3,4,1,3)
+    %
     %
     % Original codes from:
     % http://www.translationalneuromodeling.org/tnu-checkphysretroicor-toolbox/

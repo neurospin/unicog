@@ -1,4 +1,5 @@
-function physio_regressors_computation_tapas(data_local_dir, root_file_name, order_c, order_r, order_cr, verbose_level)
+%function physio_regressors_computation_tapas(data_local_dir, root_file_name, order_c, order_r, order_cr, verbose_level)
+function physio_regressors_computation_tapas(root_file_name, order_c, order_r, order_cr, verbose_level)
 %
 % Performs PhysIO-Regressor generation from Siemens Minneapolis sequence
 % logfiles
@@ -8,14 +9,18 @@ function physio_regressors_computation_tapas(data_local_dir, root_file_name, ord
 %
 % IMPORTANT: 
 %
-% 1) put all your data (.nii file, .log files) in a same directory for 
-%    every subject and session
+% 1) organize your data: all .nii and .log files must be in the same local 
+%    directory for every subject (for example "fMRI").
 %
-% 2) before using this fuction, run the local installation of SPM8 
-%    (necessary only the first time after opening Matlab). For example:
+% 2) in Matlab, add the directory containing the "PhysIO" toolbox and run 
+%    SPM (only necessary once for a Matlab session):
 %
-% addpath /home/yourlogin/matlab/spm8
-% spm('fmri')
+%    addpath('/path_to_the_toolbox/PhysIO/')
+%    spm8 # or other version
+%    spm('fmri')
+%
+% 3) run this function in the directory of the subject containing the data
+%    (.nii and .log files).
 %
 % CAREFUL: This function only computes the regressors for one fMRI session 
 %          (one .nii file)!
@@ -60,7 +65,7 @@ function physio_regressors_computation_tapas(data_local_dir, root_file_name, ord
 %
 %
 % Example for running:
-% > physio_regressors_computation_tapas('data','epi_sess2_bp160018_20160511_07',3,4,1,3)
+% > physio_regressors_computation_tapas('epi_sess2_bp160018_20160511_07',3,4,1,3)
 %
 %
 % Original codes from:
@@ -87,7 +92,8 @@ function physio_regressors_computation_tapas(data_local_dir, root_file_name, ord
 
 % Load information in file 'SliceTimingInfo.mat' (this file has to be in
 % the local data directory).
-local_slice_timing_info_file = fullfile(data_local_dir, 'SliceTimingInfo.mat');
+%local_slice_timing_info_file = fullfile(data_local_dir, 'SliceTimingInfo.mat');
+local_slice_timing_info_file = fullfile('SliceTimingInfo.mat');
 scan_info = load(local_slice_timing_info_file);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,9 +110,12 @@ verbose     = physio.verbose;            % Auxiliary: Output
 %% 1. Define Input Files
 
 log_files.vendor            = 'Siemens_minn';
-log_files.cardiac           = strcat(fullfile(data_local_dir, root_file_name),'_PULS.log');
-log_files.respiration       = strcat(fullfile(data_local_dir, root_file_name),'_RESP.log');
-log_files.scan_timing       = strcat(fullfile(data_local_dir, root_file_name),'_Info.log');
+%log_files.cardiac           = strcat(fullfile(data_local_dir, root_file_name),'_PULS.log');
+%log_files.respiration       = strcat(fullfile(data_local_dir, root_file_name),'_RESP.log');
+%log_files.scan_timing       = strcat(fullfile(data_local_dir, root_file_name),'_Info.log');
+log_files.cardiac           = strcat(fullfile(root_file_name),'_PULS.log');
+log_files.respiration       = strcat(fullfile(root_file_name),'_RESP.log');
+log_files.scan_timing       = strcat(fullfile(root_file_name),'_Info.log');
 log_files.sampling_interval = [2*1/400 8*1/400 1/400]; % [cardiac_SampleTime respiration_SampleTime tick_time] in seconds
 log_files.align_scan        = 'first';
 log_files.relative_start_acquisition = 0 ; % in seconds
@@ -117,7 +126,8 @@ sqpar.Nslices           = scan_info.NumberOfSlices;
 sqpar.NslicesPerBeat    = sqpar.Nslices;   % typically equivalent to Nslices; exception: heartbeat-triggered sequence
 sqpar.TR                = scan_info.TR; % in seconds
 sqpar.Ndummies          = 0;    % number of dummy volumes
-my_vol                  = spm_vol(strcat(fullfile(data_local_dir, root_file_name),'.nii'));
+%my_vol                  = spm_vol(strcat(fullfile(data_local_dir, root_file_name),'.nii'));
+my_vol                  = spm_vol(strcat(fullfile(root_file_name),'.nii'));
 sqpar.Nscans            = numel(my_vol); % donne le nombre d'images 3D dans le volume 4D
 sqpar.onset_slice       = 1; % or = floor( (scan_info.NumberOfSlices + 1) / 2);   % The one in the middle
 
@@ -160,7 +170,8 @@ model.rvt.delays = 0; % (TODO)
 % OTHER
 model.input_other_multiple_regressors = ''; % either .txt-file or .mat-file (saves variable R)
 output_multiple_regressors_filename = strcat('physio_regressors_', root_file_name, '.txt');
-model.output_multiple_regressors = fullfile(data_local_dir, output_multiple_regressors_filename);
+%model.output_multiple_regressors = fullfile(data_local_dir, output_multiple_regressors_filename);
+model.output_multiple_regressors = fullfile(output_multiple_regressors_filename);
 
 %% 4. Define Gradient Thresholds to Infer Gradient Timing (Philips only)
 %
