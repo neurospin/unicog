@@ -1,0 +1,11 @@
+# Dependencies (can simply pip install package):
+pydicom
+pandas
+
+# Neurospin server to bids
+
+test_dataset follows a minimal set of conventions for the download to work.
+
+cd path_to/test_dataset
+python path_to/neurospin_to_bids.py -neurospin_database trio
+
