@@ -302,6 +302,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         DATE = subject_info['acq_date'].replace('-', '').replace('\n', '')
         NIP = subject_info['NIP']
         nip_dirs = glob.glob(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
+        print os.path.join(db_path, str(DATE), str(NIP) + '-*')
         if len(nip_dirs) < 1:
             raise Exception('No directory found for given NIP %s SESSION %s' %
                             (NIP, session_id))
@@ -354,7 +355,11 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                             run_session,
                                                             subject_id))
 
-            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
+#            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
+#                            shell=True)
+            print dicom_path
+            print os.curdir
+            subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
                             shell=True)
 
             # Expecting page 10 bids specification file name
@@ -363,20 +368,30 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                 session_id=run_session,
                                                 file_tag=row['acq_name'],
                                                 file_type='nii')
+                                                
+            filename_json = os.path.join(target_path, filename[:-3] + 'json')
+            
             shutil.copyfile(glob.glob(os.path.join(dicom_path,
                                                    '*.nii'))[0],
                             os.path.join(target_path, filename))
+                          
+            print glob.glob(os.path.join(dicom_path,'*.json'))[0]
+            shutil.copyfile(glob.glob(os.path.join(dicom_path,
+                                                   '*.json'))[0],
+                            os.path.join(filename_json))
+                            
             # Copy slice_times from dicom reference file
-            if 'bold' in row['acq_name']:
-                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
-                                   '*.dcm')))[4]
-                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
-                TR = dicom.read_file(dicom_ref).RepetitionTime
-                json_ref = open(os.path.join(target_path, filename[:-3] +
-                                'json'), 'w')
-                json.dump({'SliceTiming': slice_times,
-                           'RepetitionTime': int(TR)}, json_ref)
-                json_ref.close()
+            #do by dcm2niix
+#            if 'bold' in row['acq_name']:
+#                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
+#                                   '*.dcm')))[4]
+#                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
+#                TR = dicom.read_file(dicom_ref).RepetitionTime
+#                json_ref = open(os.path.join(target_path, filename[:-3] +
+#                                'json'), 'a')
+#                json.dump({'SliceTiming': slice_times,
+#                           'RepetitionTime': int(TR)}, json_ref)
+#                json_ref.close()
             # remove temporary dicom folder
             shutil.rmtree(dicom_path)
 
@@ -411,6 +426,8 @@ if __name__ == "__main__":
                         help='neurospin server to download from')
     # LOAD CONSOLE ARGUMENTS
     args = parser.parse_args()
+    print args
+    print type(args)
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
                               download_database=args.neurospin_database[0],
