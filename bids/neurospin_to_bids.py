@@ -97,16 +97,15 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
 def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                      dataset_name=None):
     data_path = get_bids_default_path(data_root_path, dataset_name)
-    if glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*')):
+    if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
         sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*'))
     else:
-        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*'))
+        sub_folders = glob.glob(os.path.join(data_root_path, behav_path, 'sub-*'))
 
     for sub_folder in sub_folders:
         for file_name in os.listdir(os.path.join(sub_folder, 'func')):
-            bidx = len(behav_path) + 1
             shutil.copy2(os.path.join(sub_folder, 'func', file_name),
-                         os.path.join(data_path, sub_folder[bidx:],
+                         os.path.join(data_path, os.path.basename(sub_folder),
                                       'func', file_name))
 
 
