@@ -23,16 +23,29 @@ The neurospin_to_bids.py script can be use without install the unicog module.
 The test_dataset follows a minimal set of conventions for the download to work.
 
 
-# Using:
+# Basic usage:
 
-        cd path_to/test_dataset
+        cd <path_to/test_dataset>
         python path_to/neurospin_to_bids.py -neurospin_database trio
 
+In this case, the **\<path_to/test_dataset\>** directory contains a **exp_info** directory with 2 files 
+(**participants.tsv** and **download.tsv**) indicating what are the subjects to download.
+For more information, read the Additional information section.
+Indicate your **neurospin_database** either "prisma" or "trio" (prisma is the default parameter).
+
+# Advanced usage:
+
+        python neurospin_to_bids.py -root_path <root_path> -dataset_name <my_dataset> -neurospin_database trio
+
+The **-root_path** option allows to indicate a specific path including the **exp_info** directory.
+The **-dataset_name** option allows to give a specific name to the dataset ( the default is bids_dataset).
+For more information, read the Additional information section.
 
 # Additionnal information
 ## Input files for the preparation of importation:
-Two input files are needed:
-- participants.tsv: corresponds to the list of participants. Here is an example:
+Two input files are mandatory and the events are optionals:
+
+- **participants.tsv**: corresponds to the list of participants. Here is an example:
 
         participant_id	NIP	acq_date
         sub-1	nip_number	2010-06-28
@@ -40,7 +53,7 @@ Two input files are needed:
 
 
 
-- download.tsv: corresponds to the acquisitions to download. If the number of acquisition is
+- **download.tsv**: corresponds to the acquisitions to download. If the number of acquisition is
 the same for all subjects, you have to indicate only the acquisition number once. Here is an 
 example:
 
@@ -48,16 +61,24 @@ example:
         2	anat	T1w
         9	func	task-loc_std_bold
 
-## Importation of data:
-Remind this script is dedecated to Neurospin server.
 
-        cd path_to/<data>
-        python neurospin_to_bids.py -neurospin_database trio
+- **sub-\*\_\<task\>\_events.tsv**: here is an example:
 
-Select your database_neurospin either "prisma" or "trio" (prisma is the default parameter).
-If you need, you can use a specific path.
+        onset	duration	trial_type	trial_name
+        0.0	1	8	computation_video
+        2.4	1	8	computation_video
+        8.7	1	1	h_checkerboard
+        11.4	1	3	r_hand_audio
+        15.0	1	10	sentence_audio
+
+
+# Importation events:
+The events can be imported if files exist like this:
+
+    <data_root>/exp_info/recorded_events/sub-*/func/sub-*_<task>_events.tsv
+
+
+<!-- * Multiple session: --> 
 
 Note:
 If the importation is interrupted, the script will import only missing data.   
-
-<!-- Importation events: -->
