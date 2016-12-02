@@ -1,8 +1,8 @@
 
-We propose here a script to import data from the neuropsin dataserver with 
+We propose, here, a script to import data from the neuropsin dataserver with 
 the BIDS organization (Brain Imaging Data Structure / http://bids.neuroimaging.io/).
 The BIDS oragnization has been selected because the organization is simple, 
-easily shared and supported by many software even if is not a standard.
+easily shared and supported by many software even if it is not a standard.
 
 # Dependencies (can simply pip install package):
 pydicom  

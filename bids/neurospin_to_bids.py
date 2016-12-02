@@ -260,8 +260,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     bids_init_dataset(data_root_path, dataset_name)
 
     # Get info of subjects/sessions to download
-    pop = pd.read_csv(os.path.join(get_exp_info_path(), 'participants.tsv'),
+    pop = pd.read_csv(os.path.join(exp_info_path, 'participants.tsv'),
                       dtype=str, sep='\t', index_col=False)
+#    pop = pd.read_csv(os.path.join(get_exp_info_path(), 'participants.tsv'),
+#                      dtype=str, sep='\t', index_col=False)
 
     download_report = ('download_report_' +
                        time.strftime("%d-%b-%Y-%H:%M:%S", time.gmtime()) +
@@ -314,7 +316,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             optional_filters += [('ses', session_id)]
 
         # Get appropriate download file. As specific as possible
-        specs_path = file_manager_default_file(get_exp_info_path(),
+        specs_path = file_manager_default_file(exp_info_path,
                                                optional_filters, 'download',
                                                file_type='tsv',
                                                allow_other_fields=False)
