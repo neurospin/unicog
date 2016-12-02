@@ -181,8 +181,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     Name: dataset_name
     BidsVersion: 1.0.0
     """
-    if dataset_name is None:
-        dataset_name = get_bids_default_path(data_root_path, dataset_name)
+    dataset_name = get_bids_default_path(data_root_path, dataset_name)   
     if not os.path.exists(dataset_name):
         os.makedirs(dataset_name)
     # Check dataset_description.json
@@ -357,8 +356,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
 #            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
 #                            shell=True)
-            print dicom_path
-            print os.curdir
             subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
                             shell=True)
 
@@ -375,7 +372,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                    '*.nii'))[0],
                             os.path.join(target_path, filename))
                           
-            print glob.glob(os.path.join(dicom_path,'*.json'))[0]
             shutil.copyfile(glob.glob(os.path.join(dicom_path,
                                                    '*.json'))[0],
                             os.path.join(filename_json))
@@ -426,8 +422,6 @@ if __name__ == "__main__":
                         help='neurospin server to download from')
     # LOAD CONSOLE ARGUMENTS
     args = parser.parse_args()
-    print args
-    print type(args)
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
                               download_database=args.neurospin_database[0],
