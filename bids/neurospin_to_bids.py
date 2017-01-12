@@ -120,14 +120,14 @@ def get_bids_path(data_root_path='', subject_id='01', folder='',
 
 
 def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
-                             acq_id=None, rec_id=None, run_id=None,
+                             acq_label=None, rec_id=None, run_id=None,
                              file_tag=None, file_type=None):
     """Creates a filename descriptor following BIDS.
 
     subject_id refers to the subject label
     task_id refers to the task label
     run_id refers to run index
-    acq_id refers to acquisition parameters as a label
+    acq_label refers to acquisition parameters as a label
     rec_id refers to reconstruction parameters as a label
     """
     descriptor = 'sub-{0}'.format(subject_id)
@@ -135,8 +135,8 @@ def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
         descriptor += '_ses-{0}'.format(session_id)
     if task_id is not None:
         descriptor += '_task-{0}'.format(task_id)
-    if acq_id is not None:
-        descriptor += '_acq-{0}'.format(acq_id)
+    if acq_label is not None:
+        descriptor += '_acq-{0}'.format(acq_label)
     if rec_id is not None:
         descriptor += '_rec-{0}'.format(rec_id)
     if run_id is not None:
@@ -274,7 +274,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Download command for each subject/session
     # (following neurospin server conventions)
     for row_idx, subject_info in pop.iterrows():
-        subject_id = subject_info['participant_id'].split('-')[1]
+        subject_id = subject_info['participant_label'].split('-')[1]
         if 'session_id' in subject_info.index:
             session_id = subject_info['session_id'].split('-')[1]
         else:
@@ -346,7 +346,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             dicom_path = os.path.join(target_path, 'dicom')
 
             run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                              format(int(row['acq_id']))))
+                                              format(int(row['acq_label']))))
             if run_path:
                 shutil.copytree(run_path[0], dicom_path)
             else:

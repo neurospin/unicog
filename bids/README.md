@@ -44,48 +44,96 @@ data are stored, either "prisma" or "trio" (prisma is the default parameter).
 * The **dataset_name** option allows to give a specific name to the dataset (the default is bids_dataset).
 
 # Additionnal information
+## BIDS organisation: 
+For anatomical and functional data, the bids nomenclature corresponds to the following organisation of files.  
+The anatomical data will be imported according the bids nomencalture such as:
+
+        sub­<participant_label>/
+            anat/
+                sub­<participant_label>[_acq­<label>][_rec­<label>][_run­<index>]_T1w.nii[.gz]
+
+The functional data will be imported according the bids nomencalture such as:
+
+        sub­<participant_label>/
+            func/
+                sub­<participant_label>_task­<task_label>[_acq­<label>][_rec­<label>][_run­<index>]_bold.nii[.gz]
+
+If you have a session level, a directory is added between the **sub­<participant_label>** and the modality (here, **anat** or **func**).
+
 ## Input files for the importation of data:
-Two files are mandatories: **participants.tsv** and **[sub-*_][ses-*_]download.csv**. Their configuration is depending
-to the dataset (number of sessions, runs, tasks ....). Many cases are presented below.
+Two files are mandatories: **participants.tsv** and **[sub-*_][ses-*_]download.csv** in the **exp_info** directory. 
+Those files are not a part of bids specifications. They are needed in order to import and organize data as defined in bids specifications
+Their configuration is depending on the dataset (number of sessions, runs, tasks ....). Many cases are presented below.
 
 ### One session/subject 
 - **participants.tsv**: corresponds to the list of participants. Some additional field can be added such
 as sex, age ... 
 
-        participant_id	NIP	acq_date
-        sub-01	nip_number	year-month-day
-        sub-02	nip_number	year-month-day
+--------------------------------------------------------------------
+Nomenclature                            Example
+-------------------------------------   ----------------------------
+participant_label	NIP	acq_date     participant_label	NIP	acq_date
+sub-label	nip_number	YYYY-MM-DD        sub-01	tt989898	2015-02-28
+sub-label	nip_number	YYYY-MM-DD        sub-02	pp898989	2015-02-27
+--------------------------------------------------------------------
+
+
++----------------------------+-------+
+| En-tête                    | etc... |
++===+===+
+| Plusieurs lignes de texte  | - liste |
+| dans la même cellule, mais | - à puces |
+| toujours aligné à gauche ! |
++---+---+
+| Texte _formaté_,           | #. liste |
+| `code`, etc...             | #. numérotée |
++---+---+
+
+
 
 - **download.tsv**: corresponds to the acquisitions to download.
-If the number of acquisitions is the same for all subjects, you have to indicate only 
-the acquisition number once. Here is an example:
+If the number of acquisitions are the same for all subjects, you can share the **download.tsv** file for all subjects:
 
-        acq_id	acq_folder	acq_name
-        <number> 	anat	T1w
-        <number>	 	func	task-<name_task_one>
-        <number>	 	func	task-<name_task_two>
+        acq_label    acq_folder	acq_name
+        label	     anat	T1w
+        label	     func	task-<label>
+        label	     func	task-<label>
 
-The **acq_id** corresponds to a part of the acquired files. For instance, for **000002_mprage-sag-T1-160sl** file, the line 
+If the number of acquisitions are not the same for all subjects, you have to write a specific **[sub-*_][ses-*_]download.csv** file for all
+subject:
+
+* **sub-01_download.tsv** file:
+        acq_label    acq_folder	acq_name
+        label	     anat	T1w
+        label	     func	task-<label>
+
+* **sub-02_download.tsv** file:
+        acq_label    acq_folder	acq_name
+        label	     anat	T1w
+        label	     func	task-<label>
+
+
+The **acq_label** corresponds to a part of the acquired files. For instance, for **000002_mprage-sag-T1-160sl** file, the line 
 will be:
 
         2 	anat	T1w
 
-If the **acq_id** is not the same for all subjects, you have to create a specific **download.tsv** per subject.
+If the **acq_label** is not the same for all subjects, you have to create a specific **download.tsv** per subject.
 For instance:
 
 * **sub-01_download.tsv** file:
 
 
-        acq_id	acq_folder	acq_name
+        acq_label	acq_folder	acq_name
         2	anat	T1w
-        10	func	task-<name-task>
+        10	func	task-<label>
 
 
 * **sub-02_download.tsv** file:
 
-        acq_id	acq_folder	acq_name
+        acq_label	acq_folder	acq_name
         2	anat	T1w
-        9	func	task-<name-task>
+        9	func	task-<label>
 
 
 ### Multiple runs/acquisition: 
@@ -93,10 +141,10 @@ The **participants.tsv** file is the same as above.
 
 For the **download.tsv** file add one line per run in as follows:
 
-        acq_id	acq_folder	acq_name
+        acq_label	acq_folder	acq_name
         <number> 		anat	T1w
-        <number>	 	func	task-<name_task_one>_run01
-        <number>	 	func	task-<name_task_one>_run02
+        <number>	 	func	task-<label>_run01
+        <number>	 	func	task-<label>_run02
 
 ### Multiple sessions/subject: 
 The multiple session case corresponds to the acquisition of several identical or simalar data at 
@@ -106,27 +154,27 @@ the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
 - The **participants.tsv** file will be:
 
-        participant_id	session_id NIP	acq_date
-        sub-01 ses-01 nip_number	date
-        sub-01 ses-02 nip_number	date
-        sub-02 ses-01 nip_number	date
-        sub-02 ses-02 nip_number	date
+        participant_label	session_id NIP	acq_date
+        sub-01 ses-01 nip_number	YYYY-MM-DD
+        sub-01 ses-02 nip_number	YYYY-MM-DD
+        sub-02 ses-01 nip_number	YYYY-MM-DD
+        sub-02 ses-02 nip_number	YYYY-MM-DD
 
 
 - Many **ses-\<numb\>\_download.tsv**  files as follows:
 
     **ses-01_download.tsv** file:
 
-        acq_id	acq_folder	acq_name
+        acq_label	acq_folder	acq_name
         2	anat	T1w
-        9	func	task-<name-task>
+        9	func	task-label
 
 
     **ses-02_download.tsv** file:
 
-        acq_id	acq_folder	acq_name
+        acq_label	acq_folder	acq_name
         2	anat	T1w
-        9	func	task-<name-task>
+        9	func	task-label
 
 If you have some specific information on subjects for each session, you have to create files as **[sub-*_][ses-*_]download.csv**.
 
@@ -154,9 +202,7 @@ See the bids specification (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 # Notes:
 * Note 1: if the importation has been interrupted or partial, then launch again the script. All
 data will be redownloaded.
-* Note 2: the files contained in the exp_info directory are not a part of bids specifications. They are needed
-in order to import and organize data as defined in bids specifications.
-* Note 3: the .tsv extension means "tabulation separated values", so each value must be separated by a tabulation and not 
+* Note 2: the .tsv extension means "tabulation separated values", so each value must be separated by a tabulation and not 
 a set of dots. If the neurospin_to_bids.py script has some problems to read information contained in this kind of files, the problem can be due
 to dots instead of tabulations. In order to check that point, display the tabulations thanks to your text editor.
  
