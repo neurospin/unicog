@@ -1,5 +1,4 @@
-%function physio_regressors_computation_tapas(data_local_dir, root_file_name, order_c, order_r, order_cr, verbose_level)
-function physio_regressors_computation_tapas(root_file_name, order_c, order_r, order_cr, verbose_level)
+function physio_regressors_computation_tapas(data_local_dir, root_file_name, c, r, cr, verbose_level)
 %
 % Performs PhysIO-Regressor generation from Siemens Minneapolis sequence
 % logfiles
@@ -9,43 +8,29 @@ function physio_regressors_computation_tapas(root_file_name, order_c, order_r, o
 %
 % IMPORTANT: 
 %
-% 1) organize your data: all .nii and .log files must be in the same local 
-%    directory for every subject (for example "fMRI").
+% 1) put all your data (.nii file, .log files) in a directory called "data"
+%    at the same level as this .m file
 %
-% 2) in Matlab, add the directory containing the "PhysIO" toolbox and run 
-%    SPM (only necessary once for a Matlab session):
+% 2) before using this fuction, run the local installation of SPM8 
+%    (necessary only the first time after opening Matlab). For example:
 %
-%    addpath('/path_to_the_toolbox/PhysIO/')
-%    spm8 # or other version
-%    spm('fmri')
-%
-% 3) run this function in the directory of the subject containing the data
-%    (.nii and .log files).
+% addpath /home/am985309/matlab/spm8
+% spm('fmri')
 %
 % CAREFUL: This function only computes the regressors for one fMRI session 
 %          (one .nii file)!
 %
 % Inputs: 
-%        - name of the local directory containing the data: .nii images,
-%        the physiological data (files _PULS.log, _RESP.log, _Info.log),
-%        and the file 'SliceTimingInfo.mat' (computed with the function 
-%        'create_SliceTimingInfo_mat.m'). This directory will also be the
-%        output directory where the regressors ( file 
-%        "physio_regressors_*.txt") will be copied in.
+%        - name of the local directory containing the data 
 %        - name of the .nii file (fMRI session) which must be the same root
 %        name for the physiological data files from Siemens 3T Minneapolis 
 %        (_PULS.log, _RESP.log and _Info.log)
-%        - order of cardiac phase Fourier expansion (e.g. 3)
-%        - order of respiratory phase Fourier expansion (e.g. 4)
-%        - order of sum/difference of cardiac/respiratory phase expansion 
-%        (phase interaction) (e.g. 1)
 %        - verbose_level indicates the number of plots to display:
-%        0 = none; 1 = main plots (default); 2 = debugging plots, for 
+%        0 = none; 1 = main plots (default);  2 = debugging plots, for 
 %        setting up new study; 3 = all plots
 %
 % Output: file containing the physiological regressors, which is named with 
-%         the prefix "physio_regressors_" plus the root name, plus ".txt".
-%         This file is copied in the local data directory.
+%         the prefix "physio_regressors_" plus the root name, plus ".txt"
 %         The output matrix contains columns corresponding to the
 %         regressors such that (for an example of order 3 for cardiac 
 %         signal and order 4 for respiration):
@@ -65,7 +50,7 @@ function physio_regressors_computation_tapas(root_file_name, order_c, order_r, o
 %
 %
 % Example for running:
-% > physio_regressors_computation_tapas('epi_sess2_bp160018_20160511_07',3,4,1,3)
+% > physio_regressors_computation_tapas('data','epi_sess2_bp160018_20160511_07',3)
 %
 %
 % Original codes from:
@@ -90,32 +75,28 @@ function physio_regressors_computation_tapas(root_file_name, order_c, order_r, o
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Load information in file 'SliceTimingInfo.mat' (this file has to be in
-% the local data directory).
-%local_slice_timing_info_file = fullfile(data_local_dir, 'SliceTimingInfo.mat');
-local_slice_timing_info_file = fullfile('SliceTimingInfo.mat');
-scan_info = load(local_slice_timing_info_file);
+% TO DO AUTOMATICALLY!!!
+scan_info = load(fullfile(data_local_dir, 'SliceTimingInfo.mat')) ;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-physio      = tapas_physio_new();        % create structure, numbering according to *PhysIO_PhysNoiseBackground.pptx
-log_files   = physio.log_files;          % 1a) Read logfiles
-sqpar       = physio.scan_timing.sqpar;  % 1b) Sequence timing
-thresh      = physio.preproc;            % 2) Preprocess phys & align scan-timing
-model       = physio.model;              % 3)/4) Model physiological time series
-verbose     = physio.verbose;            % Auxiliary: Output
+physio      = tapas_physio_new();   % create structure, numbering according to *PhysIO_PhysNoiseBackground.pptx
+log_files   = physio.log_files;     % 1a) Read logfiles
+sqpar       = physio.scan_timing.sqpar;         % 1b) Sequence timing
+%sqpar       = physio.sqpar;         % 1b) Sequence timing
+thresh      = physio.preproc;
+%thresh      = physio.thresh;        % 2) Preprocess phys & align scan-timing
+model       = physio.model;         % 3)/4) Model physiological time series
+verbose     = physio.verbose;       % Auxiliary: Output
 
 
 %% 1. Define Input Files
 
 log_files.vendor            = 'Siemens_minn';
-%log_files.cardiac           = strcat(fullfile(data_local_dir, root_file_name),'_PULS.log');
-%log_files.respiration       = strcat(fullfile(data_local_dir, root_file_name),'_RESP.log');
-%log_files.scan_timing       = strcat(fullfile(data_local_dir, root_file_name),'_Info.log');
-log_files.cardiac           = strcat(fullfile(root_file_name),'_PULS.log');
-log_files.respiration       = strcat(fullfile(root_file_name),'_RESP.log');
-log_files.scan_timing       = strcat(fullfile(root_file_name),'_Info.log');
+log_files.cardiac           = strcat(fullfile(data_local_dir, root_file_name),'_PULS.log');
+log_files.respiration       = strcat(fullfile(data_local_dir, root_file_name),'_RESP.log');
+log_files.scan_timing       = strcat(fullfile(data_local_dir, root_file_name),'_Info.log');
 log_files.sampling_interval = [2*1/400 8*1/400 1/400]; % [cardiac_SampleTime respiration_SampleTime tick_time] in seconds
 log_files.align_scan        = 'first';
 log_files.relative_start_acquisition = 0 ; % in seconds
@@ -126,10 +107,10 @@ sqpar.Nslices           = scan_info.NumberOfSlices;
 sqpar.NslicesPerBeat    = sqpar.Nslices;   % typically equivalent to Nslices; exception: heartbeat-triggered sequence
 sqpar.TR                = scan_info.TR; % in seconds
 sqpar.Ndummies          = 0;    % number of dummy volumes
-%my_vol                  = spm_vol(strcat(fullfile(data_local_dir, root_file_name),'.nii'));
-my_vol                  = spm_vol(strcat(fullfile(root_file_name),'.nii'));
+my_vol                  = spm_vol(strcat(fullfile(data_local_dir, root_file_name),'.nii'));
 sqpar.Nscans            = numel(my_vol); % donne le nombre d'images 3D dans le volume 4D
-sqpar.onset_slice       = 1; % or = floor( (scan_info.NumberOfSlices + 1) / 2);   % The one in the middle
+%sqpar.onset_slice       = floor( (scan_info.NumberOfSlices + 1) / 2);   % The one in the middle
+sqpar.onset_slice       = 1;
 
 % Set to >=0 to count scans and dummy
 % volumes from beginning of run, i.e. logfile,
@@ -146,7 +127,7 @@ model.type = 'RETROICOR_HRV_RVT';  % ‘RETROICOR’ , ‘HRV’, ‘RVT’ or
                                    % ‘RETROICOR_HRV_RVT’, ‘HRV_RVT’
 % RETROICOR parameters
 model.retroicor.include = 1; 
-model.retroicor.order = struct('c', order_c, 'r', order_r, 'cr', order_cr, 'orthogonalise', 'none'); 
+model.retroicor.order = struct('c',3,'r',4,'cr',1, 'orthogonalise', 'none'); 
                           % model.order.c: e.g. 3; order of cardiac phase 
                           %                Fourier expansion
                           % model.order.r: e.g. 4; order of respiratory
@@ -169,9 +150,7 @@ model.rvt.delays = 0; % (TODO)
 
 % OTHER
 model.input_other_multiple_regressors = ''; % either .txt-file or .mat-file (saves variable R)
-output_multiple_regressors_filename = strcat('physio_regressors_', root_file_name, '.txt');
-%model.output_multiple_regressors = fullfile(data_local_dir, output_multiple_regressors_filename);
-model.output_multiple_regressors = fullfile(output_multiple_regressors_filename);
+model.output_multiple_regressors = strcat(data_local_dir, '/physio_regressors_', root_file_name, '.txt');
 
 %% 4. Define Gradient Thresholds to Infer Gradient Timing (Philips only)
 %
@@ -198,7 +177,11 @@ thresh.cardiac.initial_cpulse_select.min = 0.3; % minimum pulse height (for dete
 
 %% 6. Output Figures to be generated
 
+%verbose.level           = 2; % 0 = none; 1 = main plots (default);  2 = debugging plots, for setting up new study; 3 = all plots
+%verbose.level           = 3; % 0 = none; 1 = main plots (default);  2 = debugging plots, for setting up new study; 3 = all plots
 verbose.level           = verbose_level; % 0 = none; 1 = main plots (default);  2 = debugging plots, for setting up new study; 3 = all plots
+%verbose.fig_output_file = 'PhysIO.ps'; % Physio.tiff, .ps, .fig possible
+%verbose.fig_output_file = 'PhysIO.tiff'; % Physio.tiff, .ps, .fig possible
 verbose.fig_output_file = strcat(root_file_name, '_PhysIO_figure.tiff'); % .tiff, .ps, .fig possible
 
 %% 7. Run the main script with defined parameters
@@ -206,11 +189,12 @@ verbose.fig_output_file = strcat(root_file_name, '_PhysIO_figure.tiff'); % .tiff
 physio.log_files    = log_files;
 physio.sqpar        = sqpar;
 physio.model        = model;
+%physio.thresh       = thresh;
 physio.preproc      = thresh; % Added by A. Moreno - 25/07/2016
 physio.verbose      = verbose;
 
-% %% Save RETROICOR order information (uncomment if necessary)
-% order_to_save = model.retroicor.order;
-% save(strcat(root_file_name, '_retroicor_order_info.mat'),'order_to_save')
+%% Save RETROICOR order information
+order_to_save = model.retroicor.order;
+%save(strcat(root_file_name, '_retroicor_order_info.mat'),'order_to_save')
 
 [physio_out, R, ons_secs] = tapas_physio_main_create_regressors(physio);

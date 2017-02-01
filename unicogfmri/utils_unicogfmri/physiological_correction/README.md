@@ -28,9 +28,10 @@ Copy all the directory "PhysIO". Then, you will have to add the path to it in Ma
 
 More detailed information in the header of the function:
 
+
     function [SliceTiming, TR, TE, SliceThickness, SpacingBetweenSlices, ...
                 NumberOfSlices, PixelSpacing, total_readout_time_spm, total_readout_time_fsl] ...
-                = create_SliceTimingInfo_mat(spm_path, list_file)
+                = create_SliceTimingInfo_mat(spm_path, list_file, machine_ns)
     
     % Adapted by A. Moreno (September 2016) from code created by F. Meyniel:
     % https://github.com/florentmeyniel/fmspm12batch/blob/PhysioCorrection/fmspm12batch_preproc_GetSliceTiming_NS.m
@@ -44,6 +45,10 @@ More detailed information in the header of the function:
     % To get the parameter value from an arbitrary DICOM file, use the option 5th argument 
     % to overide the search on the Neurospin server. The file name of this reference
     % DICOM file should be a full path name..
+    %
+    % Possible values of the (optional) variable 'machine_ns':
+    % machine_ns = '3T' (default value)
+    % machine_ns = '7T'
     %
     % Value returned:
     % 	SliceTiming
@@ -59,7 +64,7 @@ More detailed information in the header of the function:
     % Usage:
     % [SliceTiming, TR, TE, SliceThickness, SpacingBetweenSlices, ...
     %            NumberOfSlices, PixelSpacing, total_readout_time_spm, total_readout_time_fsl] ...
-    %            = create_SliceTimingInfo_mat(spm_path, list_file)
+    %            = create_SliceTimingInfo_mat(spm_path, list_file, machine_ns)
     %
     % Attention: 
     % - this function must be run in the directory where "list_file" is placed 
@@ -84,7 +89,9 @@ More detailed information in the header of the function:
     % > spm_path = '/i2bm/local/spm8'
     % > list_file = 'list_subjects.txt'
     % > create_SliceTimingInfo_mat(spm_path, list_file)
- 
+    % or:
+    % > create_SliceTimingInfo_mat(spm_path, list_file, '7T')
+
 ### computing the regressors
 
 Run function "physio_regressors_computation_tapas" with the appropriate parameters. For example :
@@ -95,7 +102,7 @@ Run function "physio_regressors_computation_tapas" with the appropriate paramete
 
 More detailed information in the header of the function:
 
-    function physio_regressors_computation_tapas(root_file_name, order_c, order_r, order_cr, verbose_level)
+    function physio_regressors_computation_tapas(data_local_dir, root_file_name, c, r, cr, verbose_level)
     %
     % Performs PhysIO-Regressor generation from Siemens Minneapolis sequence
     % logfiles
@@ -105,43 +112,29 @@ More detailed information in the header of the function:
     %
     % IMPORTANT: 
     %
-    % 1) organize your data: all .nii and .log files must be in the same local 
-    %    directory for every subject (for example "fMRI").
+    % 1) put all your data (.nii file, .log files) in a directory called "data"
+    %    at the same level as this .m file
     %
-    % 2) in Matlab, add the directory containing the "PhysIO" toolbox and run 
-    %    SPM (only necessary once for a Matlab session):
+    % 2) before using this fuction, run the local installation of SPM8 
+    %    (necessary only the first time after opening Matlab). For example:
     %
-    %    addpath('/path_to_the_toolbox/PhysIO/')
-    %    spm8 # or other version
-    %    spm('fmri')
-    %
-    % 3) run this function in the directory of the subject containing the data
-    %    (.nii and .log files).
+    % addpath /home/am985309/matlab/spm8
+    % spm('fmri')
     %
     % CAREFUL: This function only computes the regressors for one fMRI session 
     %          (one .nii file)!
     %
     % Inputs: 
-    %        - name of the local directory containing the data: .nii images,
-    %        the physiological data (files _PULS.log, _RESP.log, _Info.log),
-    %        and the file 'SliceTimingInfo.mat' (computed with the function 
-    %        'create_SliceTimingInfo_mat.m'). This directory will also be the
-    %        output directory where the regressors ( file 
-    %        "physio_regressors_*.txt") will be copied in.
+    %        - name of the local directory containing the data 
     %        - name of the .nii file (fMRI session) which must be the same root
     %        name for the physiological data files from Siemens 3T Minneapolis 
     %        (_PULS.log, _RESP.log and _Info.log)
-    %        - order of cardiac phase Fourier expansion (e.g. 3)
-    %        - order of respiratory phase Fourier expansion (e.g. 4)
-    %        - order of sum/difference of cardiac/respiratory phase expansion 
-    %        (phase interaction) (e.g. 1)
     %        - verbose_level indicates the number of plots to display:
-    %        0 = none; 1 = main plots (default); 2 = debugging plots, for 
+    %        0 = none; 1 = main plots (default);  2 = debugging plots, for 
     %        setting up new study; 3 = all plots
     %
     % Output: file containing the physiological regressors, which is named with 
-    %         the prefix "physio_regressors_" plus the root name, plus ".txt".
-    %         This file is copied in the local data directory.
+    %         the prefix "physio_regressors_" plus the root name, plus ".txt"
     %         The output matrix contains columns corresponding to the
     %         regressors such that (for an example of order 3 for cardiac 
     %         signal and order 4 for respiration):
@@ -161,7 +154,7 @@ More detailed information in the header of the function:
     %
     %
     % Example for running:
-    % > physio_regressors_computation_tapas('epi_sess2_bp160018_20160511_07',3,4,1,3)
+    % > physio_regressors_computation_tapas('data','epi_sess2_bp160018_20160511_07',3)
     %
     %
     % Original codes from:
