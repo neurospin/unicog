@@ -19,7 +19,7 @@ so the key referters to same fusion in both dictionaries.
 """
 
 
-from unicogfmri.utils_unicog.viewer import pyanatomist_viewer
+from unicogfmri.utils_unicogfmri.viewer import pyanatomist_viewer
 import glob
 import os
 

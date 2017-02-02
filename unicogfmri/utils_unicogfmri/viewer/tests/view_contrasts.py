@@ -23,7 +23,7 @@ and add a loop too.
 import glob
 import os
 
-from unicogfmri.utils_unicog.viewer import pyanatomist_viewer
+from unicogfmri.utils_unicogfmri.viewer import pyanatomist_viewer
 
 ######  Parameters to change ###############################################
 
