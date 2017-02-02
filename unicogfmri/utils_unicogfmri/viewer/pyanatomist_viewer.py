@@ -39,7 +39,7 @@ def fusion2D_map_activation(
         threshold=3.1,
         maxval=10,
         orientation='Axial',
-        cursor=[100, 100, 100, 0]):
+        cursor=[0, 0, 0, 0]):
 
     """ Function to merge one or many activation maps with a the
     single_subj_T1.nii template of spm8. The defaults values are
@@ -172,14 +172,14 @@ def fusion2D_map_activation(
     for w,f in zip(window_list, fusion_list) :
         # show the fusion
         w.assignReferential(mni_ref)
+        w.moveLinkedCursor(cursor)
         a.addObjects(f, w)
         
         #changement de position du curseur   
         a.execute('LinkedCursor',
                   object=f,
                   mode="linear_on_defined",
-                  rate=0.5,
-                  position=cursor)
+                  rate=0.5)
     
     # start loop
     sys.exit(app.exec_())
