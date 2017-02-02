@@ -35,7 +35,11 @@ except:
 def fusion2D_map_activation(
         dic_maps,
         template_file="/i2bm/local/spm8/canonical/single_subj_T1.nii",
-        dic_templates=""):
+        dic_templates="",
+        threshold=3.1,
+        maxval=10,
+        orientation='Axial',
+        cursor=[100, 100, 100, 0]):
 
     """ Function to merge one or many activation maps with a the
     single_subj_T1.nii template of spm8. The defaults values are
@@ -147,7 +151,8 @@ def fusion2D_map_activation(
         
         #palette and options
         map_activation.setPalette("Rainbow1-fusion",
-                                  minVal=1,
+                                  minVal=threshold,
+                                  maxVal=maxval,
                                   absoluteMode=True)
         # create the fusion object  
         if dic_templates_fusion.has_key("template"):
@@ -160,7 +165,7 @@ def fusion2D_map_activation(
                                          'Fusion2DMethod')                              
                                      
         fusion_list.append(fusion_map)
-        window_list.append(a.createWindow('Axial'))
+        window_list.append(a.createWindow(orientation))
     
     
     
@@ -174,7 +179,7 @@ def fusion2D_map_activation(
                   object=f,
                   mode="linear_on_defined",
                   rate=0.5,
-                  position=[100, 100, 100, 0])
+                  position=cursor)
     
     # start loop
     sys.exit(app.exec_())
