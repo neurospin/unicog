@@ -272,9 +272,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Download command for each subject/session
     # (following neurospin server conventions)
     for row_idx, subject_info in pop.iterrows():
-        subject_id = subject_info['participant_label'].split('-')[1]
-        if 'session_id' in subject_info.index:
-            session_id = subject_info['session_id'].split('-')[1]
+        subject_id = subject_info['participant_label']
+        if 'session_label' in subject_info.index:
+            session_id = subject_info['session_label']
         else:
             session_id = None
 
@@ -344,7 +344,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             dicom_path = os.path.join(target_path, 'dicom')
 
             run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                              format(int(row['acq_label']))))
+                                              format(int(row['acq_number']))))
             if run_path:
                 shutil.copytree(run_path[0], dicom_path)
             else:
