@@ -2,30 +2,27 @@
 We propose a script to import data from the neurospin dataserver according to 
 the BIDS organization (Brain Imaging Data Structure / http://bids.neuroimaging.io/). The BIDS oragnization has been selected because the organization is simple, easy to share and supported by many software. We are focused on fMRI data but other modalities can be added (diffusion imaging, behavioral ...). For a full description, please see the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
-# Dependencies (can simply pip install package):
-pydicom  
-pandas
+# Dependencies (can simply pip install packages):
+
+        pip install pydicom --user
+        pip install pandas --user
 
 # Installation:
 The neurospin_to_bids.py script can be used as a bash command. There is no need for installation.
 
-## Download the unicog repository:
+Simply download the unicog repository:
 
+        cd <path_to_download_to>
         git clone https://github.com/neurospin/unicog.git
-
-## Read the documentation:
-
-        python neurospin_to_bids.py -h
-
-# Demonstration dataset:
-The test_dataset follows a minimal set of conventions for the download to work.
 
 # Usage:
 
-After downloading the unicog repository open a terminal and write the following commands.
+After downloading the unicog repository, you will find a dataset example in unicog/bids. The test_dataset follows the minimal set of conventions necessary to make a test download.
 
-        cd <path_to>/test_dataset
-        python <path_to>/neurospin_to_bids.py -neurospin_database trio
+To make it work you simply have to open a terminal and write the following commands:
+
+        cd <path_to>/unicog/bids/test_dataset
+        python <path_to>/unicog/bids/neurospin_to_bids.py -neurospin_database trio
 
 * The **\<path_to\>/test_dataset** directory must contain an **exp_info** directory with 2 files (**participants.tsv** and **download.tsv**), indicating what are the subjects to download. For more details, on the files content and structure, read the Additional information section.
 * The neurospin_to_bids.py script will download files from a Neurospin server based on the information contained in the **exp_info** directory. The script when used as a bash command accept three optional arguments:
@@ -39,9 +36,12 @@ If instead we wanted to pass the root_path (the one containing an **exp_info** f
 
         python neurospin_to_bids.py -root_path some_path -dataset_name my_dataset -neurospin_database trio
 
+To read the script documentation you can write:
+
+        python neurospin_to_bids.py -h
 
 # Additionnal information
-## BIDS organisation: 
+## BIDS organisation
 For anatomical and functional data, the bids nomenclature corresponds to the following organisation of files.  
 The anatomical data will be imported according the bids nomencalture such as:
 
