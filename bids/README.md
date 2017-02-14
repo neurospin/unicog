@@ -30,7 +30,7 @@ To make it work you simply have to open a terminal and write the following comma
     * **-neurospin_database**: refers to the neurospin server where your images are stored, either "prisma" or "trio" (prisma, the most recent server, is the default parameter).
     * **-dataset_name**: the folder name of the downloaded bids formatted dataset. It is "bids_dataset" by default.
 
-As can be seen in the previous example since we cd to the target path we do not need to provide the root_path. Since this is an old dataset, its files are stored in the "trio" server, so we have to specify it, but for new datasets it would not be necessary. Finally in this example the bids formatted dataset would be created in a folder name "bids_dataset".
+As can be seen in the previous example since we go to the target path we do not need to provide the root_path. This is an old dataset, its files are stored in the "trio" server, so we have to specify it, but for new datasets it would not be necessary. Finally in this example the bids formatted dataset would be created in a folder name "bids_dataset".
 
 If instead we wanted to pass the root_path (the one containing an **exp_info** folder) and specify a name for the bids dataset folder we would run the command as follows:
 
@@ -62,10 +62,10 @@ As seen by the examples, if you have a session level, a **ses-<ses_label>** dire
 
 The run_id "run-<run_label>" is optional if there is only one functional run for a particular task.
 
-Moreover there are plenty more optional id fields to include in the file names depending on your needs. For more details on that please check directly the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
+Moreover there are plenty more optional fields to include in the file names depending on your needs. For more details on that please check directly the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
-## Input files for the importation of data:
-Two files are mandatories: **participants.tsv** and **[sub-*_][ses-*_]download.csv** in the **exp_info** directory. 
+## Files in the **exp_info** folder specifying the data download:
+Two files are mandatories: **participants.tsv** and **[sub-<subject_label>_][ses-<ses_label>_]download.csv** in the **exp_info** directory. 
 Those files are not a part of bids specifications. They are needed in order to import and organize data as defined in bids specifications
 Their configuration is depending on the dataset (number of sessions, runs, tasks ....). Many cases are presented below.
 
@@ -80,20 +80,6 @@ participant_label	NIP	acq_date     participant_label	NIP	acq_date
 sub-label	nip_number	YYYY-MM-DD        sub-01	tt989898	2015-02-28
 sub-label	nip_number	YYYY-MM-DD        sub-02	pp898989	2015-02-27
 --------------------------------------------------------------------
-
-
-+----------------------------+-------+
-| En-tête                    | etc... |
-+===+===+
-| Plusieurs lignes de texte  | - liste |
-| dans la même cellule, mais | - à puces |
-| toujours aligné à gauche ! |
-+---+---+
-| Texte _formaté_,           | #. liste |
-| `code`, etc...             | #. numérotée |
-+---+---+
-
-
 
 - **download.tsv**: corresponds to the acquisitions to download.
 If the number of acquisitions are the same for all subjects, you can share the **download.tsv** file for all subjects:
@@ -182,13 +168,12 @@ the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
 If you have some specific information on subjects for each session, you have to create files as **[sub-*_][ses-*_]download.csv**.
 
-# Importation events:
-The events (optionals) can be imported if files exist as follows:
+# Importation of events:
+The events for functional runs will be automatically copied in the bids dataset if the files are available in a "recorded_events" folder that already respect the bids structure. Which means that files would have the same fields as the bold.nii files in its file name but its final name part would be events.tsv instead, for example:
 
-    <data_root>/exp_info/recorded_events/sub-*/func/sub-*_<task>_events.tsv
+    <data_root>/exp_info/recorded_events/sub-<sub_label>[/ses-<ses_label>]/func/sub-*_<task>_events.tsv
 
-
-Here is an example of **sub-\*\_\<task\>\_events.tsv**: 
+Here is an example of **sub-\*\_\<task\>\_events.tsv** following the bids standard:
 
         onset	duration	trial_type
         0.0	1	computation_video
@@ -197,16 +182,8 @@ Here is an example of **sub-\*\_\<task\>\_events.tsv**:
         11.4	1	r_hand_audio
         15.0	1	sentence_audio
 
-Onset and duration fields should be expressed in second.
-Other information can be added to events.tsv files such as ​response_time or other
-arbitrary additional columns.
-See the bids specification (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
-
+the onset, duration and trial_type columns are the only mandatory ones. onset and duration fields should be expressed in seconds. Other information can be added to events.tsv files such as ​response_time or other arbitrary additional columns respecting subject anonimity. See the bids specification (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
 # Notes:
-* Note 1: if the importation has been interrupted or partial, then launch again the script. All
-data will be redownloaded.
-* Note 2: the .tsv extension means "tabulation separated values", so each value must be separated by a tabulation and not 
-a set of dots. If the neurospin_to_bids.py script has some problems to read information contained in this kind of files, the problem can be due
-to dots instead of tabulations. In order to check that point, display the tabulations thanks to your text editor.
- 
+* Note 1: if the importation has been interrupted or partially then, then launch again the script. The last partially downloaded data folder will be redownloaded from scratch.
+* Note 2: the .tsv extension means "tabulation separated values", so each value must be separated by a tabulation and not commas, spaces or dots. If files in exp_info are not tsv, most likely the neurospin_to_bids.py script will fail. Please make sure your files comply with your favorite text editor.
