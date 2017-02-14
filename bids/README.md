@@ -87,7 +87,7 @@ participant_label  NIP         acq_date     session_label    sex
 01                 tt989898    2015-03-15   02               M
 02                 pp898989    2015-02-27   01               F
 02                 pp898989    2015-03-20   02               F
------------------------------------------
+-----------------------------------------------------------------------------
 
 The order of the rows do not really matter, although we recommend to add the acquisitions as they are done and automatically download to make sanity checks of the data. The download can be done incrementally so there is no need for you to wait until the end of experiment to start downloading files to the bids format and start playing with it.
 
