@@ -41,21 +41,28 @@ To read the script documentation you can write:
         python neurospin_to_bids.py -h
 
 # Additionnal information
-## BIDS organisation
-For anatomical and functional data, the bids nomenclature corresponds to the following organisation of files.  
-The anatomical data will be imported according the bids nomencalture such as:
+## Basic BIDS organization
+For anatomical and functional data, the bids nomenclature corresponds to the following organisation of files.
 
-        sub­<participant_label>/
-            anat/
-                sub­<participant_label>[_acq­<label>][_rec­<label>][_run­<index>]_T1w.nii[.gz]
+Anatomical:
 
-The functional data will be imported according the bids nomencalture such as:
+        sub­-<participant_label>/
+            [ses-<session_label>]/
+                anat/
+                    sub­-<participant_label>[_ses-<session_label>]_T1w.nii[.gz]
 
-        sub­<participant_label>/
-            func/
-                sub­<participant_label>_task­<task_label>[_acq­<label>][_rec­<label>][_run­<index>]_bold.nii[.gz]
+Functional:
 
-If you have a session level, a directory is added between the **sub­<participant_label>** and the modality (here, **anat** or **func**).
+        sub­-<participant_label>/
+            [ses-<session_label>]/
+                func/
+                    sub­-<participant_label>[_ses-<session_label>]_task-­<task_label>[_run-­<run_label>]_bold.nii[.gz]
+
+As seen by the examples, if you have a session level, a **ses-<ses_label>** directory is added under the **sub­-<participant_label>** and it would then be the one to contain the modality folders (here, **anat** or **func**). Moreover it should also form part of the file names.
+
+The run_id "run-<run_label>" is optional if there is only one functional run for a particular task.
+
+Moreover there are plenty more optional id fields to include in the file names depending on your needs. For more details on that please check directly the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
 ## Input files for the importation of data:
 Two files are mandatories: **participants.tsv** and **[sub-*_][ses-*_]download.csv** in the **exp_info** directory. 
