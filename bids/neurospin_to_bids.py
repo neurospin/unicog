@@ -180,7 +180,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     Name: dataset_name
     BidsVersion: 1.0.0
     """
-    dataset_name = get_bids_default_path(data_root_path, dataset_name)   
+    dataset_name = get_bids_default_path(data_root_path, dataset_name)
     if not os.path.exists(dataset_name):
         os.makedirs(dataset_name)
     # Check dataset_description.json
@@ -261,8 +261,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Get info of subjects/sessions to download
     pop = pd.read_csv(os.path.join(exp_info_path, 'participants.tsv'),
                       dtype=str, sep='\t', index_col=False)
-#    pop = pd.read_csv(os.path.join(get_exp_info_path(), 'participants.tsv'),
-#                      dtype=str, sep='\t', index_col=False)
 
     download_report = ('download_report_' +
                        time.strftime("%d-%b-%Y-%H:%M:%S", time.gmtime()) +
@@ -355,10 +353,12 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                             run_session,
                                                             subject_id))
 
-#            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
-#                            shell=True)
-            subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
+            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
                             shell=True)
+
+            # Will swap to dcm2niix in the future
+            # subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
+            #                 shell=True)
 
             # Expecting page 10 bids specification file name
             filename = get_bids_file_descriptor(subject_id, task_id=run_task,
@@ -366,29 +366,26 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                 session_id=run_session,
                                                 file_tag=row['acq_name'],
                                                 file_type='nii')
-                                                
+
             filename_json = os.path.join(target_path, filename[:-3] + 'json')
-            
-            shutil.copyfile(glob.glob(os.path.join(dicom_path,
-                                                   '*.nii'))[0],
+
+            shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.nii'))[0],
                             os.path.join(target_path, filename))
-                          
-            shutil.copyfile(glob.glob(os.path.join(dicom_path,
-                                                   '*.json'))[0],
+            shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.json'))[0],
                             os.path.join(filename_json))
-                            
+
+            # Will be done with dcm2niix in the future (get all header fields)
             # Copy slice_times from dicom reference file
-            #do by dcm2niix
-#            if 'bold' in row['acq_name']:
-#                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
-#                                   '*.dcm')))[4]
-#                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
-#                TR = dicom.read_file(dicom_ref).RepetitionTime
-#                json_ref = open(os.path.join(target_path, filename[:-3] +
-#                                'json'), 'a')
-#                json.dump({'SliceTiming': slice_times,
-#                           'RepetitionTime': int(TR)}, json_ref)
-#                json_ref.close()
+            if 'bold' in row['acq_name']:
+                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
+                                   '*.dcm')))[4]
+                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
+                TR = dicom.read_file(dicom_ref).RepetitionTime
+                json_ref = open(os.path.join(target_path, filename[:-3] +
+                                'json'), 'a')
+                json.dump({'SliceTiming': slice_times,
+                           'RepetitionTime': int(TR)}, json_ref)
+                json_ref.close()
             # remove temporary dicom folder
             shutil.rmtree(dicom_path)
 
