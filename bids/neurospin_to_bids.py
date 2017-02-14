@@ -97,16 +97,15 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
 def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                      dataset_name=None):
     data_path = get_bids_default_path(data_root_path, dataset_name)
-    if glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*')):
+    if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
         sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*'))
     else:
-        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*'))
+        sub_folders = glob.glob(os.path.join(data_root_path, behav_path, 'sub-*'))
 
     for sub_folder in sub_folders:
         for file_name in os.listdir(os.path.join(sub_folder, 'func')):
-            bidx = len(behav_path) + 1
             shutil.copy2(os.path.join(sub_folder, 'func', file_name),
-                         os.path.join(data_path, sub_folder[bidx:],
+                         os.path.join(data_path, os.path.basename(sub_folder),
                                       'func', file_name))
 
 
@@ -121,14 +120,14 @@ def get_bids_path(data_root_path='', subject_id='01', folder='',
 
 
 def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
-                             acq_id=None, rec_id=None, run_id=None,
+                             acq_label=None, rec_id=None, run_id=None,
                              file_tag=None, file_type=None):
     """Creates a filename descriptor following BIDS.
 
     subject_id refers to the subject label
     task_id refers to the task label
     run_id refers to run index
-    acq_id refers to acquisition parameters as a label
+    acq_label refers to acquisition parameters as a label
     rec_id refers to reconstruction parameters as a label
     """
     descriptor = 'sub-{0}'.format(subject_id)
@@ -136,8 +135,8 @@ def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
         descriptor += '_ses-{0}'.format(session_id)
     if task_id is not None:
         descriptor += '_task-{0}'.format(task_id)
-    if acq_id is not None:
-        descriptor += '_acq-{0}'.format(acq_id)
+    if acq_label is not None:
+        descriptor += '_acq-{0}'.format(acq_label)
     if rec_id is not None:
         descriptor += '_rec-{0}'.format(rec_id)
     if run_id is not None:
@@ -181,8 +180,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     Name: dataset_name
     BidsVersion: 1.0.0
     """
-    if dataset_name is None:
-        dataset_name = get_bids_default_path(data_root_path, dataset_name)
+    dataset_name = get_bids_default_path(data_root_path, dataset_name)   
     if not os.path.exists(dataset_name):
         os.makedirs(dataset_name)
     # Check dataset_description.json
@@ -261,8 +259,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     bids_init_dataset(data_root_path, dataset_name)
 
     # Get info of subjects/sessions to download
-    pop = pd.read_csv(os.path.join(get_exp_info_path(), 'participants.tsv'),
+    pop = pd.read_csv(os.path.join(exp_info_path, 'participants.tsv'),
                       dtype=str, sep='\t', index_col=False)
+#    pop = pd.read_csv(os.path.join(get_exp_info_path(), 'participants.tsv'),
+#                      dtype=str, sep='\t', index_col=False)
 
     download_report = ('download_report_' +
                        time.strftime("%d-%b-%Y-%H:%M:%S", time.gmtime()) +
@@ -274,7 +274,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Download command for each subject/session
     # (following neurospin server conventions)
     for row_idx, subject_info in pop.iterrows():
-        subject_id = subject_info['participant_id'].split('-')[1]
+        subject_id = subject_info['participant_label'].split('-')[1]
         if 'session_id' in subject_info.index:
             session_id = subject_info['session_id'].split('-')[1]
         else:
@@ -315,7 +315,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             optional_filters += [('ses', session_id)]
 
         # Get appropriate download file. As specific as possible
-        specs_path = file_manager_default_file(get_exp_info_path(),
+        specs_path = file_manager_default_file(exp_info_path,
                                                optional_filters, 'download',
                                                file_type='tsv',
                                                allow_other_fields=False)
@@ -346,7 +346,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             dicom_path = os.path.join(target_path, 'dicom')
 
             run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                              format(int(row['acq_id']))))
+                                              format(int(row['acq_label']))))
             if run_path:
                 shutil.copytree(run_path[0], dicom_path)
             else:
@@ -357,8 +357,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
 #            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
 #                            shell=True)
-            print dicom_path
-            print os.curdir
             subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
                             shell=True)
 
@@ -375,7 +373,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                    '*.nii'))[0],
                             os.path.join(target_path, filename))
                           
-            print glob.glob(os.path.join(dicom_path,'*.json'))[0]
             shutil.copyfile(glob.glob(os.path.join(dicom_path,
                                                    '*.json'))[0],
                             os.path.join(filename_json))
@@ -426,8 +423,6 @@ if __name__ == "__main__":
                         help='neurospin server to download from')
     # LOAD CONSOLE ARGUMENTS
     args = parser.parse_args()
-    print args
-    print type(args)
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
                               download_database=args.neurospin_database[0],
