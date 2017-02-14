@@ -1,19 +1,15 @@
 
-We propose a script to import data from the neuropsin dataserver according to 
-the BIDS organization (Brain Imaging Data Structure / http://bids.neuroimaging.io/).
-The BIDS oragnization has been selected because the organization is simple, 
-easily shared and supported by many software.
-We are focused on fMRI data but other modalities can be added (diffusion imaging, behavioral ...).
-For a full description, please see the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
+We propose a script to import data from the neurospin dataserver according to 
+the BIDS organization (Brain Imaging Data Structure / http://bids.neuroimaging.io/). The BIDS oragnization has been selected because the organization is simple, easy to share and supported by many software. We are focused on fMRI data but other modalities can be added (diffusion imaging, behavioral ...). For a full description, please see the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
 # Dependencies (can simply pip install package):
 pydicom  
 pandas
 
 # Installation:
-The neurospin_to_bids.py script can be use without install the unicog module.
- 
-## Download the unicog module:
+The neurospin_to_bids.py script can be used as a bash command. There is no need for installation.
+
+## Download the unicog repository:
 
         git clone https://github.com/neurospin/unicog.git
 
@@ -21,27 +17,28 @@ The neurospin_to_bids.py script can be use without install the unicog module.
 
         python neurospin_to_bids.py -h
 
-# Demonstration data:
+# Demonstration dataset:
 The test_dataset follows a minimal set of conventions for the download to work.
 
+# Usage:
 
-# Basic usage:
+After downloading the unicog repository open a terminal and write the following commands.
 
-        cd <path_to/test_dataset>
+        cd <path_to>/test_dataset
         python <path_to>/neurospin_to_bids.py -neurospin_database trio
 
-* The **\<path_to/test_dataset\>** directory contains an **exp_info** directory with 2 files 
-(**participants.tsv** and **download.tsv**) indicating what are the subjects to download.
-For details on the files content/structure, read the Additional information section.
-* The **neurospin_database** parameter refers to the neurospin server where your 
-data are stored, either "prisma" or "trio" (prisma is the default parameter).
+* The **\<path_to\>/test_dataset** directory must contain an **exp_info** directory with 2 files (**participants.tsv** and **download.tsv**), indicating what are the subjects to download. For more details, on the files content and structure, read the Additional information section.
+* The neurospin_to_bids.py script will download files from a Neurospin server based on the information contained in the **exp_info** directory. The script when used as a bash command accept three optional arguments:
+    * **-root_path**: allows to specify the target directory, if not given the current directory will be taken as root_path.
+    * **-neurospin_database**: refers to the neurospin server where your images are stored, either "prisma" or "trio" (prisma, the most recent server, is the default parameter).
+    * **-dataset_name**: the folder name of the downloaded bids formatted dataset. It is "bids_dataset" by default.
 
-# Advanced usage:
+As can be seen in the previous example since we cd to the target path we do not need to provide the root_path. Since this is an old dataset, its files are stored in the "trio" server, so we have to specify it, but for new datasets it would not be necessary. Finally in this example the bids formatted dataset would be created in a folder name "bids_dataset".
 
-        python neurospin_to_bids.py -root_path <root_path> -dataset_name <my_dataset> -neurospin_database trio
+If instead we wanted to pass the root_path (the one containing an **exp_info** folder) and specify a name for the bids dataset folder we would run the command as follows:
 
-* The **root_path** option allows to indicate a specific path including the **exp_info** directory.
-* The **dataset_name** option allows to give a specific name to the dataset (the default is bids_dataset).
+        python neurospin_to_bids.py -root_path some_path -dataset_name my_dataset -neurospin_database trio
+
 
 # Additionnal information
 ## BIDS organisation: 
