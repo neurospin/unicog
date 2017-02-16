@@ -100,13 +100,13 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
     if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
         sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*'))
     else:
-        sub_folders = glob.glob(os.path.join(data_root_path, behav_path, 'sub-*'))
+        sub_folders = glob.glob(os.path.join(data_root_path, behav_path, 'sub-*/func'))
 
     for sub_folder in sub_folders:
-        for file_name in os.listdir(os.path.join(sub_folder, 'func')):
-            shutil.copy2(os.path.join(sub_folder, 'func', file_name),
-                         os.path.join(data_path, os.path.basename(sub_folder),
-                                      'func', file_name))
+        sub_id = os.path.basename(os.path.split(sub_folder)[0])
+        for file_name in os.listdir(os.path.join(sub_folder)):
+            shutil.copy2(os.path.join(sub_folder, file_name),
+                         os.path.join(data_path, sub_id, 'func', file_name))
 
 
 def get_bids_path(data_root_path='', subject_id='01', folder='',
@@ -371,8 +371,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
             shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.nii'))[0],
                             os.path.join(target_path, filename))
-            shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.json'))[0],
-                            os.path.join(filename_json))
+            if glob.glob(os.path.join(dicom_path, '*.json')):
+                shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.json'))[0],
+                                os.path.join(filename_json))
 
             # Will be done with dcm2niix in the future (get all header fields)
             # Copy slice_times from dicom reference file
