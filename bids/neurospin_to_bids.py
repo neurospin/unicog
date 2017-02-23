@@ -98,15 +98,20 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                      dataset_name=None):
     data_path = get_bids_default_path(data_root_path, dataset_name)
     if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
-        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*'))
+        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*',
+                                             'func'))
     else:
-        sub_folders = glob.glob(os.path.join(data_root_path, behav_path, 'sub-*/func'))
+        sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
+                                             'sub-*', 'func'))
+    # raise exception if no folder is found in recorded events
+    if not sub_folders:
+        raise Exception('no valid recorded events provided to copy behavior')
 
     for sub_folder in sub_folders:
-        sub_id = os.path.basename(os.path.split(sub_folder)[0])
+        file_path = sub_folder.replace(behav_path + '/', '')
         for file_name in os.listdir(os.path.join(sub_folder)):
             shutil.copy2(os.path.join(sub_folder, file_name),
-                         os.path.join(data_path, sub_id, 'func', file_name))
+                         os.path.join(data_path, file_path, file_name))
 
 
 def get_bids_path(data_root_path='', subject_id='01', folder='',
@@ -339,7 +344,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
             run_task = get_value('task', row['acq_name'])
             run_id = get_value('run', row['acq_name'])
-            run_session = get_value('ses', row['acq_name'])
+            run_session = session_id
+            tag = row['acq_name'].split('_')[-1]
             target_path = os.path.join(sub_path, row['acq_folder'])
             dicom_path = os.path.join(target_path, 'dicom')
 
@@ -349,9 +355,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 shutil.copytree(run_path[0], dicom_path)
             else:
                 raise Exception('DICOM FILES NOT FOUNDS FOR RUN %s'
-                                ' TASK %s SES %s SUB %s' % (run_id, run_task,
-                                                            run_session,
-                                                            subject_id))
+                                ' TASK %s SES %s SUB %s TAG %s' %
+                                (run_id, run_task, run_session,
+                                subject_id, tag))
 
             subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
                             shell=True)
@@ -364,7 +370,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             filename = get_bids_file_descriptor(subject_id, task_id=run_task,
                                                 run_id=run_id,
                                                 session_id=run_session,
-                                                file_tag=row['acq_name'],
+                                                file_tag=tag,
                                                 file_type='nii')
 
             filename_json = os.path.join(target_path, filename[:-3] + 'json')
