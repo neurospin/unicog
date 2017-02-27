@@ -39,7 +39,8 @@ def fusion2D_map_activation(
         threshold=3.1,
         maxval=10,
         orientation='Axial',
-        cursor=[0, 0, 0, 0]):
+        cursor=[0, 0, 0, 0],
+        block=False):
 
     """ Function to merge one or many activation maps with a the
     single_subj_T1.nii template of spm8. The defaults values are
@@ -120,7 +121,31 @@ def fusion2D_map_activation(
 
 
     fusion_list = []   
-    window_list = []                         
+    window_list = [] 
+    
+    if block:
+        #compute the number of columns which are needed to display in block
+        ncol=2
+        nrow=1
+        nimg=len(dic_maps)
+        print "NB IMG", nimg
+        def nb_col(ncol, nrow, nimg):
+            ncases = ncol*nrow
+            while ncases < nimg :
+                if (ncol - nrow == 1):
+                    ncol = ncol + 1     
+                else :
+                    nrow = nrow + 1   
+                ncases = ncol*nrow
+            return ncol, nrow
+                
+        if nimg == 1:
+            new_ncol = 1
+        else:
+            new_ncol, new_row = nb_col(ncol, nrow, nimg)     
+        
+        
+        block=a.createWindowsBlock(new_ncol, new_row)                       
    
     #loop on maps 
     for fusion_name, file_name in dic_maps.items():
@@ -165,9 +190,14 @@ def fusion2D_map_activation(
                                          'Fusion2DMethod')                              
                                      
         fusion_list.append(fusion_map)
-        window_list.append(a.createWindow(orientation))
+        if block:
+            window_list.append(a.createWindow(orientation, block=block))
+        else:
+            window_list.append(a.createWindow(orientation))   
     
     
+    #a.linkWindows(window_list, 1)
+    #a.AWindowsBlock(nbCols=4,)
     
     for w,f in zip(window_list, fusion_list) :
         # show the fusion
