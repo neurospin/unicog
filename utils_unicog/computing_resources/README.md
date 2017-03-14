@@ -1,11 +1,10 @@
 # SOMA-WORKFLOW TUTORIAL
 
 ## WHAT IS SOMA-WORKFLOW ?
-Soma-workflow is an interface for submission, control and monitoring of jobs on parallel computing resources.
-Here, we are going to describe the case for which you want to use gabriel server, available
-at NeuroSpin.
+Soma-workflow is an interface (graphical or not) for submission, control and monitoring of jobs on parallel computing resources.
 One parallel computing resource could be your own computer by using all processors or a specific cluster like Gabriel at NeuroSpin.
-Jobs are launched in parallel and not one after the other.
+Jobs are launched in parallel and not one after the other. Here, we are going to describe the cases for which you want to use gabriel server, available
+at NeuroSpin or on your own computer.
 
 More information on [http://brainvisa.info/soma-workflow-2.8/sphinx/](http://brainvisa.info/soma-workflow-2.8/sphinx/)
 and [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow) 
@@ -13,8 +12,9 @@ and [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/so
 ## HOW CAN I LAUNCH MY JOBS WITH SOMA WORKFLOW ?
 You can use soma-workflow in two ways:
 
-* <a id=config_1 href="#config_1">only on your own workstation - see configuration (1) </a>: if your machine is multi-core, Soma-workflow optimizes the use of resources on your PC.
-* <a id=config_2 href="#config_1">on a cluster - see configuration (1) & (2) </a>: if you have an access to a cluster, Soma-workflow is an interface (graphical or not) for submission, control and monitoring jobs. 
+* Only on your own workstation: if your machine is multi-core, Soma-workflow optimizes the use of resources on your PC.
+* On a cluster: if you have an access to a cluster for instance at Neurospin we
+can use the Gabriel Server.
 
 Please, note that:
 
@@ -26,23 +26,11 @@ Please, note that:
 1 : a MATLAB compiler is available at NeuroSpin.  
 
 
-## INSATALLATION / CONFIGURATION / EXAMPLES
+## INSTALLATION / CONFIGURATION / EXAMPLES
 ### INSTALLATION:
 #### MODULE INSTALLATION
-All information on [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow).
 
-| On your own workstation        | On a cluster     |
-| -------------------------------|-----------------|
-|Install soma-workflow  ([1](#config_1))  &nbsp;&nbsp;&nbsp;| Install soma-workflow [(2](#config_2) ) |
-|Install dependencies of soma-workflow pyro, paramiko   ([2](#config_2)) &nbsp;&nbsp;&nbsp;| Install dependencies of soma-workflow ([2](#config_2)) |
-
-[https://github.com/irmen/Pyro3](https://github.com/irmen/Pyro3)
-
-[https://github.com/paramiko/paramiko](https://github.com/paramiko/paramiko)
-
-HOW INSTALL A MODULE PYTHON:
-
-Here is an example with soma-workflow:
+Many python modules have to be installed, so here is an example for the installation of a python module with soma-workflow:
 
 	$ cd <somewhere>
 	$ git clone https://github.com/neurospin/soma-workflow.git
@@ -52,11 +40,30 @@ Here is an example with soma-workflow:
 The --user allows to install the module in /home/~/.local. In this case you don't need root permissions, but the
 module is available only for you. The module will be automatically found. 
 
+
+All information on [https://github.com/neurospin/soma-workflow](https://github.com/neurospin/soma-workflow).
+
+| On your own workstation        | On the cluster     |
+| -------------------------------|-----------------|
+|Soma-workflow   &nbsp;&nbsp;&nbsp;| Soma-workflow  |
+|Pyro3 and paramiko  &nbsp;&nbsp;&nbsp;| Pyro3 and paramiko |
+| - | PBS DRMAA  |
+
+[https://github.com/irmen/Pyro3](https://github.com/irmen/Pyro3)
+[https://github.com/paramiko/paramiko](https://github.com/paramiko/paramiko)
+
+The PBS DRMAA librairy is already available at Neurospin. To use it, add those lines to your .bashrc file on your gabriel's account.
+The .bashrc file is a file of system. Make a copy before adding changes:
+
+    export I2BM_OSID=CentOS-5.11-x86_64
+    export LD_LIBRARY_PATH=/i2bm/brainvisa/$I2BM_OSID/pbs_drmaa-1.0.13/lib/:$LD_LIBRARY_PATH
+
+
 #### LAUNCH soma_workflow_gui GRAPHICAL INTERFACE
 
 Add the following line into your ~/.bashrc:
 
-	export PATH=~/.local/bin/:$PATH
+	export PATH=~/.local/bin:$PATH
 	
 Launch the soma_workflow_gui interface into a terminal:
 
@@ -68,12 +75,16 @@ If you want to check where is located the soma_workflow_gui :
 
 
 ### CONFIGURATION:
+
+If you don't have an account on Gabriel, please take a look at:
+[See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
+
 #### CLIENT CONFIGURATION: 
 On your PC, edit the following file:
 
     /home/your_logging/.soma-workflow.cfg
 
-Add the following lines for the configuration:
+Add the following lines for the configuration and change the **your_logging** part:
 
     [DSV_cluster_your_logging]
     #remote access information
@@ -90,7 +101,7 @@ The "server" refers to the resource called Gabriel:
 [See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
 
 STEP1:
-Connect to gabriel from your workstation with the login/pw given for gabriel:
+Connect to gabriel from your workstation with the login/pw given for Gabriel:
 
     ssh your_logging_for_gabriel@gabriel.intra.cea.fr
 
@@ -99,7 +110,7 @@ On the server, edit the following file:
 
     /home/your_logging/.soma-workflow.cfg
 
-Add the following lines for the configuration ([with vi](http://www.neurospin-wiki.org/pmwiki/Main/LINUX), to edit file into a console):
+Add the following lines for the configuration ([with vi](http://www.neurospin-wiki.org/pmwiki/Main/LINUX), to edit file into a console). Change the **your_logging** part:
 
     [DSV_cluster_your_logging]
     NATIVE_SPECIFICATION = -l walltime=20:00:00
@@ -115,7 +126,7 @@ Add the following lines for the configuration ([with vi](http://www.neurospin-wi
     ENGINE_LOG_FORMAT = %(asctime)s => %(module)s line %(lineno)s: %(message)s %(threadName)s
     ENGINE_LOG_LEVEL  = ERROR
     PATH_TRANSLATION_FILES =
-    MAX_JOB_IN_QUEUE = {5} run32{5} Global_long{5}
+    MAX_JOB_IN_QUEUE = {10} run32{5} Global_long{5} Global_short{5}
 
 STEP3:
 Create the following directories, if needed:
@@ -127,7 +138,7 @@ Create the following directories, if needed:
 
 STEP4:
 Launch the soma-workflow engine on Gabriel (if soma_workflow is not started on your gabriel account, 
-you can't launch soma-workflow_gui from your workstation):
+you can't launch soma-workflow_gui from your workstation). Change the **your_logging** part:
 
     python -m soma_workflow.start_database_server DSV_cluster_your_logging
     #to move the programm in background, use ctrl + Z then tape bg
@@ -136,7 +147,7 @@ Check if soma_workflow.start_database_server is started:
 
     ps -aux | grep your_logging
 
-If you have a line like the one below, the configuration is correct:
+If you have a line as shown below, the configuration is correct:
 
     python -m soma_workflow.start_database_server DSV_cluster_your_logging &
 
@@ -145,7 +156,7 @@ If the server has been stopped, you have to launch again the soma-workflow engin
 
 
 ### EXAMPLES:
-#### SIMPLE EXAMPLE:
+#### SIMPLE EXAMPLE WITH THE GRAPHICAL INTERFACE:
 
 STEP1:
 Create a job_to_launch.py python file into /tmp/python_file/:
@@ -177,6 +188,10 @@ Create a /tmp/create_somaWF_jobs.py python file to generate your soma_workflow_j
 	workflow=Workflow(jobs)
 	Helper.serialize('test_script_python.somawf', workflow)
 
+
+Then, launch the script:
+
+    python /tmp/create_somaWF_jobs.py
 	
 This step creates a /tmp/test_script_python.somawf file.
 
@@ -187,6 +202,48 @@ Launch the soma_workflow_gui
 	#open and submit the /tmp/test_script_python.somawf
 	
 STEP4:
+Check if a /tmp/file_test.txt was created.
+
+#### SIMPLE EXAMPLE WITHOUT THE GRAPHICAL INTERFACE:
+
+STEP1:
+Create a job_to_launch.py python file into /tmp/python_file/:
+
+	# -*- coding: utf-8 -*-
+	import os
+	import subprocess
+
+	cmd = "touch  /tmp/file_test.txt" 
+	subprocess.call(cmd, shell=True)
+	
+	
+STEP2:
+Create a /tmp/create_somaWF_jobs.py python file to generate your soma_workflow_job into. Change the **your_logging** and **your_logging** part:
+
+	# -*- coding: utf-8 -*-
+	import os, sys, glob
+	from soma_workflow.client import Job, Workflow, Helper
+	from soma_workflow.client import WorkflowController
+
+	if len(sys.argv)==1:
+		list_scripts = glob.glob("/tmp/python_file/job_to_launch.py")
+	else:
+		list_scripts= sys.argv[1:]
+
+	jobs = []
+	for f in list_scripts:
+		jobs.append(Job(command=["python", os.path.abspath(f)], name=f))
+
+	workflow=Workflow(jobs)
+	controller = WorkflowController("DSV_cluster_your_logging", "your_logging", "your_password")
+	controller.submit_workflow(workflow=workflow,
+                           name="simple example")
+
+Launch the script:
+
+    python /tmp/create_somaWF_jobs.py
+
+STEP3:
 Check if a /tmp/file_test.txt was created.
 
 
@@ -251,12 +308,6 @@ Add the following lines for the configuration of **.soma-workflow.cfg** [with vi
 
 STEP2:
 Open the .bashrc file and check if the following lines exist, if not, add them:
-
-    # .bashrc
-    # Source global definitions
-    if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
-    fi
 
     # User specific aliases and functions
     if [ -f /i2bm/local/etc/bashrc ]; then
