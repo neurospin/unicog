@@ -28,6 +28,11 @@ Please, note that:
 
 ## INSTALLATION / CONFIGURATION / EXAMPLES
 ### INSTALLATION:
+
+If you don't have an account on Gabriel, please take a look at:
+[See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
+
+
 #### MODULE INSTALLATION
 
 Many python modules have to be installed, so here is an example for the installation of a python module with soma-workflow:
@@ -50,6 +55,7 @@ All information on [https://github.com/neurospin/soma-workflow](https://github.c
 | - | PBS DRMAA  |
 
 [https://github.com/irmen/Pyro3](https://github.com/irmen/Pyro3)
+
 [https://github.com/paramiko/paramiko](https://github.com/paramiko/paramiko)
 
 The PBS DRMAA librairy is already available at Neurospin. To use it, add those lines to your .bashrc file on your gabriel's account.
@@ -75,10 +81,6 @@ If you want to check where is located the soma_workflow_gui :
 
 
 ### CONFIGURATION:
-
-If you don't have an account on Gabriel, please take a look at:
-[See information on wiki](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources)
-
 #### CLIENT CONFIGURATION: 
 On your PC, edit the following file:
 
@@ -218,7 +220,7 @@ Create a job_to_launch.py python file into /tmp/python_file/:
 	
 	
 STEP2:
-Create a /tmp/create_somaWF_jobs.py python file to generate your soma_workflow_job into. Change the **your_logging** and **your_logging** part:
+Create a /tmp/create_somaWF_jobs.py python file to generate your soma_workflow_job into. Change the **your_logging** and **your_password** part:
 
 	# -*- coding: utf-8 -*-
 	import os, sys, glob
