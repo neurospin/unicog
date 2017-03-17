@@ -98,15 +98,20 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                      dataset_name=None):
     data_path = get_bids_default_path(data_root_path, dataset_name)
     if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
-        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*'))
+        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*',
+                                             'func'))
     else:
-        sub_folders = glob.glob(os.path.join(data_root_path, behav_path, 'sub-*'))
+        sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
+                                             'sub-*', 'func'))
+    # raise exception if no folder is found in recorded events
+    if not sub_folders:
+        raise Exception('no valid recorded events provided to copy behavior')
 
     for sub_folder in sub_folders:
-        for file_name in os.listdir(os.path.join(sub_folder, 'func')):
-            shutil.copy2(os.path.join(sub_folder, 'func', file_name),
-                         os.path.join(data_path, os.path.basename(sub_folder),
-                                      'func', file_name))
+        file_path = sub_folder.replace(behav_path + '/', '')
+        for file_name in os.listdir(os.path.join(sub_folder)):
+            shutil.copy2(os.path.join(sub_folder, file_name),
+                         os.path.join(data_path, file_path, file_name))
 
 
 def get_bids_path(data_root_path='', subject_id='01', folder='',
@@ -180,7 +185,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     Name: dataset_name
     BidsVersion: 1.0.0
     """
-    dataset_name = get_bids_default_path(data_root_path, dataset_name)   
+    dataset_name = get_bids_default_path(data_root_path, dataset_name)
     if not os.path.exists(dataset_name):
         os.makedirs(dataset_name)
     # Check dataset_description.json
@@ -261,8 +266,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Get info of subjects/sessions to download
     pop = pd.read_csv(os.path.join(exp_info_path, 'participants.tsv'),
                       dtype=str, sep='\t', index_col=False)
-#    pop = pd.read_csv(os.path.join(get_exp_info_path(), 'participants.tsv'),
-#                      dtype=str, sep='\t', index_col=False)
 
     download_report = ('download_report_' +
                        time.strftime("%d-%b-%Y-%H:%M:%S", time.gmtime()) +
@@ -274,9 +277,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Download command for each subject/session
     # (following neurospin server conventions)
     for row_idx, subject_info in pop.iterrows():
-        subject_id = subject_info['participant_label'].split('-')[1]
-        if 'session_id' in subject_info.index:
-            session_id = subject_info['session_id'].split('-')[1]
+        subject_id = subject_info['participant_label']
+        if 'session_label' in subject_info.index:
+            session_id = subject_info['session_label']
         else:
             session_id = None
 
@@ -341,54 +344,55 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
             run_task = get_value('task', row['acq_name'])
             run_id = get_value('run', row['acq_name'])
-            run_session = get_value('ses', row['acq_name'])
+            run_session = session_id
+            tag = row['acq_name'].split('_')[-1]
             target_path = os.path.join(sub_path, row['acq_folder'])
             dicom_path = os.path.join(target_path, 'dicom')
 
             run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                              format(int(row['acq_label']))))
+                                              format(int(row['acq_number']))))
             if run_path:
                 shutil.copytree(run_path[0], dicom_path)
             else:
                 raise Exception('DICOM FILES NOT FOUNDS FOR RUN %s'
-                                ' TASK %s SES %s SUB %s' % (run_id, run_task,
-                                                            run_session,
-                                                            subject_id))
+                                ' TASK %s SES %s SUB %s TAG %s' %
+                                (run_id, run_task, run_session,
+                                subject_id, tag))
 
-#            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
-#                            shell=True)
-            subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
+            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
                             shell=True)
+
+            # Will swap to dcm2niix in the future
+            # subprocess.call(("dcm2niix -b y -z n -o {output_path} {data_path}".format(output_path=dicom_path, data_path=dicom_path)),
+            #                 shell=True)
 
             # Expecting page 10 bids specification file name
             filename = get_bids_file_descriptor(subject_id, task_id=run_task,
                                                 run_id=run_id,
                                                 session_id=run_session,
-                                                file_tag=row['acq_name'],
+                                                file_tag=tag,
                                                 file_type='nii')
-                                                
+
             filename_json = os.path.join(target_path, filename[:-3] + 'json')
-            
-            shutil.copyfile(glob.glob(os.path.join(dicom_path,
-                                                   '*.nii'))[0],
+
+            shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.nii'))[0],
                             os.path.join(target_path, filename))
-                          
-            shutil.copyfile(glob.glob(os.path.join(dicom_path,
-                                                   '*.json'))[0],
-                            os.path.join(filename_json))
-                            
+            if glob.glob(os.path.join(dicom_path, '*.json')):
+                shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.json'))[0],
+                                os.path.join(filename_json))
+
+            # Will be done with dcm2niix in the future (get all header fields)
             # Copy slice_times from dicom reference file
-            #do by dcm2niix
-#            if 'bold' in row['acq_name']:
-#                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
-#                                   '*.dcm')))[4]
-#                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
-#                TR = dicom.read_file(dicom_ref).RepetitionTime
-#                json_ref = open(os.path.join(target_path, filename[:-3] +
-#                                'json'), 'a')
-#                json.dump({'SliceTiming': slice_times,
-#                           'RepetitionTime': int(TR)}, json_ref)
-#                json_ref.close()
+            if 'bold' in row['acq_name']:
+                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
+                                   '*.dcm')))[4]
+                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
+                TR = dicom.read_file(dicom_ref).RepetitionTime
+                json_ref = open(os.path.join(target_path, filename[:-3] +
+                                'json'), 'a')
+                json.dump({'SliceTiming': slice_times,
+                           'RepetitionTime': int(TR)}, json_ref)
+                json_ref.close()
             # remove temporary dicom folder
             shutil.rmtree(dicom_path)
 
