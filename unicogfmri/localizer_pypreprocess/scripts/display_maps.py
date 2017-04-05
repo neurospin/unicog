@@ -6,8 +6,7 @@ Visualization of maps
 import os
 import glob
 
-from unicogfmri.utils_unicog.viewer import pyanatomist_viewer
-
+from unicogfmri.utils_unicogfmri.viewer import pyanatomist_viewer
 
 datadir = os.path.join(os.getenv('ROOTDIR'))
 path_results = os.path.join(datadir, "results")
