@@ -62,38 +62,9 @@ Note that all the commands that follow are supposed to be executed from the *scr
 
        cd $ROOTDIR/scripts
 
-
 ####  Data importation 
+Please the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](BIDS).
 
-The first step is to import data. 
-
-The location of the scans is described in a text file. Here is an example of such a file:
-
-
-     subj01  20110404 fp110067 02 anat 05 norm1 07 jabb1 09 norm2 
-     subj02  20110404 kl198789 02 anat 05 norm1 07 jabb1 09 norm2 
-  
-The input consists of one line per participant: 
-
-* The first item of each line specifies the name of the subdirectory that will be created to store this participant's data.
-* The second item is the date of acquisition in the format YYYYMMDD,
-* The third item is the participant's NIP identifier (Note: if, for any reason, a given participant appears to have been scanned several times the same day, the nip number is not sufficient to uniquely identify the scans and you must ask the manips for the nip and exam numbers. You then have to write: nip-exam number, for example: kl198789-4004)
-* the remaining of the line is a series of pairs 'series_number' and 'target_name'. Each series is identified by a *two-digits number* (i.e. *01* rather than *1*), the "target name" will be added as a prefix to the file name for this series.
-
-For this tutorial, we have already created the file.
-
-      cd $ROOTDIR/scripts
-      cat scan_list.txt
-      subject01 20100628 tr070015 02 anat 09 func_1 
-      subject02 20100701 ap100009 02 anat 09 func_1
-
-To start the importation, you just have to type:
-
-      python import_scans.py scan_list.txt
-
-The scans should now reside in a directory 'raw_data'. You can check that with:
-
-      ls $ROOTDIR/raw_data
 
 ###### Preprocessing and first-level
 

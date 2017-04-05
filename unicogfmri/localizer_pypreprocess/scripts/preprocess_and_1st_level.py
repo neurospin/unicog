@@ -9,19 +9,18 @@ and using a first beta version of https://github.com/neurospin/pypreprocess.
 import time
 import os
 import sys
-
 import numpy as np
-from nipy.modalities.fmri.design_matrix import make_dmtx
-from nipy.modalities.fmri.glm import FMRILinearModel
+
 import nibabel
 
-
+from pypreprocess.external.nistats.glm import FirstLevelGLM
+from pypreprocess.external.nistats.design_matrix import make_design_matrix
 from pypreprocess.reporting.base_reporter import ProgressReport
 from pypreprocess.reporting.glm_reporter import generate_subject_stats_report
 from pypreprocess.nipype_preproc_spm_utils import do_subjects_preproc
 from pypreprocess.conf_parser import _generate_preproc_pipeline
 
-from unicogfmri.localizer.utils_localizer import paradigm_contrasts
+import paradigm_contrasts
 
 #############################################################################
 # preproc
@@ -37,7 +36,8 @@ def first_level(subject_dic):
     stats_start_time = time.ctime()
     tr = 2.4
     drift_model = 'blank'
-    hrf_model = 'canonical'  # hemodynamic reponse function
+    #hrf_model = 'canonical'  # hemodynamic reponse function
+    hrf_model = 'spm'  # hemodynamic reponse function
     hfcut = 128.
     n_scans = 128
 
@@ -51,16 +51,18 @@ def first_level(subject_dic):
 
         # build design matrix
         frametimes = np.linspace(0, (n_scans - 1) * tr, n_scans)
-        design_matrix = make_dmtx(
+        design_matrix = make_design_matrix(
             frametimes,
             paradigm, hrf_model=hrf_model,
-            drift_model=drift_model, hfcut=hfcut,
+            drift_model=drift_model, period_cut=hfcut,
             )
         design_matrices.append(design_matrix)
 
     # Specify contrasts
-    contrasts = paradigm_contrasts.localizer_contrasts(design_matrix)
-
+    contrasts = paradigm_contrasts.localizer_contrasts(paradigm)
+    for contrast_id, contrast_val in contrasts.items():
+        contrasts[contrast_id] = np.append(contrast_val, 1.)
+    
     #create output directory
     subject_session_output_dir = os.path.join(subject_dic['output_dir'],
                                                   'res_stats')
@@ -69,19 +71,16 @@ def first_level(subject_dic):
              os.makedirs(subject_session_output_dir)
 
     # Fit GLM
-    print 'Fitting a GLM (this takes time)...'
-    fmri_glm = FMRILinearModel(fmri_files,
-                               [design_matrix.matrix
-                                for design_matrix in design_matrices],
-                               mask='compute'
+    print 'Fitting a GLM (this takes time)...'    
+    fmri_glm = FirstLevelGLM(noise_model='ar1', standardize=False).fit(fmri_files,
+                               [design_matrix
+                                for design_matrix in design_matrices]
                                )
-    fmri_glm.fit(do_scaling=True, model='ar1')
 
     # save computed mask
     mask_path = os.path.join(subject_session_output_dir,
                              "mask.nii.gz")
-    print "Saving mask image %s" % mask_path
-    nibabel.save(fmri_glm.mask, mask_path)
+    nibabel.save(fmri_glm.masker_.mask_img_, mask_path)
     mask_images.append(mask_path)
 
     # compute contrasts
@@ -89,14 +88,13 @@ def first_level(subject_dic):
     effects_maps = {}
     for contrast_id, contrast_val in contrasts.iteritems():
         print "\tcontrast id: %s" % contrast_id
-        z_map, t_map, effects_map, var_map = fmri_glm.contrast(
-            [contrast_val] * 1,
-            con_id=contrast_id,
-            output_z=True,
-            output_stat=True,
-            output_effects=True,
-            output_variance=True
-            )
+        z_map, t_map, effects_map, var_map = fmri_glm.transform([contrast_val] * 1, 
+                                    contrast_name=contrast_id,
+                                    output_z=True,
+                                    output_stat=True,
+                                    output_effects=True,
+                                    output_variance=True)
+
 
         # store stat maps to disk
         for map_type, out_map in zip(['z', 't', 'effects', 'variance'],
@@ -119,24 +117,22 @@ def first_level(subject_dic):
     # do stats report
     anat_img = nibabel.load(subject_dic['anat'])
     stats_report_filename = os.path.join(subject_session_output_dir,
-                                         "report_stats.html")
-                                         
+                                         "report_stats.html")                              
     generate_subject_stats_report(
         stats_report_filename,
         contrasts,
         z_maps,
-        fmri_glm.mask,
+        fmri_glm.masker_.mask_img_,
         threshold=2.3,
         cluster_th=15,
         anat=anat_img,
         anat_affine=anat_img.get_affine(),
-        design_matrices=design_matrix,
-        subject_id="sub001",
+        design_matrices=None,
+        paradigm= paradigm,
+        subject_id=subject_dic['session_id'],
         start_time=stats_start_time,
         title="GLM for subject %s" % subject_dic['session_id'],
-    
         # additional ``kwargs`` for more informative report
-        paradigm=paradigm.__dict__,
         TR=tr,
         n_scans=n_scans,
         hfcut=hfcut,
@@ -144,6 +140,7 @@ def first_level(subject_dic):
         drift_model=drift_model,
         hrf_model=hrf_model,
         )
+    
     
     ProgressReport().finish_dir(subject_session_output_dir)
     print "Statistic report written to %s\r\n" % stats_report_filename
