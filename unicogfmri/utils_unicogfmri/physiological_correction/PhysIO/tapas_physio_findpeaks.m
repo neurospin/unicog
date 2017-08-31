@@ -44,7 +44,8 @@ function [pks,locs] = tapas_physio_findpeaks(X,varargin)
 %   Copyright 2007-2010 The MathWorks, Inc.
 %   $Revision: 235 $  $Date: 2013-08-19 18:28:07 +0200 (Mon, 19 Aug 2013) $
 
-error(nargchk(1,11,nargin,'struct'));
+%error(nargchk(1,11,nargin,'struct'));
+narginchk(1,11);
 
 [X,Ph,Pd,Th,Np,Str,infIdx] = parse_inputs(X,varargin{:});
 [pks,locs] = getPeaksAboveMinPeakHeight(X,Ph);

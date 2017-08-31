@@ -1,4 +1,4 @@
-function [c, r, c_t, c_pulse, verbose] = tapas_physio_read_physlogfiles_siemens_resp(log_files, ...
+function [c, r, c_t, c_pulse, verbose] = tapas_physio_read_physlogfiles_siemens_resp_7T_bis(log_files, ...
     verbose, varargin)
 % reads out physiological time series and timing vector for Siemens
 % logfiles of peripheral cardiac monitoring (ECG/Breathing Belt or
@@ -78,7 +78,8 @@ if ~isempty(log_files.cardiac)
     % logfile footers
     hasScanTimingDicomImage = ~isempty(log_files.scan_timing);
     
-    linesFooter = C{1}(2:end);
+    %linesFooter = C{1}(2:end);
+    linesFooter = C{1}(7:end); % CHANGED for "_resp_7T_bis"
     LogStartTimeSeconds =   str2num(char(regexprep(linesFooter(~cellfun(@isempty,strfind(linesFooter,...
         'LogStartMDHTime'))),'\D',''))) / 1000;
     LogStopTimeSeconds =    str2num(char(regexprep(linesFooter(~cellfun(@isempty,strfind(linesFooter,...
@@ -120,7 +121,8 @@ if ~isempty(log_files.cardiac)
         log_files.relative_start_acquisition;
     
     
-    c_lineData = C{1}{1};
+    %c_lineData = C{1}{1};
+    c_lineData = C{1}{6}; % CHANGED for "_resp_7T_bis"
     c_iTrigger = regexpi(c_lineData, '6002'); % signals start of data logging
     c_lineData = c_lineData((c_iTrigger(end)+4):end);
     c_data = textscan(c_lineData, '%d', 'Delimiter', ' ', 'MultipleDelimsAsOne',1);
@@ -304,7 +306,8 @@ if ~isempty(log_files.respiration)
     fclose(fid);
     
     
-    r_lineData = R{1}{1};
+    %r_lineData = R{1}{1};
+    r_lineData = R{1}{6}; % CHANGED for "_resp_7T_bis"
     r_iTrigger = regexpi(r_lineData, '6002'); % signals start of data logging
     r_lineData = r_lineData((r_iTrigger(end)+4):end);
     r_data = textscan(r_lineData, '%d', 'Delimiter', ' ', 'MultipleDelimsAsOne',1);

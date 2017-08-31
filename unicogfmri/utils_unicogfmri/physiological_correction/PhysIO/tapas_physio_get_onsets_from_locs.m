@@ -70,8 +70,24 @@ end
 
 Nallvols = length(VOLLOCS);
 for v = 1:Nallvols-1
+    
     SLICELOCS{v} = LOCS(intersect(find(LOCS>=VOLLOCS(v), Nslices, 'first'), ...
         find(LOCS<VOLLOCS(v+1))));
+    
+    % bugfix double indeces at the end of a volume, i.e. twice the same
+    % index on LOCS that belong to different VOLLOCS
+    % check whether correct number of SLICELOGS have been found
+    if length(SLICELOCS{v})~=Nslices
+        % check whether last LOCS is present twice
+        double_pos = find(LOCS==VOLLOCS(v+1));
+        if length(double_pos) > 1
+            % manually add the first of the two LOCS to the end
+           SLICELOCS{v} = LOCS([intersect(find(LOCS>=VOLLOCS(v), Nslices, 'first'), ...
+        find(LOCS<VOLLOCS(v+1))); double_pos(1)]);            
+        end
+    end
+    
+    
     if length(SLICELOCS{v})~=Nslices
         verbose = tapas_physio_log(sprintf(...
             'Volume event %d: %d instead of %d slice events found\n', v, ...

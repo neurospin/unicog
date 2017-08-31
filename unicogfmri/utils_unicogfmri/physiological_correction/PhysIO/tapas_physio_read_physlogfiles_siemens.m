@@ -62,7 +62,8 @@ dt                  = log_files.sampling_interval;
 
 if ~isempty(log_files.cardiac)
     fid             = fopen(log_files.cardiac);
-    C               = textscan(fid, '%s', 'Delimiter', '\n', 'bufsize', 1e9);
+    %C               = textscan(fid, '%s', 'Delimiter', '\n', 'bufsize', 1e9);
+    C               = textscan(fid, '%s', 'Delimiter', '\n');
     fclose(fid);
     
     % Determine relative start of acquisition from dicom headers and
@@ -220,15 +221,27 @@ if ~isempty(log_files.cardiac)
     ampl = max(meanChannel); % for plotting timing events
     
     if DEBUG
+        
+        %% Added by A. Moreno - 14/12/2016
+        % To improve figures visualization
+        linewidth = 1;
+        axesfontsize = 15;
+        %%
+        
         stringTitle = 'Raw Siemens physlog data';
         verbose.fig_handles(end+1) = tapas_physio_get_default_fig_params();
         set(gcf, 'Name', stringTitle);
         stem(cpulse, ampl*ones(size(cpulse)), 'g'); hold all;
         stem(cpulse_off, ampl*ones(size(cpulse_off)), 'r');
         stem(t(stopSample), ampl , 'm');
-        plot(t, channel_1);
-        plot(t, channel_AVF);
-        plot(t, meanChannel);
+        %% Added by A. Moreno - 14/12/2016
+        % To improve figures visualization
+        %plot(t, channel_1);
+        %plot(t, channel_AVF);
+        %plot(t, meanChannel);
+        plot(t, channel_1, 'LineWidth', linewidth);
+        plot(t, channel_AVF, 'LineWidth', linewidth);
+        plot(t, meanChannel, 'LineWidth', linewidth);
        
         stringLegend = { ...
             'cpulse on', 'cpulse off', 'assumed last sample of last scan volume', ...
@@ -246,6 +259,11 @@ if ~isempty(log_files.cardiac)
         legend(stringLegend);
         title(stringTitle);
         xlabel('t (seconds)');
+
+        %% Added by A. Moreno - 14/12/2016
+        % To improve figures visualization
+        set(gca,'FontSize',axesfontsize)
+        %%
     end
     % crop end of log file
     

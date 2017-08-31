@@ -67,6 +67,20 @@ switch lower(log_files.vendor)
             tapas_physio_read_physlogfiles_siemens(log_files, verbose);
         acq_codes = [];
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Added by A. Moreno - 14/12/2016
+    case 'siemens_ns'
+        [c, r, t, cpulse, verbose] = ...
+            tapas_physio_read_physlogfiles_siemens_resp(log_files, verbose);
+        acq_codes = [];
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %% Added by A. Moreno - 20/06/2017
+    case 'siemens_ns_7t_bis'
+        [c, r, t, cpulse, verbose] = ...
+            tapas_physio_read_physlogfiles_siemens_resp_7T_bis(log_files, verbose);
+        acq_codes = [];
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Added by A. Moreno - 19/05/2016
     case 'siemens_minn'
         [c, r, t, cpulse] = ...

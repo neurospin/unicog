@@ -1,6 +1,6 @@
 # Physiological correction code
 
-PhysIO is a toolbox that can be used to correct fMRI images using physiological data acquired during acquisition (pulse and respiration). This toolbox computes the regressors (with RETROICOR algorithm) to be included in your design. It is a version of the [TAPAS toolbox](http://www.translationalneuromodeling.org/tnu-checkphysretroicor-toolbox/). It has been adapted for the 3T MRI scanner in NeuroSpin, using fMRI acquisitions with Minneapolis sequences.
+PhysIO is a toolbox that can be used to correct fMRI images using physiological data acquired during acquisition (pulse and respiration). This toolbox computes the regressors (with RETROICOR algorithm) to be included in your design. It is a version of the [TAPAS toolbox](http://www.translationalneuromodeling.org/tnu-checkphysretroicor-toolbox/) (check their website for recent updates). It has been adapted for the 3T MRI scanner in NeuroSpin, using fMRI acquisitions with Minneapolis sequences, and also for the 7T MRI scanner in NeuroSpin.
 
 ### installation
 
@@ -10,15 +10,15 @@ Copy all the directory "PhysIO". Then, you will have to add the path to it in Ma
 
 ### before using the toolbox
 
-1) Organize your data: .nii and .log files must be in the local "fMRI" directory for every subject.
+1.- Organize your data: .nii and .log files must be in the local "fMRI" directory for every subject.
 
-2) In Matlab, add the directory containing the "PhysIO" toolbox and run SPM (only necessary once for a Matlab session):
+2.- In Matlab, add the directory containing the "PhysIO" toolbox and run SPM (only necessary once for a Matlab session):
 
     addpath('/path_to_the_toolbox/PhysIO/')
-    spm8 # or other version
-    spm('fmri')
+    spm_path = '/i2bm/local/spm12'
+    spm12 # or other version
 
-3) You need to get some acquisition information from your data. For this, you can use the provided function "create_SliceTimingInfo_mat" that will create file SliceTimingInfo.mat (in the directory "fMRI" containing the .nii data) for every subject, by using file "list_subjects.txt" (the file used for importation).
+3.- You need to get some acquisition information from your data. For this, you can use the provided function “create_SliceTimingInfo_mat” (or one of the adapted versions -see the comments in the corresponding file for further information-) that will create file SliceTimingInfo.mat (in the directory “fMRI” containing the .nii data) for every subject, by using file “list_subjects.txt” (the file typically used for importation).
 
 **Attention**: 
 
@@ -27,7 +27,6 @@ Copy all the directory "PhysIO". Then, you will have to add the path to it in Ma
 * data must be placed in a subdirectory called "fMRI" for every subject.
 
 More detailed information in the header of the function:
-
 
     function [SliceTiming, TR, TE, SliceThickness, SpacingBetweenSlices, ...
                 NumberOfSlices, PixelSpacing, total_readout_time_spm, total_readout_time_fsl] ...
@@ -94,13 +93,15 @@ More detailed information in the header of the function:
 
 ### computing the regressors
 
-Run function "physio_regressors_computation_tapas" with the appropriate parameters. For example :
+Run function "physio_regressors_computation_tapas" (or the adapted version) with the appropriate parameters. For example:
 
     physio_regressors_computation_tapas('epi_sess1_bp160018_20160511_05',3,4,1,3)
 
 **Attention**: this function only computes the regressors for ONE fMRI session (one .nii file)!
 
-More detailed information in the header of the function:
+Some examples of use are furnished in files: “compute_all_regressors_all_subjects.m”, “compute_all_regressors_all_subjects_only_puls.m”, “compute_all_regressors_all_subjects_only_resp.m”.
+
+More detailed information in the header of the function(s):
 
     function physio_regressors_computation_tapas(data_local_dir, root_file_name, c, r, cr, verbose_level)
     %
