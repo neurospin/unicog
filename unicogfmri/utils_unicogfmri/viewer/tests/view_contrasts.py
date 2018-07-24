@@ -4,7 +4,7 @@ Created on Mon Feb 24 15:12:04 2014
 @author: id983365
 
 Script to illustrate how you can select and display many fusions with the
-/i2bm/local/spm8/canonical/single_subj_T1.nii.
+/i2bm/local/spm12/canonical/single_subj_T1.nii.
 In order to change the template, use the template_file option in fusion2D_map_activation
 
 1- Configure paths

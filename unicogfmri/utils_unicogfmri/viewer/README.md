@@ -8,12 +8,12 @@ contrasts of interest, because you can launch many fusions at the same time.
 Note that before launching the script, it is necessary to initialize 
 correctly paths for Anatomist with the first line.
 
-    source /i2bm/local/Ubuntu-12.04-x86_64/brainvisa/bin/bv_env.sh
+    source /i2bm/local/Ubuntu-14.04-x86_64/brainvisa/bin/bv_env.sh
     cd <my_repository>/unicog/unicogfmri/utils_unicog/viewer/tests
     python view_contrasts.py
 
 Note: For more information see 
-[pyanatomist module](http://brainvisa.info/doc/cartointernet/cartointernet_pg/en/html/ch05.html)
+[pyanatomist module](http://brainvisa.info/pyanatomist-4.6/sphinx/index.html)
 
 Note: If you work on your laptop, you probably have to install Brainvisa package including pyanatomist and Anatomist.
 

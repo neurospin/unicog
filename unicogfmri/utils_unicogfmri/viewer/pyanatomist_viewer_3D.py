@@ -36,7 +36,6 @@ except:
 
 
 def fusion3D_map_activation(list_maps, template_file="", path_mesh=""):
-
     template_file = "/neurospin/unicog/protocols/IRMf/Tests_Isa/template/avg152T1.nii"
     path_mesh = "/neurospin/unicog/protocols/IRMf/Tests_Isa/template/mni152_05_brain.mesh"
 
@@ -80,7 +79,8 @@ def fusion3D_map_activation(list_maps, template_file="", path_mesh=""):
     cpt_color = 0     
     
     #loop on maps to set correctly the referential 
-    for file_name in list_maps:
+    for file_name in list_maps.itervalues():
+        print file_name
         map_activation = a.loadObject(file_name)
         # load identity transformtion to mni_SPM
         tmp_map = 'truth for ' + os.path.basename(file_name)

@@ -1,2 +1,0 @@
-subject01 20100628 tr070015 02 anat 09 func_1 
-subject02 20100701 ap100009 02 anat 09 func_1

@@ -7,8 +7,8 @@ Data come from an experimental paradigm designed by Philippe Pinel at Neurospin.
 In this tutorial, we will import scans from two individuals on Neurospin's data acquisition server, then run the preprocessing stages (realignment, spatial normalization, smoothing) and compute some statistical maps for some contrasts at the single subject level.
 
 The preprocessing stages, driven by pypreprocess, are performed using
-the standalone SPM8 program (avoiding the need for a matlab license)
-while the statistic analyses rely on [http://nipy.org](Nipy).
+the standalone SPM12 program (avoiding the need for a matlab license)
+while the statistic analyses rely on [http://nipy.org](http://nipy.org).
 
 ### Prerequisites
 
@@ -43,7 +43,7 @@ If you see any error message, you will need to install the module(s) with issue.
 
 Let us create a directory to run this tutorial, by issuing the following commands in a terminal:
 
-       export ROOTDIR=/volatile/test_localizer
+       export ROOTDIR=/volatile/test_git_unicog/localizer
        mkdir -p $ROOTDIR
        cd $ROOTDIR
 
@@ -63,30 +63,42 @@ Note that all the commands that follow are supposed to be executed from the *scr
        cd $ROOTDIR/scripts
 
 ####  Data importation 
-Please the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](BIDS).
+Please the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](https://github.com/neurospin/unicog/tree/master/bids).
+
+To launch the step of importation, place the exp_info/download.tsv and the exp_info/participants.tsv into the $ROOTDIR/dataset/exp_info directory.
+Then use the script of importation:
+
+      python neurospin_to_bids.py -root_path $ROOTDIR/dataset -neurospin_database trio
 
 
-###### Preprocessing and first-level
 
-We are now going to use pypreprocess to run the preprocessing and the first level analysis in a single step. All the information resides in a configuration file, here *config.ini*. Read this file. The parameters are document on pypreprocess website. 
+#### Preprocessing
 
+We are now going to use the script for the preprocessing. The configuration of all steps (slice timing, normalisation, use SPM8 or SPM12, 
+use the MCR (Matlab Compiled Runtime) .... ) are described in the config.ini file.
+To launch this step:
 
-Then, run:
+    python preprocess.py config.ini
 
-      python preprocess_and_1st_level.py config.ini
-
-
-If everything works well, reports have been create in html files which you can open, e.g., with firefox. 
-
-* $ROOTDIR/processed_data/report_preproc.html
-* $ROOTDIR/processed_data/sub*/res_stats/report_stats.
-
-The statistics maps are located in the subjects subfolders in results:
+When the preprocessing is finished, you can see a report into $ROOTDIR/processed_data/report_preproc.html
 
 
-#### Visualizing contrasts
+#### First level
 
-The maps can be visualized interactively with the [Anatomist Software](http://brainvisa.info/doc/anatomist-4.4/ana_training/en/html/index.html#ana_training%book).
+Now we are going to launch the first level (design matrix, fit the data, contrast of interest):
+
+      python first_level.py
+
+When the script is finished, you can see a report into $ROOTDIR/processed_data/sub*/res_stats/report_stats.html
+
+
+#### For further analysis
+Further analysis can be done with python tools. Please take a look at [https://nistats.github.io/auto_examples/index.html#second-level-analysis-examples](https://nistats.github.io/auto_examples/index.html#second-level-analysis-examples).
+
+
+#### Additional step for visualizing contrasts with the Anatomist software
+
+The maps can be visualized interactively with the [Anatomist Software](http://brainvisa.info/web/anatomist.html).
 
 
      source /i2bm/local/Ubuntu-14.04-x86_64/brainvisa/bin/bv_env.sh

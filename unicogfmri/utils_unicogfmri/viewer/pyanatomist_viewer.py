@@ -34,7 +34,7 @@ except:
 
 def fusion2D_map_activation(
         dic_maps,
-        template_file="/i2bm/local/spm8/canonical/single_subj_T1.nii",
+        template_file="/i2bm/local/spm12/canonical/single_subj_T1.nii",
         dic_templates="",
         threshold=3.1,
         maxval=10,
@@ -187,7 +187,7 @@ def fusion2D_map_activation(
         else:
             fusion_map = a.fusionObjects([map_activation, 
                                          dic_templates_fusion[fusion_name]],
-                                         'Fusion2DMethod')                              
+                                         'Fusion2DMethod')    
                                      
         fusion_list.append(fusion_map)
         if block:
@@ -201,9 +201,11 @@ def fusion2D_map_activation(
     
     for w,f in zip(window_list, fusion_list) :
         # show the fusion
+        f.setReferential(mni_ref)
         w.assignReferential(mni_ref)
         w.moveLinkedCursor(cursor)
         a.addObjects(f, w)
+        
         
         #changement de position du curseur   
         a.execute('LinkedCursor',
