@@ -47,35 +47,47 @@ Let us create a directory to run this tutorial, by issuing the following command
        mkdir -p $ROOTDIR
        cd $ROOTDIR
 
-And copy there the 'localizer/scripts' directory of unicogfmri
+###  Data importation 
+Please the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](https://github.com/neurospin/unicog/tree/master/bids).
+
+Let us create a directory to import data:
+
+       mkdir -p $ROOTDIR/dataset/exp_info
+       cd $ROOTDIR/dataset
+
+
+Copy the *.tsv file to select data (from neurospin):
+
+       cp -a /tmp/unicog/unicogfmri/localizer_pypreprocess/scripts/exp_info/*tsv $ROOTDIR/dataset/exp_info
+
+
+Launch the importation:
+
+      cd $ROOTDIR/dataset
+      python /tmp/unicog/bids/neurospin_to_bids.py -root_path $ROOTDIR/dataset -neurospin_database trio
+
+
+### Processing 
+
+Copy the 'localizer/scripts' directory of unicogfmri
  
        cp -a /tmp/unicog/unicogfmri/localizer/scripts $ROOTDIR
 
 (remark: if you installed the unicog git repository elsewhere than in /tmp, you will need to adjust the preceding line) 
 
 We are ready to go! 
-
-### Processing 
     
 Note that all the commands that follow are supposed to be executed from the *scripts* folder.
 
-
        cd $ROOTDIR/scripts
-
-####  Data importation 
-Please the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](https://github.com/neurospin/unicog/tree/master/bids).
-
-To launch the step of importation, place the exp_info/download.tsv and the exp_info/participants.tsv into the $ROOTDIR/dataset/exp_info directory.
-Then use the script of importation:
-
-      python neurospin_to_bids.py -root_path $ROOTDIR/dataset -neurospin_database trio
-
 
 
 #### Preprocessing
 
 We are now going to use the script for the preprocessing. The configuration of all steps (slice timing, normalisation, use SPM8 or SPM12, 
 use the MCR (Matlab Compiled Runtime) .... ) are described in the config.ini file.
+Check and set up the paths "dataset_dir" and 'output_dir" into the config.ini if needed. It is not possible to use $ROOTDIR inside. 
+
 To launch this step:
 
     python preprocess.py config.ini

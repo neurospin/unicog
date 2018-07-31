@@ -103,15 +103,36 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
     else:
         sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
                                              'sub-*', 'func'))
-    # raise exception if no folder is found in recorded events
+                                             
+    # raise warning if no folder is found in recorded events
     if not sub_folders:
-        raise Exception('no valid recorded events provided to copy behavior')
+        print '\n No information events provided to copy behavior\n'
+    else:
+        for sub_folder in sub_folders:
+            file_path = sub_folder.replace(behav_path + '/', '')
+            for file_name in os.listdir(os.path.join(sub_folder)):
 
-    for sub_folder in sub_folders:
-        file_path = sub_folder.replace(behav_path + '/', '')
-        for file_name in os.listdir(os.path.join(sub_folder)):
-            shutil.copy2(os.path.join(sub_folder, file_name),
-                         os.path.join(data_path, file_path, file_name))
+#                dest_directory = os.path.join(data_path, file_path)
+#                if not os.path.exists(dest_directory):
+#                    os.makedirs(dest_directory)
+                
+                file_ext = []
+                last = ''
+                root, last = os.path.split(sub_folder) 
+                while last != 'recorded_events':
+                    if last == '':
+                        break
+                    file_ext.append(last)  
+                    sub_folder = root
+                    root, last = os.path.split(sub_folder)
+                    
+                list_tmp = []
+                elements_path = [[item, '/'] for item in reversed(file_ext)]
+                elements_path = [(list_tmp.append(item[0]), list_tmp.append(item[1])) for item in elements_path]
+                ext = ''.join(list_tmp)    
+                
+                shutil.copyfile(os.path.join(file_path, file_name),
+                             os.path.join(data_path, ext, file_name))
 
 
 def get_bids_path(data_root_path='', subject_id='01', folder='',

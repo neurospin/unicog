@@ -9,7 +9,7 @@ import glob
 from unicogfmri.utils_unicogfmri.viewer import pyanatomist_viewer
 
 datadir = os.path.join(os.getenv('ROOTDIR'))
-path_results = os.path.join(datadir, "results")
+path_results = os.path.join(datadir, "processed_data")
 dic_maps = {}
 contrasts_of_interest = ['left-right', 'right-left',
                          'audio-video', 'video-audio']

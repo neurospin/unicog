@@ -54,6 +54,7 @@ def first_level(subject_id):
 
     # Preparation of paradigm
     events_file = glob.glob(os.path.join(data_dir, 'func/*_task-standartloc_events.tsv'))[0]
+    print events_file
     paradigm = paradigm_contrasts.localizer_paradigm(events_file)
     
     
@@ -67,7 +68,7 @@ def first_level(subject_id):
 
 
     # Specify contrasts
-    contrasts = paradigm_contrasts.localizer_contrasts(design_matrix, events_file)
+    contrasts = paradigm_contrasts.localizer_contrasts(design_matrix)
     
     
     # Fit GLM
