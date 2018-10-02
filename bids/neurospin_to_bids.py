@@ -109,7 +109,8 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
         print '\n No information events provided to copy behavior\n'
     else:
         for sub_folder in sub_folders:
-            file_path = sub_folder.replace(behav_path + '/', '')
+            #file_path = sub_folder.replace(behav_path + '/', '')
+            file_path = sub_folder
             for file_name in os.listdir(os.path.join(sub_folder)):
 
 #                dest_directory = os.path.join(data_path, file_path)
@@ -129,8 +130,7 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                 list_tmp = []
                 elements_path = [[item, '/'] for item in reversed(file_ext)]
                 elements_path = [(list_tmp.append(item[0]), list_tmp.append(item[1])) for item in elements_path]
-                ext = ''.join(list_tmp)    
-                
+                ext = ''.join(list_tmp)  
                 shutil.copyfile(os.path.join(file_path, file_name),
                              os.path.join(data_path, ext, file_name))
 
