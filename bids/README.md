@@ -75,8 +75,8 @@ Contains information about the participants and their acqusitions. It contains t
         -----------------------------------------------------------------------------
         Nomenclature                       
         -----------------------------------------------------------------------------
-        participant_label  NIP	       acq_date    session_label (if sessions)  other
-        label	           nip_number  YYYY-MM-DD  label                        xxx
+        participant_label  NIP         acq_date    session_label (if sessions)  other
+        label              nip_number  YYYY-MM-DD  label                        xxx
         -----------------------------------------------------------------------------
 
         ----------------------------------------------------------------
@@ -155,12 +155,12 @@ The events for functional runs will be automatically copied in the bids dataset 
 
 Here is an example of **sub-\*\_\<task\>\_events.tsv** following the bids standard:
 
-        onset	duration	trial_type
-        0.0	1	computation_video
-        2.4	1	computation_video
-        8.7	1	h_checkerboard
-        11.4	1	r_hand_audio
-        15.0	1	sentence_audio
+        onset   duration   trial_type
+        0.0     1          computation_video
+        2.4     1          computation_video
+        8.7     1          h_checkerboard
+        11.4    1          r_hand_audio
+        15.0    1          sentence_audio
 
 the onset, duration and trial_type columns are the only mandatory ones. onset and duration fields should be expressed in seconds. Other information can be added to events.tsv files such as ​response_time or other arbitrary additional columns respecting subject anonimity. See the bids specification (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
