@@ -72,22 +72,22 @@ Those files are not part of the bids standard. They are defined to contain the m
 
 Contains information about the participants and their acqusitions. It contains three mandatory columns: participant_label, NIP and acq_data. When there are multiple sessions per subject (with different acquisition_dates), then the session_label column is also mandatory. Moreover other columns with subject information can be included like sex, manuality, etc.
 
--------------------------------------------------------------------------------
-Nomenclature                       
--------------------------------------------------------------------------------
-participant_label	NIP	        acq_date     session_label (if sessions)  other
-label	            nip_number	YYYY-MM-DD   label                        xxx 
--------------------------------------------------------------------------------
+        -----------------------------------------------------------------------------
+        Nomenclature                       
+        -----------------------------------------------------------------------------
+        participant_label  NIP	       acq_date    session_label (if sessions)  other
+        label	           nip_number  YYYY-MM-DD  label                        xxx
+        -----------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
-Example
-------------------------------------------------------------------------------
-participant_label  NIP         acq_date     session_label    sex
-01                 tt989898    2015-02-28   01               M
-01                 tt989898    2015-03-15   02               M
-02                 pp898989    2015-02-27   01               F
-02                 pp898989    2015-03-20   02               F
------------------------------------------------------------------------------
+        ----------------------------------------------------------------
+        Example
+        ----------------------------------------------------------------
+        participant_label  NIP         acq_date     session_label    sex
+        01                 tt989898    2015-02-28   01               M
+        01                 tt989898    2015-03-15   02               M
+        02                 pp898989    2015-02-27   01               F
+        02                 pp898989    2015-03-20   02               F
+        ----------------------------------------------------------------
 
 The order of the rows do not really matter, although we recommend to add the acquisitions as they are done and automatically download to make sanity checks of the data. The download can be done incrementally so there is no need for you to wait until the end of experiment to start downloading files to the bids format and start playing with it.
 
@@ -103,12 +103,12 @@ Contains information about the specific files to download from the neurospin ser
 
 So if the experimental design of all sessions is the same for all subjects, you only need to create one **download.tsv** file.
 
--------------------------------------------------------------------------------
-Nomenclature                       
--------------------------------------------------------------------------------
-acq_number   acq_folder              acq_name
-n            bids_modality_folder    bids_desired_file_name
--------------------------------------------------------------------------------
+        -----------------------------------------------------------
+        Nomenclature                       
+        -----------------------------------------------------------
+        acq_number   acq_folder              acq_name
+        n            bids_modality_folder    bids_desired_file_name
+        -----------------------------------------------------------
 **bids_modality_folder**: "anat" for the anatomical images and "func" for functional images.
 
 **IMPORTANT bids_desired_file_name**: Before panicking rest assured that a filename like "task-MyTask_run-01_bold" is all you really need to know in most cases. Here we clarify details if you need extra fields of information or want to go beyond in available options.
@@ -123,30 +123,30 @@ The subject_id (sub-<label>) and session_id (ses-<label>) of course will be adde
 
 For more details about file naming please consult the bids specifications (http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
--------------------------------------------------------------------------------
-Example
--------------------------------------------------------------------------------
-acq_number   acq_folder              acq_name
-3            anat                    T1w
-7            func                    task-LanguageLocalizer_bold
-9            func                    task-MyParadigm_run-01_bold
-11           func                    task-MyParadigm_run-02_bold
-13           func                    task-MyParadigm_run-02_bold
--------------------------------------------------------------------------------
+       -------------------------------------------------------------------------------
+       Example
+       -------------------------------------------------------------------------------
+       acq_number   acq_folder              acq_name
+       3            anat                    T1w
+       7            func                    task-LanguageLocalizer_bold
+       9            func                    task-MyParadigm_run-01_bold
+       11           func                    task-MyParadigm_run-02_bold
+       13           func                    task-MyParadigm_run-02_bold
+       -------------------------------------------------------------------------------
 **Clarification**: All labels accompanying fields in the file name are strings. So the task label, run label, participant label and session labels in the example that use a numeric style are not part of the standard, feel free to pick the most appropriate label for your particular case.
 
 Now in case there is a different design or an exception in acq_number due to problems during acquistion. You have to create additional files **[sub-<participant_label>_][ses-<session_label>_]download.tsv** as necessary. Where the participant_label and session_label are the same as in **participants.tsv**. You are not forced to create a specific file for each subject and session, the script looks for the most specific file it can find and use that one. For example if **sub-01_download.tsv** is provided and there are multiple sessions for that subject, all of them will assume the files follow the content of sub-01_download.tsv. If there is no file for sub-04 then it will assume the content of **download.tsv**. Basically there is a default reference file unless you provide a more specific one.
 
--------------------------------------------------------------------------------
-Example **sub-01_download.tsv** (same as **download.tsv** but acq_number)
--------------------------------------------------------------------------------
-acq_number   acq_folder              acq_name
-3            anat                    T1w
-9            func                    task-LanguageLocalizer_bold
-11           func                    task-MyParadigm_run-01_bold
-13           func                    task-MyParadigm_run-02_bold
-15           func                    task-MyParadigm_run-02_bold
--------------------------------------------------------------------------------
+       -------------------------------------------------------------------------------
+       Example **sub-01_download.tsv** (same as **download.tsv** but acq_number)
+       -------------------------------------------------------------------------------
+       acq_number   acq_folder              acq_name
+       3            anat                    T1w
+       9            func                    task-LanguageLocalizer_bold
+       11           func                    task-MyParadigm_run-01_bold
+       13           func                    task-MyParadigm_run-02_bold
+       15           func                    task-MyParadigm_run-02_bold
+       -------------------------------------------------------------------------------
 
 # Importation of events:
 The events for functional runs will be automatically copied in the bids dataset if the files are available in a "recorded_events" folder that already respect the bids structure. Which means that files would have the same fields as the bold.nii files in its file name but its final name part would be events.tsv instead, for example:
