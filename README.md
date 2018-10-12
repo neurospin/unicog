@@ -2,7 +2,7 @@
 
 "unicog" is a set of tools (scripts, python modules, examples, ...)  to perform various tasks.  
 
-The files are gathered in a git repository named "unicog" located on http://github.com
+The files are gathered in a git repository named "unicog" located on [GitHub](http://github.com/neurospin).
 
 ### installation
 
@@ -31,5 +31,3 @@ From time to time, to update you local copy of "unicog", got to the unicog folde
 
     git pull
     python setup.py install --user
-
-
