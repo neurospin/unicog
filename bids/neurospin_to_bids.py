@@ -430,6 +430,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Copy recorded event files
     bids_copy_events(behav_path, data_root_path, dataset_name)
 
+
 if __name__ == "__main__":
     # Parse arguments from console
     parser = argparse.ArgumentParser(description='Neurospin to BIDS program')
