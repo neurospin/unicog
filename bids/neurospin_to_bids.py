@@ -103,7 +103,7 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
     else:
         sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
                                              'sub-*', 'func'))
-                                             
+
     # raise warning if no folder is found in recorded events
     if not sub_folders:
         print '\n No information events provided to copy behavior\n'
@@ -116,23 +116,25 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
 #                dest_directory = os.path.join(data_path, file_path)
 #                if not os.path.exists(dest_directory):
 #                    os.makedirs(dest_directory)
-                
+
                 file_ext = []
                 last = ''
-                root, last = os.path.split(sub_folder) 
+                root, last = os.path.split(sub_folder)
                 while last != 'recorded_events':
                     if last == '':
                         break
-                    file_ext.append(last)  
+                    file_ext.append(last)
                     sub_folder = root
                     root, last = os.path.split(sub_folder)
-                    
+
                 list_tmp = []
                 elements_path = [[item, '/'] for item in reversed(file_ext)]
-                elements_path = [(list_tmp.append(item[0]), list_tmp.append(item[1])) for item in elements_path]
-                ext = ''.join(list_tmp)  
+                elements_path = [(list_tmp.append(item[0]),
+                                  list_tmp.append(item[1]))
+                                 for item in elements_path]
+                ext = ''.join(list_tmp)
                 shutil.copyfile(os.path.join(file_path, file_name),
-                             os.path.join(data_path, ext, file_name))
+                                os.path.join(data_path, ext, file_name))
 
 
 def get_bids_path(data_root_path='', subject_id='01', folder='',
@@ -378,7 +380,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 raise Exception('DICOM FILES NOT FOUNDS FOR RUN %s'
                                 ' TASK %s SES %s SUB %s TAG %s' %
                                 (run_id, run_task, run_session,
-                                subject_id, tag))
+                                 subject_id, tag))
 
             subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
                             shell=True)
