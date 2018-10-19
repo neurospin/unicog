@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Utilities to handle the BIDS standard."""
 import os
 import pandas as pd
