@@ -12,6 +12,11 @@ import time
 import argparse
 import re
 
+NEUROSPIN_DATABASES = {
+    'prisma': '/neurospin/acquisition/database/Prisma_fit',
+    'trio': '/neurospin/acquisition/database/TrioTim',
+}
+
 
 def file_manager_default_file(main_path, filter_list, file_tag,
                               file_type='*', allow_other_fields=True):
@@ -198,7 +203,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
 
     participants.tsv columns can be extended as desired, the first column
     is mandatory by the standard, while the acq_date and NIP columns are only
-    relevant as Neurospin/Unicog scanning reference and will be useful for
+    relevant as NeuroSpin/Unicog scanning reference and will be useful for
     automatic download of acquisitions respecting bids conventions.
 
     README is quite free as a file
@@ -243,7 +248,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                               test_paths=False):
     """Automatically download files from neurospin server to a BIDS dataset.
 
-    Download-database is based on Neurospin server conventions.
+    Download-database is based on NeuroSpin server conventions.
     Options are 'prisma', 'trio' and custom path.
     Prisma db_path = '/neurospin/acquisition/database/Prisma_fit'
     Trio db_path = '/neurospin/acquisition/database/TrioTim'
@@ -276,11 +281,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
     # Determine target path
     target_root_path = get_bids_default_path(data_root_path, dataset_name)
-    # Determine path to files in Neurospin server
-    if download_database == 'prisma':
-        db_path = '/neurospin/acquisition/database/Prisma_fit'
-    elif download_database == 'trio':
-        db_path = '/neurospin/acquisition/database/TrioTim'
+    # Determine path to files in NeuroSpin server
+    if download_database in NEUROSPIN_DATABASES:
+        db_path = NEUROSPIN_DATABASES[download_database]
     else:
         db_path = download_database
 
@@ -323,8 +326,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             if os.path.isfile(check_file):
                 continue
 
-        # DATE has to be transformed from bids to neurospin server standard
-        # Neurospin standard is yyyymmdd
+        # DATE has to be transformed from BIDS to NeuroSpin server standard
+        # NeuroSpin standard is yyyymmdd
         # Bids standard is YYYY-MM-DD
         DATE = subject_info['acq_date'].replace('-', '').replace('\n', '')
         NIP = subject_info['NIP']
@@ -434,7 +437,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
 if __name__ == "__main__":
     # Parse arguments from console
-    parser = argparse.ArgumentParser(description='Neurospin to BIDS program')
+    parser = argparse.ArgumentParser(description='NeuroSpin to BIDS conversion')
     parser.add_argument('-root_path',
                         type=str,
                         nargs=1,
