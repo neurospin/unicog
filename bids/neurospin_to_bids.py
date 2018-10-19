@@ -106,7 +106,7 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
 
     # raise warning if no folder is found in recorded events
     if not sub_folders:
-        print '\n No information events provided to copy behavior\n'
+        print('\n No information events provided to copy behavior\n')
     else:
         for sub_folder in sub_folders:
             #file_path = sub_folder.replace(behav_path + '/', '')
@@ -328,7 +328,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         DATE = subject_info['acq_date'].replace('-', '').replace('\n', '')
         NIP = subject_info['NIP']
         nip_dirs = glob.glob(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
-        print os.path.join(db_path, str(DATE), str(NIP) + '-*')
+        print(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
         if len(nip_dirs) < 1:
             raise Exception('No directory found for given NIP %s SESSION %s' %
                             (NIP, session_id))
