@@ -1,3 +1,35 @@
+For submitting jobs to the cluster, you have to use the `qsub` command. This command can be used on the cluster
+by the user or you can use soma-workflow to manage your jobs from your client (your workstation). Soma-workflow is a python module (with or without GUI).
+The choice between `qsub` and soma-workflow depends on users and needs. In a few words, `qsub` is more direct but you have to manage
+all output files for instance to understand why a job failed. Soma-workflow is more longer to install because there are some 
+python dependencies but you can visualize quickly which job failed and why. 
+
+In this readme, you will find documentation for both.
+More information on the queues which are available for users at NeuroSpin (unicog or not) at [http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources).
+
+# QSUB COMMAND
+
+## LAUNCH ONE JOB:
+Very basic using of `qsub`, without any options. By default, if any queue is mentionned, the **global_long** or **global_short** queue will be used (depends on the walltime parameter).
+
+        $ qsub <pathtoScript>
+
+Many options are available such as `-q` to indicate the queue. Many specific queues are available at NeuroSpin, take a look at [http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources](http://www.neurospin-wiki.org/pmwiki/Main/ComputationalResources). For instance, use the **Unicog_short** queue:
+
+        $ qsub -q Unicog_short <pathtoScript>
+
+Many other options are available. See the qsub documention to know all options:
+
+        $ qsub -q <queue> -w e -N <job_name> -l h_vmem=<memory, e.g. 4G> -l walltime=<hh:mm:ss> -o <outputlogfile> -e <errorlogfile> <pathtoScript> <arg1> <arg2>
+
+## LAUNCH MANY JOBS:
+If you want to launch many jobs, you can use a shell or python script. Some examples are available at:
+
+* [https://github.com/neurospin/unicog/tree/master/utils_unicog/computing_resources/example/qsub_python.py](https://github.com/neurospin/unicog/tree/master/utils_unicog/computing_resources/example/qsub_python.py)
+* [https://github.com/neurospin/unicog/tree/master/utils_unicog/computing_resources/example/example_for_many_jobs.sh](https://github.com/neurospin/unicog/tree/master/utils_unicog/computing_resources/example/example_for_many_jobs.sh)
+
+For some specific cases (specific software version ...), containers such as [singularity](https://singularity.lbl.gov/) can be used on the cluster. 
+
 # SOMA-WORKFLOW TUTORIAL
 
 ## WHAT IS SOMA-WORKFLOW ?
