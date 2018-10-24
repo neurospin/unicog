@@ -11,27 +11,68 @@ description, please consult the
         pip install pydicom --user
         pip install pandas --user
 
-# Installation:
-The `neurospin_to_bids.py` script can be used as a bash command.
-There is no need for installation.
+# Installation and usage:
+## With the installation of the module
+You can install the unicog repository and use `neurospin_to_bids.py` from anywhere.
+To install the module, please tape:
 
+        cd <path_to_download_to>
+        git clone https://github.com/neurospin/unicog.git
+        python setup.py install --user
+
+and use as follow:
+
+        neurospin_to_bids.py -h
+
+## Without the installation of the module
+If you don't want install the module, you can just use the `neurospin_to_bids.py` script as a python script.
 Simply download the unicog repository:
 
         cd <path_to_download_to>
         git clone https://github.com/neurospin/unicog.git
 
-# Usage:
+and use as follow for instance:
+                                        
+        python <path_to_download_to>/unicog/bids/neurospin_to_bids.py -h
 
-After downloading the unicog repository, you will find a dataset example
-in `unicog/bids`. The test_dataset follows the minimal set of conventions
-necessary to make a test download.
+
+# Preparation of data
+**To import data from NeuroSpin, you have to be connected to the NeuroSpin network.** 
+In a few words, information about subjects to import are stored into a **exp_info** directory. For instance:
+
+        ├── exp_info
+        │   ├── download.tsv
+        │   ├── participants.tsv
+        │   └── recorded_events
+        │       ├── sub-01
+        │       │   └── func
+        │       │       └── sub-01_task-standartloc_events.tsv
+        │       └── sub-02
+        │           └── func
+        │               └── sub-02_task-standartloc_events.tsv
+
+
+
+See a small example at [https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer_pypreprocess/scripts/exp_info](https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer_pypreprocess/scripts/exp_info)
+
+# Importation of data
+Now we set all files into **exp_info** directory, you can launch the importation:
+
+	cd <path_where_is_exp_info>
+	neurospin_to_bids.py -neurospin_database trio 
+
+# More information on usage
+You will find a dataset examples at:
+
+* [https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer_pypreprocess/scripts/exp_info](https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer_pypreprocess/scripts/exp_info)
+* [https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info](https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info)
 
 To make it work you simply have to open a terminal and write the following commands:
 
-        cd <path_to>/unicog/bids/test_dataset
-        python <path_to>/unicog/bids/neurospin_to_bids.py -neurospin_database trio
+        cd <path_to>/data
+        python neurospin_to_bids.py -neurospin_database trio
 
-* The `<path_to>/test_dataset` folder must contain an `exp_info` subfolder with at least two files (`participants.tsv` and `download.tsv`) specifying the subjects to download. For more details on the content and structure of these files, read the Additional information section.
+* The `<path_to>/data` folder must contain an `exp_info` subfolder with at least two files (`participants.tsv` and `download.tsv`) specifying the subjects to download. For more details on the content and structure of these files, read the Additional information section.
 * The `neurospin_to_bids.py` script will export files from the NeuroSpin archive based on the information contained in the **exp_info** directory. The script when used as a bash command accept three optional arguments:
     * **-root_path**: specifies the target folder - by default the current directory.
     * **-neurospin_database**: refers to the NeuroSpin database where your images are stored, _prisma_, _trio_ or a full path - by default the most recent database _prisma_.
@@ -41,17 +82,17 @@ In the previous example we do not need `-root_path` since we move
 into the target folder. This is an old dataset, its files are stored in the
 _trio_ database, so we have to specify it, but for new datasets stored in
 the _prisma_ database it would not be necessary. Finally in this example
-the BIDS formatted dataset would be created in subfolder `bids_dataset`.
+the BIDS formatted dataset would be created in subfolder `bids_daw:taset`.
 
 If instead we were to specify the target folder (the one containing an
 `exp_info` subfolder) and a name for the BIDS dataset subfolder, we would
 run the command as follows:
 
-        python neurospin_to_bids.py -root_path some_path -dataset_name my_dataset -neurospin_database trio
+        neurospin_to_bids.py -root_path some_path -dataset_name my_dataset -neurospin_database trio
 
 To read the script documentation you can write:
 
-        python neurospin_to_bids.py -h
+        neurospin_to_bids.py -h
 
 # Additionnal information
 
