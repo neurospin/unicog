@@ -1,0 +1,35 @@
+4000	text	Attention !\BL les intructions vont \BLdéfiler automatiquement \BLet rapidement.\BL Restez attentif ...
+7500	text	Durant les cinq prochaines minutes,\BL vous aurez à effectuer de façon alternée,\BL une succession de 4 tâches différentes.
+9000	text	1- Ecoute ou lecture de phrases :\BL vous aurez juste à les écouter/lire\BL attentivement (lecture silencieuse sans RIEN prononcer).
+8000	text	2- Ecoute ou lecture de soustractions :\BL vous devrez les résoudre mentalement.\BL- Ne PAS donner de réponse orale.\BL- Faire les calculs jusqu'au bout.
+8000	text	3- 'Appuyez 3 fois sur le bouton \BLgauche / droit' :\BL pressez alors sur le bon bouton \BLaussi vite que possible (!!) suivant \BLles instructions auditives/visuelles (laisser l'autre main au repos). 
+7000	text	4- Visualisation passive\BL de damiers noir et blanc\BL \BL (garder le regard au centre des damiers!)
+2000	text	\BL
+7000	text	Les stimulations visuelles consisteront\BL en une série de groupe de mots\BL (phrase, instruction ou calcul)\BL présentées rapidement.
+2000	text	en voici deux exemples
+1000	text	\BL
+ 250	text	un incident
+ 100	text	\BL
+ 250	text	s'est produit
+ 100	text	\BL
+ 250	text	à l'entrée
+ 100	text	\BL
+ 250	text	de l'usine
+4000	text	\BL
+ 250	text	calculez
+ 100	text	\BL
+ 250	text	neuf
+ 100	text	\BL
+ 250	text	moins
+ 100	text	\BL
+ 250	text	trois
+3000	text	\BL
+7000	text	Durant chaque essai, évitez\BL de bouger les yeux. Une croix\BL vous aidera à garder votre regard\BL au centre de l'écran\BL +
+2000	text	\BL
+6000	text	Les stimulations auditives (phrases,\BL instruction ou calcul) ressembleront\BL aux deux exemples suivants
+1000	text	\BL
+4000	sound	exemple.wav
+4000	sound	calc25.wav
+6000	text	ATTENTION!\BL ces essais vont se succéder assez\BLrapidement. Restez donc attentif\BL tout au long de ces cinq minutes.
+2000	text	
+4000	text	Nous allons bientôt commencer\BL\BL Appuyez sur un bouton\BL lorsque vous serez prêt.

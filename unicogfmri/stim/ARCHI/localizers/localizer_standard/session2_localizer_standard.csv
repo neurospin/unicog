@@ -1,0 +1,80 @@
+calculvideo	0	rsvp	calculez,dix-sept,moins,neuf
+calculvideo	2400	rsvp	calculez,quatorze,moins,sept
+CboardH	8700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+clicDaudio	11400	sound	clic3D.wav
+phraseAudio	15000	sound	ph11.wav
+clicDvideo	18000	rsvp	appuyez,trois fois,sur le bouton,droit
+phraseAudio	20700	sound	ph12.wav
+clicGaudio	23700	sound	clic3G.wav
+clicGvideo	26700	rsvp	appuyez,trois fois,sur le bouton,gauche
+phraseAudio	29700	sound	ph13.wav
+CboardV	33000	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+calculaudio	35400	sound	calc15.wav
+phraseVideo	39000	rsvp	le village,est situé,à coté,du lac
+phraseVideo	41700	rsvp	Les livres,de cuisine,sont très,utiles
+calculaudio	44700	sound	calc11.wav
+calculaudio	48000	sound	calc14.wav
+phraseVideo	56400	rsvp	la lune,brille ,au dessus,de la mer
+CboardH	59700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+clicGaudio	62400	sound	clic3G.wav
+clicDvideo	69000	rsvp	appuyez,trois fois,sur le bouton,droit
+clicGvideo	71400	rsvp	appuyez,trois fois,sur le bouton,gauche
+phraseVideo	75000	rsvp	Il donne,un cadeau,à ses,enfants
+calculaudio	83400	sound	calc16.wav
+clicDaudio	87000	sound	clic3D.wav
+phraseAudio	89700	sound	ph14.wav
+CboardV	96000	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+calculaudio	108000	sound	calc20.wav
+clicGvideo	116700	rsvp	appuyez,trois fois,sur le bouton,gauche
+phraseAudio	119400	sound	ph15.wav
+CboardV	122700	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+calculvideo	125400	rsvp	calculez,dix,moins,neuf
+phraseVideo	131400	rsvp	en haut,de la ville,se dresse,une tour
+calculaudio	135000	sound	calc12.wav
+calculaudio	137700	sound	calc18.wav
+CboardV	140400	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+clicDaudio	143400	sound	clic3D.wav
+phraseAudio	146700	sound	ph16.wav
+CboardH	149400	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+calculvideo	153000	rsvp	calculez,quinze,moins,quatre
+CboardV	156000	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+phraseVideo	159000	rsvp	le bruit,des vagues,a reveillé,le pêcheur
+clicDaudio	162000	sound	clic3D.wav
+calculvideo	164400	rsvp	calculez,douze,moins,neuf
+phraseVideo	167700	rsvp	ce train,arrive,souvent,en retard
+clicGaudio	170400	sound	clic3G.wav
+calculaudio	173700	sound	calc19.wav
+CboardH	176700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+CboardH	188400	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+calculaudio	191700	sound	calc13.wav
+phraseVideo	195000	rsvp	le feu,a brûlé,l'ensemble,du quartier
+calculvideo	198000	rsvp	calculez,seize,moins,sept
+calculvideo	201000	rsvp	calculez,douze,moins,cinq
+CboardV	203700	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+CboardV	207000	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+CboardV	210000	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+clicGvideo	212700	rsvp	appuyez,trois fois,sur le bouton,gauche
+clicGvideo	215700	rsvp	appuyez,trois fois,sur le bouton,gauche
+CboardH	218700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+calculvideo	221400	rsvp	calculez,quatorze,moins,quatre
+CboardH	224700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+clicDvideo	227700	rsvp	appuyez,trois fois,sur le bouton,droit
+clicDaudio	230700	sound	clic3D.wav
+calculvideo	234000	rsvp	calculez,onze,moins,quatre
+phraseAudio	236700	sound	ph17.wav
+phraseVideo	246000	rsvp	Il a perdu,les clefs,de sa,voiture
+CboardH	248400	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+calculaudio	251700	sound	calc17.wav
+clicGaudio	254700	sound	clic3G.wav
+clicGaudio	257399	sound	clic3G.wav
+calculvideo	260399	rsvp	calculez,dix-huit,moins,huit
+CboardV	264000	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+CboardH	266700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+CboardH	269700	pictseq	checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp,checherboardhpb.bmp,checherboardhnb.bmp
+clicDvideo	275400	rsvp	appuyez,trois fois,sur le bouton,droit
+CboardV	278400	pictseq	checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp,checherboardvpb.bmp,checherboardvnb.bmp
+phraseAudio	284400	sound	ph18.wav
+phraseVideo	288000	rsvp	au dessus,des toits,volent,les avions
+clicDvideo	291000	rsvp	appuyez,trois fois,sur le bouton,droit
+phraseAudio	293400	sound	ph19.wav
+phraseAudio	296700	sound	ph20.wav
