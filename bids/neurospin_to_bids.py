@@ -413,12 +413,15 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             if 'bold' in row['acq_name']:
                 dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
                                    '*.dcm')))[4]
-                slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
-                TR = pydicom.read_file(dicom_ref).RepetitionTime
                 json_ref = open(os.path.join(target_path, filename[:-3] +
                                 'json'), 'a')
-                json.dump({'SliceTiming': slice_times,
-                           'RepetitionTime': int(TR)}, json_ref)
+                try:
+                    slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
+                    json.dump({'SliceTiming': slice_times}, json_ref)
+                except:
+                    print('No value for slicee timing, please add information manually in json file.')
+                TR = pydicom.read_file(dicom_ref).RepetitionTime
+                json.dump({'RepetitionTime': int(TR)}, json_ref)
                 json_ref.close()
             # remove temporary dicom folder
             shutil.rmtree(dicom_path)
