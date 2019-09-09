@@ -80,7 +80,7 @@ def fusion3D_map_activation(list_maps, template_file="", path_mesh=""):
     
     #loop on maps to set correctly the referential 
     for file_name in list_maps.itervalues():
-        print file_name
+        print(file_name)
         map_activation = a.loadObject(file_name)
         # load identity transformtion to mni_SPM
         tmp_map = 'truth for ' + os.path.basename(file_name)

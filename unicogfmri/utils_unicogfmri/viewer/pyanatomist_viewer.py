@@ -128,7 +128,7 @@ def fusion2D_map_activation(
         ncol=2
         nrow=1
         nimg=len(dic_maps)
-        print "NB IMG", nimg
+        print("NB IMG", nimg)
         def nb_col(ncol, nrow, nimg):
             ncases = ncol*nrow
             while ncases < nimg :
