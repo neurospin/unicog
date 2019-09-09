@@ -113,6 +113,7 @@ Add the following lines for the configuration and change the **your_logging** pa
     #remote access information
     CLUSTER_ADDRESS     = alambic.intra.cea.fr
     SUBMITTING_MACHINES = alambic.intra.cea.fr
+    
     #optional on client
     QUEUES = run32 Global_long Global_short Unicog_short Unicog_long Unicog_run2 Unicog_run4 Unicog_run8 Unicog_run16 Unicog_run32 
     #optional login for the GUI
@@ -149,7 +150,7 @@ Add the following lines for the configuration ([with vi](http://www.neurospin-wi
     ENGINE_LOG_LEVEL  = ERROR
     PATH_TRANSLATION_FILES =
     MAX_JOB_IN_QUEUE = {10} run32{5} Global_long{5} Global_short{5}
-    SCHEDULER_TYPES = pbspro
+    SCHEDULER_TYPE = pbspro
 
 STEP3:
 Create the following directories, if needed:
@@ -286,8 +287,6 @@ on your own workstation (if many cores).
 ### EXAMPLE FOR SPM BATCHES:
 An example is available on the unicog module:</br>
 
-    cd
-    
     #if you have not already cloned unicog.git and installed it:
     git clone https://github.com/neurospin/unicog.git
     cd unicog
