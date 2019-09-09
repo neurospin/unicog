@@ -6,7 +6,7 @@ import glob as glob
 import json
 import shutil
 import subprocess
-import dicom
+import pydicom
 from itertools import combinations
 import time
 import argparse
@@ -413,8 +413,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             if 'bold' in row['acq_name']:
                 dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
                                    '*.dcm')))[4]
-                slice_times = dicom.read_file(dicom_ref)[0x19, 0x1029].value
-                TR = dicom.read_file(dicom_ref).RepetitionTime
+                slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
+                TR = pydicom.read_file(dicom_ref).RepetitionTime
                 json_ref = open(os.path.join(target_path, filename[:-3] +
                                 'json'), 'a')
                 json.dump({'SliceTiming': slice_times,

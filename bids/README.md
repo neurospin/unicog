@@ -41,15 +41,15 @@ and use as follow for instance:
 In a few words, information about subjects to import are stored into a **exp_info** directory. For instance:
 
         ├── exp_info
-        │   ├── download.tsv
-        │   ├── participants.tsv
-        │   └── recorded_events
-        │       ├── sub-01
-        │       │   └── func
-        │       │       └── sub-01_task-standartloc_events.tsv
-        │       └── sub-02
-        │           └── func
-        │               └── sub-02_task-standartloc_events.tsv
+        │   ├── download.tsv
+        │   ├── participants.tsv
+        │   └── recorded_events
+        │       ├── sub-01
+        │       │   └── func
+        │       │       └── sub-01_task-standartloc_events.tsv
+        │       └── sub-02
+        │           └── func
+        │               └── sub-02_task-standartloc_events.tsv
 
 
 
@@ -181,6 +181,25 @@ The _participant_label_ and _session_label_ are taken from this file to
 create the folders and file names in the BIDS dataset, every other column
 will be added to a new `participants.tsv` file included under the
 `bids_dataset` top folder.
+
+#### User case with 2 sessions the same day with the same participant
+For instance, if a participant undergo an examen in the morning and in the afternoon, 
+you have to complete the NIP with the number of session. The nip level in Neurospin
+is labelled as follow : <nip>-<exman-number>-<automatic-number> 
+The examen number is automatically incremented for each new examen. Don't mange about
+the automatic number. 
+
+Here is an example for the `participants.tsv` file:
+
+
+        ----------------------------------------------------------------
+        Example
+        ----------------------------------------------------------------
+        participant_label  NIP         acq_date     session_label    sex
+        01                 tt989898_6405    2015-02-28   01               M
+        01                 tt989898_6406   2015-02-28   02               M
+        ----------------------------------------------------------------
+
 
 ### Download.tsv
 
