@@ -112,7 +112,7 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
 
     # raise warning if no folder is found in recorded events
     if not sub_folders:
-        print('\n No information events provided to copy behavior\n')
+        print('****  BIDS IMPORTATION WARMING: NO EVENTS FILE')
     else:
         for sub_folder in sub_folders:
             #file_path = sub_folder.replace(behav_path + '/', '')
@@ -164,7 +164,10 @@ def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
     acq_label refers to acquisition parameters as a label
     rec_id refers to reconstruction parameters as a label
     """
-    descriptor = 'sub-{0}'.format(subject_id)
+    if 'sub-' or 'sub' in subject_id :
+        descriptor = subject_id 
+    else :
+        descriptor = 'sub-{0}'.format(subject_id)
     if session_id is not None:
         descriptor += '_ses-{0}'.format(session_id)
     if task_id is not None:
@@ -223,7 +226,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     if not os.path.isfile(f):
         f = open(f, 'w')
         dataset_description.update({'Name': dataset_name,
-                                    'BIDSVersion': '1.0.0'})
+                                    'BIDSVersion': '1.1.0'})
         json.dump(dataset_description, f)
     # Check README
     f = os.path.join(get_bids_default_path(data_root_path, dataset_name),
@@ -314,7 +317,18 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             ses_path = ''
         else:
             ses_path = 'ses-' + session_id
-        sub_path = os.path.join(target_root_path, 'sub-' + subject_id,
+        
+        try:
+            int(subject_id)
+            subject_id= 'sub-{0}'.format(subject_id)
+        except:        
+            if ('sub-') in subject_id :
+                subject_id= subject_id
+            else:
+                subject_id= subject_id
+                print("****  BIDS IMPORTATION WARMING: SUBJECT ID PROBABLY NOT CONFORM")
+        
+        sub_path = os.path.join(target_root_path, subject_id,
                                 ses_path)
 
         # Create subject path if necessary
@@ -332,12 +346,13 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         DATE = subject_info['acq_date'].replace('-', '').replace('\n', '')
         NIP = subject_info['NIP']
         nip_dirs = glob.glob(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
-        print(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
+        print('\n\nSTART FOR :', subject_id)
+        #print(os.path.join(db_path, str(DATE), str(NIP) + '-*'), '\n')
         if len(nip_dirs) < 1:
-            raise Exception('No directory found for given NIP %s SESSION %s' %
+            raise Exception('****  BIDS IMPORTATION WARMING: No directory found for given NIP %s SESSION %s' %
                             (NIP, session_id))
         elif len(nip_dirs) > 1:
-            raise Exception('Multiple path for given NIP %s SESSION %s' %
+            raise Exception('****  BIDS IMPORTATION WARMING: Multiple path for given NIP %s SESSION %s' %
                             (NIP, session_id))
 
         optional_filters = [('sub', subject_id)]
@@ -379,9 +394,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
                                               format(int(row['acq_number']))))
             if run_path:
+                print("----------- FILE IN PROCESS : ", run_path)
                 shutil.copytree(run_path[0], dicom_path)
             else:
-                raise Exception('DICOM FILES NOT FOUNDS FOR RUN %s'
+                raise Exception('****  BIDS IMPORTATION WARMING: DICOM FILES NOT FOUNDS FOR RUN %s'
                                 ' TASK %s SES %s SUB %s TAG %s' %
                                 (run_id, run_task, run_session,
                                  subject_id, tag))
@@ -399,7 +415,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                 session_id=run_session,
                                                 file_tag=tag,
                                                 file_type='nii')
-
             filename_json = os.path.join(target_path, filename[:-3] + 'json')
 
             shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.nii'))[0],
@@ -419,7 +434,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                     slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
                     json.dump({'SliceTiming': slice_times}, json_ref)
                 except:
-                    print('No value for slicee timing, please add information manually in json file.')
+                    print('****  BIDS IMPORTATION WARMING: No value for slicee timing, please add information manually in json file.')
                 TR = pydicom.read_file(dicom_ref).RepetitionTime
                 json.dump({'RepetitionTime': int(TR)}, json_ref)
                 json_ref.close()
