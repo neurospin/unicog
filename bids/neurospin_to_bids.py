@@ -1,11 +1,12 @@
-#!/usr/bin/env python
-"""Utilities to handle the BIDS standard."""
 import os
 import pandas as pd
 import glob as glob
 import json
 import shutil
 import subprocess
+from pathlib import Path
+
+from bids_validator import BIDSValidator
 import pydicom
 from itertools import combinations
 import time
@@ -486,8 +487,16 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
     # Copy recorded event files
     bids_copy_events(behav_path, data_root_path, dataset_name)
-
-
+ 
+    #Validate paths with BIDSValidato
+    validator = BIDSValidator()
+    os.chdir(target_root_path)
+    for file_to_test in  Path('.').glob('./**/*'):
+        if file_to_test .is_file():
+            file_to_test  = '/'+str(file_to_test )
+            print('\nTest the following name of file : {name} with BIDSValidator'.format(name=file_to_test))
+            print(validator.is_bids(file_to_test))
+    
 if __name__ == "__main__":
     # Parse arguments from console
     parser = argparse.ArgumentParser(description =
@@ -515,3 +524,4 @@ if __name__ == "__main__":
                               force_download=False,
                               behav_path='exp_info/recorded_events',
                               test_paths=False)
+
