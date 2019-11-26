@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+from ast import literal_eval
+import json
 import glob as glob
 import json
 import shutil
@@ -105,10 +107,12 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
 def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                      dataset_name=None):
     data_path = get_bids_default_path(data_root_path, dataset_name)
+    print(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*'))
     if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
         sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*',
                                              'func'))
     else:
+        print(os.path.join(data_root_path, behav_path,'sub-*', 'func'))
         sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
                                              'sub-*', 'func'))
 
@@ -249,10 +253,14 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
 
 
 def bids_acquisition_download(data_root_path='', dataset_name=None,
-                              download_database='prisma',
                               force_download=False,
                               behav_path='exp_info/recorded_events',
                               test_paths=False):
+#def bids_acquisition_download(data_root_path='', dataset_name=None,
+#                              download_database='prisma',
+#                              force_download=False,
+#                              behav_path='exp_info/recorded_events',
+#                              test_paths=False):
     """Automatically download files from neurospin server to a BIDS dataset.
 
     Download-database is based on NeuroSpin server conventions.
@@ -289,11 +297,11 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
     # Determine target path
     target_root_path = get_bids_default_path(data_root_path, dataset_name)
-    # Determine path to files in NeuroSpin server
-    if download_database in NEUROSPIN_DATABASES:
-        db_path = NEUROSPIN_DATABASES[download_database]
-    else:
-        db_path = download_database
+#    # Determine path to files in NeuroSpin server
+#    if download_database in NEUROSPIN_DATABASES:
+#        db_path = NEUROSPIN_DATABASES[download_database]
+#    else:
+#        db_path = download_database
 
     # Create dataset directories and files if necessary
     bids_init_dataset(data_root_path, dataset_name)
@@ -313,18 +321,36 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                         download_report), 'w')
     report_line = '%s,%s,%s\n' % ('subject_id', 'session_id', 'download_file')
     download_report.write(report_line)
+    
+    # Create a dataFrame to store participant information
+    df_participant = pd.DataFrame()    
+    
     # Download command for each subject/session
     # (following neurospin server conventions)
     for row_idx, subject_info in pop.iterrows():
+                
+        # Fill the 
+        info_participant = json.loads(subject_info['infos_participant'])  
+        info_participant['participant_id']=subject_info['participant_id'] 
+        df_participant = df_participant.append(info_participant, ignore_index=True)
+        
+        # Determine path to files in NeuroSpin server  
+        download_database = subject_info['location']        
+        if download_database in NEUROSPIN_DATABASES:
+            db_path = NEUROSPIN_DATABASES[download_database]
+        else:
+            db_path = download_database         
+        
+        
         #create a dico to store json info
         dico_json = {}
         #the row_idx for giving either participant_label or participant_id
         subject_id = subject_info[0]
         if 'session_label' in subject_info.index:
-            session_id = subject_info['session_label']
-        else:
-            session_id = None
-
+            if subject_info['session_label'] is not pd.np.nan:
+                session_id = subject_info['session_label']
+            else:
+                session_id = None
         if session_id is None:
             ses_path = ''
         else:
@@ -341,7 +367,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                       'NOT CONFORM')
         sub_path = os.path.join(target_root_path, subject_id,
                                 ses_path)
-
         # Create subject path if necessary
         if not os.path.exists(sub_path):
             os.makedirs(sub_path)
@@ -356,6 +381,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         # Bids standard is YYYY-MM-DD
         DATE = subject_info['acq_date'].replace('-', '').replace('\n', '')
         NIP = subject_info['NIP']
+        #print(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
         nip_dirs = glob.glob(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
         print('\n\nSTART FOR :', subject_id)
         #print(os.path.join(db_path, str(DATE), str(NIP) + '-*'), '\n')
@@ -380,16 +406,22 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         report_line = '%s,%s,%s\n' % (subject_id, session_id, specs_path)
         download_report.write(report_line)
 
-        specs = pd.read_csv(specs_path, dtype=str, sep='\t', index_col=False)
+        #specs = pd.read_csv(specs_path, dtype=str, sep='\t', index_col=False)
+        #retrieve tuple of tuples
+        #one tuple is configured as :(file_to_import;acq_folder;acq_name) 
+        seqs_to_retrieve = literal_eval(subject_info['to_import'])
 
         # clean directories, in case a previous download failed
-        for ridx, row in specs.iterrows():
-            toclean = os.path.join(sub_path, row['acq_folder'])
+        #for ridx, row in specs.iterrows():
+        for value in seqs_to_retrieve:
+            #toclean = os.path.join(sub_path, row['acq_folder'])
+            toclean = os.path.join(sub_path, value[1])
             if os.path.exists(toclean):
                 shutil.rmtree(toclean)
 
         # download images
-        for ridx, row in specs.iterrows():
+        #for ridx, row in specs.iterrows():
+        for value in seqs_to_retrieve:
             def get_value(key, text):
                 m = re.search(key + '-(.+?)_', text)
                 if m:
@@ -397,17 +429,26 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 else:
                     return None
 
-            dico_json['TaskName'] = row['task_name']
-            run_task = get_value('task', row['acq_name'])
-            run_id = get_value('run', row['acq_name'])
+#            dico_json['TaskName'] = row['task_name']
+#            run_task = get_value('task', row['acq_name'])
+#            run_id = get_value('run', row['acq_name'])
+            dico_json['TaskName'] = value[2]
+            run_task = get_value('task', value[2])
+            run_id = get_value('run', value[2])            
+            
             run_session = session_id
-            tag = row['acq_name'].split('_')[-1]
-            target_path = os.path.join(sub_path, row['acq_folder'])
+            #tag = row['acq_name'].split('_')[-1]
+            tag = value[2].split('_')[-1]
+            #target_path = os.path.join(sub_path, row['acq_folder'])
+            target_path = os.path.join(sub_path, value[1])
+            
             dicom_path = os.path.join(target_path, 'dicom')
 
             #row[0], either acq_number or acq_id
+            #run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
+            #                                  format(int(row[0]))))
             run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                              format(int(row[0]))))
+                                              format(int(value[0]))))
             if run_path:
                 print("----------- FILE IN PROCESS : ", run_path)
                 shutil.copytree(run_path[0], dicom_path)
@@ -418,13 +459,14 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                 (run_id, run_task, run_session,
                                  subject_id, tag))
 
-            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
-                            shell=True)
+#            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
+#                            shell=True)
 
             # Will swap to dcm2niix in the future
-            # subprocess.call(("dcm2niix -b y -z n -o {output_path} \
-            #{data_path}".format(output_path=dicom_path, data_path=dicom_path)),
-            #shell=True)
+            subprocess.call(("dcm2niix -ba y -z n -o {output_path} \
+                              {data_path}".format(output_path=dicom_path, 
+                              data_path=dicom_path)),
+                              shell=True)
 
             # Expecting page 10 bids specification file name
             filename = get_bids_file_descriptor(subject_id, task_id=run_task,
@@ -440,39 +482,49 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 shutil.copyfile(glob.glob(
                                 os.path.join(dicom_path, '*.json'))[0],
                                 os.path.join(filename_json))
+                
+            # Add descriptor  into the json file
+            if run_task:
+                with open(filename_json, 'r+') as json_file:
+                    temp_json = json.load(json_file)
+                    temp_json['TaskName'] = run_task
+                    json_file.seek(0)
+                    json.dump(temp_json, json_file)
+                    json_file.truncate()
+            
 
             # Will be done with dcm2niix in the future (get all header fields)
             # Copy slice_times from dicom reference file
-            if 'bold' in row['acq_name']:
-                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
-                                   '*.dcm')))[4]
-                json_ref = open(os.path.join(target_path, filename[:-3] +
-                                'json'), 'a')
-                try:
-                    slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
-                    if (max(slice_times) > 1000):
-                        print('****  BIDS IMPORTATION WARMING: '
-                              'SLICE TIMING SEEM TO BE IN MS, '
-                              'CONVERSION IN Seconds IS DONE')
-                        print(slice_times)
-                        slice_times = [round((v*10**-3), 4)
-                                       for v in slice_times]
-                    dico_json['SliceTiming'] = slice_times
-                    #json.dump({'SliceTiming': slice_times}, json_ref)
-                except:
-                    print('****  BIDS IMPORTATION WARMING: '
-                          'No value for slicee timing, please '
-                          'add information manually in json file.')
-                TR = pydicom.read_file(dicom_ref).RepetitionTime
-                if (TR > 10):
-                        print('****  BIDS IMPORTATION WARMING: '
-                              'REPETITION TIME SEEM TO BE IN MS, '
-                              'CONVERSION IN Seconds IS DONE')
-                        TR = round((TR * 10**-3), 4)
-                dico_json['RepetitionTime'] = TR
-                #json.dump({'RepetitionTime': TR}, json_ref)
-                json.dump(dico_json, json_ref)
-                json_ref.close()
+#            if 'bold' in row['acq_name']:
+#                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
+#                                   '*.dcm')))[4]
+#                json_ref = open(os.path.join(target_path, filename[:-3] +
+#                                'json'), 'a')
+#                try:
+#                    slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
+#                    if (max(slice_times) > 1000):
+#                        print('****  BIDS IMPORTATION WARMING: '
+#                              'SLICE TIMING SEEM TO BE IN MS, '
+#                              'CONVERSION IN Seconds IS DONE')
+#                        print(slice_times)
+#                        slice_times = [round((v*10**-3), 4)
+#                                       for v in slice_times]
+#                    dico_json['SliceTiming'] = slice_times
+#                    #json.dump({'SliceTiming': slice_times}, json_ref)
+#                except:
+#                    print('****  BIDS IMPORTATION WARMING: '
+#                          'No value for slicee timing, please '
+#                          'add information manually in json file.')
+#                TR = pydicom.read_file(dicom_ref).RepetitionTime
+#                if (TR > 10):
+#                        print('****  BIDS IMPORTATION WARMING: '
+#                              'REPETITION TIME SEEM TO BE IN MS, '
+#                              'CONVERSION IN Seconds IS DONE')
+#                        TR = round((TR * 10**-3), 4)
+#                dico_json['RepetitionTime'] = TR
+#                #json.dump({'RepetitionTime': TR}, json_ref)
+#                json.dump(dico_json, json_ref)
+#                json_ref.close()
             # remove temporary dicom folder
             shutil.rmtree(dicom_path)
 
@@ -482,13 +534,16 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
     # Create participants.tsv in dataset folder (take out NIP column)
     participants_path = os.path.join(target_root_path, 'participants.tsv')
-    pop = pop.drop('acq_date', 1)
-    pop.drop('NIP', 1).to_csv(participants_path, sep='\t', index=False)
+#    pop = pop.drop('acq_date', 1)
+#    pop.drop('NIP', 1).to_csv(participants_path, sep='\t', index=False)
+    df_participant.to_csv(participants_path, sep='\t', index=False)
+    
 
     # Copy recorded event files
     bids_copy_events(behav_path, data_root_path, dataset_name)
  
-    #Validate paths with BIDSValidato
+    #Validate paths with BIDSValidator
+    #see also http://bids-standard.github.io/bids-validator/
     validator = BIDSValidator()
     os.chdir(target_root_path)
     for file_to_test in  Path('.').glob('./**/*'):
@@ -496,6 +551,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             file_to_test  = '/'+str(file_to_test )
             print('\nTest the following name of file : {name} with BIDSValidator'.format(name=file_to_test))
             print(validator.is_bids(file_to_test))
+    #valider si les unités sont en secondes ?
     
 if __name__ == "__main__":
     # Parse arguments from console
@@ -518,10 +574,14 @@ if __name__ == "__main__":
                         help='neurospin server to download from')
     # LOAD CONSOLE ARGUMENTS
     args = parser.parse_args()
+#    bids_acquisition_download(data_root_path=args.root_path[0],
+#                              dataset_name=args.dataset_name[0],
+#                              download_database=args.neurospin_database[0],
+#                              force_download=False,
+#                              behav_path='exp_info/recorded_events',
+#                              test_paths=False)
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
-                              download_database=args.neurospin_database[0],
                               force_download=False,
                               behav_path='exp_info/recorded_events',
                               test_paths=False)
-
