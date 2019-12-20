@@ -9,6 +9,8 @@ import subprocess
 from pathlib import Path
 
 from bids_validator import BIDSValidator
+import mne
+from mne_bids import write_raw_bids
 import pydicom
 from itertools import combinations
 import time
@@ -19,6 +21,7 @@ import re
 NEUROSPIN_DATABASES = {
     'prisma': '/neurospin/acquisition/database/Prisma_fit',
     'trio': '/neurospin/acquisition/database/TrioTim',
+    'meg' : '/neurospin/acquisition/neuromag/data',
 }
 
 
@@ -332,6 +335,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         # Fill the 
         info_participant = json.loads(subject_info['infos_participant'])  
         info_participant['participant_id']=subject_info['participant_id'] 
+        print(info_participant)
         df_participant = df_participant.append(info_participant, ignore_index=True)
         
         # Determine path to files in NeuroSpin server  
@@ -382,29 +386,19 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         DATE = subject_info['acq_date'].replace('-', '').replace('\n', '')
         NIP = subject_info['NIP']
         #print(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
-        nip_dirs = glob.glob(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
-        print('\n\nSTART FOR :', subject_id)
-        #print(os.path.join(db_path, str(DATE), str(NIP) + '-*'), '\n')
-        if len(nip_dirs) < 1:
-            raise Exception('****  BIDS IMPORTATION WARMING: \
-                            No directory found for given NIP %s SESSION %s' %
-                            (NIP, session_id))
-        elif len(nip_dirs) > 1:
-            raise Exception('****  BIDS IMPORTATION WARMING: \
-                            Multiple path for given NIP %s SESSION %s' %
-                            (NIP, session_id))
+
 
         optional_filters = [('sub', subject_id)]
         if session_id is not None:
             optional_filters += [('ses', session_id)]
 
         # Get appropriate download file. As specific as possible
-        specs_path = file_manager_default_file(exp_info_path,
-                                               optional_filters, 'download',
-                                               file_type='tsv',
-                                               allow_other_fields=False)
-        report_line = '%s,%s,%s\n' % (subject_id, session_id, specs_path)
-        download_report.write(report_line)
+#        specs_path = file_manager_default_file(exp_info_path,
+#                                               optional_filters, 'download',
+#                                               file_type='tsv',
+#                                               allow_other_fields=False)
+#        report_line = '%s,%s,%s\n' % (subject_id, session_id, specs_path)
+#        download_report.write(report_line)
 
         #specs = pd.read_csv(specs_path, dtype=str, sep='\t', index_col=False)
         #retrieve tuple of tuples
@@ -421,7 +415,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
         # download images
         #for ridx, row in specs.iterrows():
+        print(seqs_to_retrieve)
         for value in seqs_to_retrieve:
+            print(value)
             def get_value(key, text):
                 m = re.search(key + '-(.+?)_', text)
                 if m:
@@ -442,91 +438,141 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             #target_path = os.path.join(sub_path, row['acq_folder'])
             target_path = os.path.join(sub_path, value[1])
             
-            dicom_path = os.path.join(target_path, 'dicom')
-
-            #row[0], either acq_number or acq_id
-            #run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-            #                                  format(int(row[0]))))
-            run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                              format(int(value[0]))))
-            if run_path:
-                print("----------- FILE IN PROCESS : ", run_path)
-                shutil.copytree(run_path[0], dicom_path)
-            else:
-                raise Exception('****  BIDS IMPORTATION WARMING: '
-                                'DICOM FILES NOT FOUNDS FOR RUN %s'
-                                ' TASK %s SES %s SUB %s TAG %s' %
-                                (run_id, run_task, run_session,
-                                 subject_id, tag))
-
-#            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
-#                            shell=True)
-
-            # Will swap to dcm2niix in the future
-            subprocess.call(("dcm2niix -ba y -z n -o {output_path} \
-                              {data_path}".format(output_path=dicom_path, 
-                              data_path=dicom_path)),
-                              shell=True)
-
-            # Expecting page 10 bids specification file name
-            filename = get_bids_file_descriptor(subject_id, task_id=run_task,
-                                                run_id=run_id,
-                                                session_id=run_session,
-                                                file_tag=tag,
-                                                file_type='nii')
-            filename_json = os.path.join(target_path, filename[:-3] + 'json')
-
-            shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.nii'))[0],
-                            os.path.join(target_path, filename))
-            if glob.glob(os.path.join(dicom_path, '*.json')):
-                shutil.copyfile(glob.glob(
-                                os.path.join(dicom_path, '*.json'))[0],
-                                os.path.join(filename_json))
+            print(value[1])
+            if value[1] == 'meg':
                 
-            # Add descriptor  into the json file
-            if run_task:
-                with open(filename_json, 'r+') as json_file:
-                    temp_json = json.load(json_file)
-                    temp_json['TaskName'] = run_task
-                    json_file.seek(0)
-                    json.dump(temp_json, json_file)
-                    json_file.truncate()
-            
+                # Create subject path if necessary
+                meg_path = os.path.join(sub_path, 'meg')
+                if not os.path.exists(meg_path):
+                    os.makedirs(meg_path)
+                    
+                # Create the sub-emptyroom
+                #sub-emptyroom_path = os.path.join(data_root_path, 'sub_emptyroom')
+#                if not os.path.exists(sub-emptyroom_path):
+#                    os.makedirs(sub-emptyroom_path)
+                
+                meg_file = os.path.join(db_path, NIP, DATE, value[0])
+                print(meg_file)
+                filename = get_bids_file_descriptor(subject_id, task_id=run_task,
+                                                    run_id=run_id,
+                                                    session_id=run_session,
+                                                    file_tag=tag,
+                                                    file_type='tif')
+                #output_path = os.path.join(target_path, filename)
+#                print(output_path)
+#                shutil.copyfile(meg_file, output_path)
+                raw = mne.io.read_raw_fif(meg_file, allow_maxshield=True)
 
-            # Will be done with dcm2niix in the future (get all header fields)
-            # Copy slice_times from dicom reference file
-#            if 'bold' in row['acq_name']:
-#                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
-#                                   '*.dcm')))[4]
-#                json_ref = open(os.path.join(target_path, filename[:-3] +
-#                                'json'), 'a')
-#                try:
-#                    slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
-#                    if (max(slice_times) > 1000):
-#                        print('****  BIDS IMPORTATION WARMING: '
-#                              'SLICE TIMING SEEM TO BE IN MS, '
-#                              'CONVERSION IN Seconds IS DONE')
-#                        print(slice_times)
-#                        slice_times = [round((v*10**-3), 4)
-#                                       for v in slice_times]
-#                    dico_json['SliceTiming'] = slice_times
-#                    #json.dump({'SliceTiming': slice_times}, json_ref)
-#                except:
-#                    print('****  BIDS IMPORTATION WARMING: '
-#                          'No value for slicee timing, please '
-#                          'add information manually in json file.')
-#                TR = pydicom.read_file(dicom_ref).RepetitionTime
-#                if (TR > 10):
-#                        print('****  BIDS IMPORTATION WARMING: '
-#                              'REPETITION TIME SEEM TO BE IN MS, '
-#                              'CONVERSION IN Seconds IS DONE')
-#                        TR = round((TR * 10**-3), 4)
-#                dico_json['RepetitionTime'] = TR
-#                #json.dump({'RepetitionTime': TR}, json_ref)
-#                json.dump(dico_json, json_ref)
-#                json_ref.close()
-            # remove temporary dicom folder
-            shutil.rmtree(dicom_path)
+                write_raw_bids(raw, filename, target_path,
+                                overwrite=True)
+                # add event 
+                # create json file
+                
+                
+                #copy the subject emptyroom
+                
+                
+                # changer download de niveau 
+                
+            elif (value[1] == 'anat') or (value[1] == 'fmri'):
+                
+                nip_dirs = glob.glob(os.path.join(db_path, str(DATE), str(NIP) + '-*'))
+                print('\n\nSTART FOR :', subject_id)
+                #print(os.path.join(db_path, str(DATE), str(NIP) + '-*'), '\n')
+                if len(nip_dirs) < 1:
+                    raise Exception('****  BIDS IMPORTATION WARMING: \
+                            No directory found for given NIP %s SESSION %s' %
+                            (NIP, session_id))
+                elif len(nip_dirs) > 1:
+                    raise Exception('****  BIDS IMPORTATION WARMING: \
+                            Multiple path for given NIP %s SESSION %s' %
+                            (NIP, session_id))
+                
+                dicom_path = os.path.join(target_path, 'dicom')
+    
+                #row[0], either acq_number or acq_id
+                #run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
+                #                                  format(int(row[0]))))
+                run_path = glob.glob(os.path.join(nip_dirs[0], '{0:06d}_*'.
+                                                  format(int(value[0]))))
+                if run_path:
+                    print("----------- FILE IN PROCESS : ", run_path)
+                    shutil.copytree(run_path[0], dicom_path)
+                else:
+                    raise Exception('****  BIDS IMPORTATION WARMING: '
+                                    'DICOM FILES NOT FOUNDS FOR RUN %s'
+                                    ' TASK %s SES %s SUB %s TAG %s' %
+                                    (run_id, run_task, run_session,
+                                     subject_id, tag))
+    
+    #            subprocess.call("dcm2nii -g n -d n -e n -p n " + dicom_path,
+    #                            shell=True)
+    
+                # Will swap to dcm2niix in the future
+                subprocess.call(("dcm2niix -ba y -z n -o {output_path} \
+                                  {data_path}".format(output_path=dicom_path, 
+                                  data_path=dicom_path)),
+                                  shell=True)
+    
+                # Expecting page 10 bids specification file name
+                filename = get_bids_file_descriptor(subject_id, task_id=run_task,
+                                                    run_id=run_id,
+                                                    session_id=run_session,
+                                                    file_tag=tag,
+                                                    file_type='nii')
+                filename_json = os.path.join(target_path, filename[:-3] + 'json')
+    
+                shutil.copyfile(glob.glob(os.path.join(dicom_path, '*.nii'))[0],
+                                os.path.join(target_path, filename))
+                if glob.glob(os.path.join(dicom_path, '*.json')):
+                    shutil.copyfile(glob.glob(
+                                    os.path.join(dicom_path, '*.json'))[0],
+                                    os.path.join(filename_json))
+                    
+                # Add descriptor  into the json file
+                if run_task:
+                    with open(filename_json, 'r+') as json_file:
+                        temp_json = json.load(json_file)
+                        temp_json['TaskName'] = run_task
+                        json_file.seek(0)
+                        json.dump(temp_json, json_file)
+                        json_file.truncate()
+                
+    
+                # Will be done with dcm2niix in the future (get all header fields)
+                # Copy slice_times from dicom reference file
+    #            if 'bold' in row['acq_name']:
+    #                dicom_ref = sorted(glob.glob(os.path.join(dicom_path,
+    #                                   '*.dcm')))[4]
+    #                json_ref = open(os.path.join(target_path, filename[:-3] +
+    #                                'json'), 'a')
+    #                try:
+    #                    slice_times = pydicom.read_file(dicom_ref)[0x19, 0x1029].value
+    #                    if (max(slice_times) > 1000):
+    #                        print('****  BIDS IMPORTATION WARMING: '
+    #                              'SLICE TIMING SEEM TO BE IN MS, '
+    #                              'CONVERSION IN Seconds IS DONE')
+    #                        print(slice_times)
+    #                        slice_times = [round((v*10**-3), 4)
+    #                                       for v in slice_times]
+    #                    dico_json['SliceTiming'] = slice_times
+    #                    #json.dump({'SliceTiming': slice_times}, json_ref)
+    #                except:
+    #                    print('****  BIDS IMPORTATION WARMING: '
+    #                          'No value for slicee timing, please '
+    #                          'add information manually in json file.')
+    #                TR = pydicom.read_file(dicom_ref).RepetitionTime
+    #                if (TR > 10):
+    #                        print('****  BIDS IMPORTATION WARMING: '
+    #                              'REPETITION TIME SEEM TO BE IN MS, '
+    #                              'CONVERSION IN Seconds IS DONE')
+    #                        TR = round((TR * 10**-3), 4)
+    #                dico_json['RepetitionTime'] = TR
+    #                #json.dump({'RepetitionTime': TR}, json_ref)
+    #                json.dump(dico_json, json_ref)
+    #                json_ref.close()
+                # remove temporary dicom folder
+                shutil.rmtree(dicom_path)
 
         done_file = open(os.path.join(sub_path, 'downloaded'), 'w')
         done_file.close()
