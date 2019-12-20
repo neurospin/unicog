@@ -258,6 +258,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
 def bids_acquisition_download(data_root_path='', dataset_name=None,
                               force_download=False,
                               behav_path='exp_info/recorded_events',
+                              copy_events='n',
                               test_paths=False):
 #def bids_acquisition_download(data_root_path='', dataset_name=None,
 #                              download_database='prisma',
@@ -586,7 +587,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     
 
     # Copy recorded event files
-    bids_copy_events(behav_path, data_root_path, dataset_name)
+    if copy_events == "y" :
+        bids_copy_events(behav_path, data_root_path, dataset_name)
  
     #Validate paths with BIDSValidator
     #see also http://bids-standard.github.io/bids-validator/
@@ -613,6 +615,11 @@ if __name__ == "__main__":
                         nargs=1,
                         default=['bids_dataset'],
                         help='desired name for the dataset')
+    parser.add_argument('-copy_events',
+                        type=str,
+                        nargs=1,
+                        default=['n'],
+                        help='copy events from a directory with the same structure')
     parser.add_argument('-neurospin_database',
                         type=str,
                         nargs=1,
@@ -630,4 +637,5 @@ if __name__ == "__main__":
                               dataset_name=args.dataset_name[0],
                               force_download=False,
                               behav_path='exp_info/recorded_events',
+                              copy_events=args.copy_events[0],
                               test_paths=False)
