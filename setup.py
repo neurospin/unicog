@@ -8,6 +8,10 @@ Created on Thu Nov 27 16:35:41 2014
 from setuptools import setup, find_packages
 
 
+datafiles = {'unicog': ['bids/template_deface/facemask.nii.gz',
+                          'bids/template_deface/mean_reg2mean.nii.gz']}
+
+
 setup(
     name='unicog',
     distname='unicog',
@@ -17,6 +21,7 @@ setup(
     author_email='isabelle.denghien@cea.fr',
     url='https://github.com/neurospin/unicog',
     packages=find_packages(),
+    package_data=datafiles,
     scripts=['bids/neurospin_to_bids.py'],
     zip_safe=False
 )
