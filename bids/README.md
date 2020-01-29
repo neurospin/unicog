@@ -123,8 +123,8 @@ dates), then the _session_label_ column is mandatory.
 
 
         participant_id	NIP		infos_participant		session_label	acq_date	location	to_import
-        sub-01		tr070015	{"sex":"F", "age":"45"}		01		2010-06-28	trio		(('2','anat','T1w'),('9','func','task-loc_std_run-01_bold'),('10','func','task-loc_std_run-02_bold'))
-        sub-02		ap100009	{"sex":"M", "age":"35"}				2010-07-01	trio		(('2','anat','T1w'),('9','func','task-loc_std_bold'))
+        sub-01		tr070015	{"sex":"F", "age":"45"}		01		2010-06-28	trio		[['2','anat','T1w'],['9','func','task-loc_std_run-01_bold'],('10','func','task-loc_std_run-02_bold']]
+        sub-02		ap100009	{"sex":"M", "age":"35"}				2010-07-01	trio		[['2','anat','T1w'],['9','func','task-loc_std_bold']]
 
 The _NIP_ column will only be used to identify subjects in the NeuroSpin
 database and will not be included in any way on the BIDS dataset to ensure
@@ -148,8 +148,8 @@ Here is an example for the `participants.tsv` file:
 
 
         participant_id  NIP             infos_participant               session_label   acq_date        location        to_import
-        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28      trio            (('2','anat','T1w'),('9','func','task-loc_std_run-01_bold'))
-        sub-01          tt989898_6405                                	02 		2010-06-28      trio            (('9','func','task-loc_std_bold'))
+        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28      trio            [['2','anat','T1w'],['9','func','task-loc_std_run-01_bold']]
+        sub-01          tt989898_6405                                	02 		2010-06-28      trio            [['9','func','task-loc_std_bold']]
 
 
 
@@ -168,6 +168,15 @@ Here is an example of `sub-*_<task>_events.tsv` following the BIDS standard:
         15.0    1          sentence_audio
 
 the onset, duration and trial_type columns are the only mandatory ones. onset and duration fields should be expressed in seconds. Other information can be added to events.tsv files such as ​response_time or other arbitrary additional columns respecting subject anonimity. See the [BIDS specification](http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
+
+
+# Deface:
+If you want to import data and share them with other laboratories or on an open server, you have to anonymize them. For that, the bids importation remove all fields in the header containing specific
+information such as "Patient's name" and the script of importation will propose to deface anatomical data. The pydeface python is used to propose this step.
+If you need to deface, ensure that pydeface is installed on your workstation.
+
+Please see [https://github.com/poldracklab/pydeface](https://github.com/poldracklab/pydeface)
+
 
 # Notes:
 * Note 1: if the importation has been interrupted or partially then, then launch again the script. The last partially downloaded data folder will be redownloaded from scratch.
