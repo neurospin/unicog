@@ -30,7 +30,6 @@ NEUROSPIN_DATABASES = {
 
 
 def yes_no(question_to_be_answered):
-    print(question_to_be_answered)
     while True:
         choice = input(question_to_be_answered).lower()
         if choice[:1] == 'y': 
@@ -241,8 +240,6 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
   
     # CHECK dataset_description.json FILE   
     description_file = os.path.exists(os.path.join(dataset_name_path, 'dataset_description.json'))
-    print(os.path.join(dataset_name_path, 'dataset_description.json'))
-    print(description_file)
     overwrite_datadesc_file = True
     if description_file:
         overwrite_datadesc_file = yes_no('A dataset_description.json is already exising, do you want to overwrite ? ')
@@ -270,37 +267,35 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     
     
     # CHECK CHANGES FILE / TEXT FILE CPAN CONVENTION
-    changes_file = os.path.exists(os.path.join(dataset_name_path, 'CHANGES'))
-    print(os.path.join(dataset_name_path, 'CHANGES'))
-    print(changes_file)
+    changes_file = os.path.join(dataset_name_path, 'CHANGES')
+    changes_file_exist = os.path.exists(changes_file)
     overwrite_changes_file = True
-    if changes_file:
+    if changes_file_exist :
         overwrite_changes_file = yes_no('A CHANGES file is already exising, do you want to overwrite ? ')
     
-    if overwrite_changes_file or not changes_file:
-        changes = yes_no('\nDo you want to create/overwrite the CCHANGES file ? (y/n)')
+    if overwrite_changes_file or not changes_file_existe :
+        changes = yes_no('\nDo you want to create/overwrite the CHANGES file ? (y/n)')
         if changes:
             changes_input= input("Tape your text: ")
-            f = open(changes_file , 'w')
-            f.write(changes_input)
-            f.close()
+            with open(changes_file, 'w') as fid:
+                fid.write(str(changes_input))
         
         
     # CHECK README FILE / TEXT FILE
-    readme_file = os.path.exists(os.path.join(dataset_name_path, 'README'))
+    readme_file = os.path.join(os.path.join(dataset_name_path, 'README'))
+    readme_file_exist = os.path.exists(readme_file)
     overwrite_readme_file = True
-    if readme_file:
+    if readme_file_exist:
         overwrite_readme_file = yes_no('A README file is already exising, do you want to overwrite ? ')
         
-    if overwrite_readme_file or not readme_file:
+    if overwrite_readme_file or not readme_file_exist:
         readme = yes_no('\nDo you want to create/complete the README file ? (y/n)')
         if not readme:
             readme_input = "TO BE COMPLETED BY THE USER"
         else:
             readme_input= input("Tape your text: ")
-        f = open(readme_file , 'w')
-        f.write(readme_input)
-        f.close()
+        with open(readme_file, 'w') as fid:
+            fid.write('test')
 
 
 
@@ -575,7 +570,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     #dcm2nii_batch_file = "/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/test_demo/exp_info/batch_dcm2nii.yaml"
     with open(dcm2nii_batch_file, 'w') as f:
         data = yaml.dump(dcm2nii_batch, f)
-
+    
     cmd = "dcm2niibatch %s"%(dcm2nii_batch_file)
     subprocess.call(cmd, shell=True)  
 
@@ -626,22 +621,22 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     if copy_events == "y" :
         bids_copy_events(behav_path, data_root_path, dataset_name)
  
+ 
     #Validate paths with BIDSValidator
     #see also http://bids-standard.github.io/bids-validator/
-#    validation_bids = yes_no('\nDo you want to use a bids validator? (y/n)')
-#    print(validation_bids)
-#    if validation_bids:
-#        if shutil.which('bids-validator'):
-#            cmd = "bids-validator %s"%(target_root_path)
-#            subprocess.call(cmd, shell=True)  
-#        else:
-#            validator = BIDSValidator()
-#            os.chdir(target_root_path)
-#            for file_to_test in  Path('.').glob('./**/*'):
-#                if file_to_test .is_file():
-#                    file_to_test  = '/'+str(file_to_test )
-#                    print('\nTest the following name of file : {name} with BIDSValidator'.format(name=file_to_test))
-#                    print(validator.is_bids(file_to_test))
+    validation_bids = yes_no('\nDo you want to use a bids validator? (y/n)')
+    if validation_bids:
+        if shutil.which('bids-validator'):
+            cmd = "bids-validator %s"%(target_root_path)
+            subprocess.call(cmd, shell=True)  
+        else:
+            validator = BIDSValidator()
+            os.chdir(target_root_path)
+            for file_to_test in  Path('.').glob('./**/*'):
+                if file_to_test .is_file():
+                    file_to_test  = '/'+str(file_to_test )
+                    print('\nTest the following name of file : {name} with BIDSValidator'.format(name=file_to_test))
+                    print(validator.is_bids(file_to_test))
 
 
 if __name__ == "__main__":
@@ -680,7 +675,7 @@ if __name__ == "__main__":
     deface = yes_no('\nDo you want deface T1? (y/n)')
       
 #    data_root_path='/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/test_demo'
-#    bids_acquisition_download(data_root_path, deface=True)
+#    bids_acquisition_download(data_root_path, deface=False)
     print(args.root_path[0])
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
