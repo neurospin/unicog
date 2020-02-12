@@ -255,7 +255,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
             references_and_links = input("\nList of references to publication that contain information on the dataset, or links. Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] :")
             doi = input('\nThe DOI for the dataset : ')
             make_dataset_description(dataset_name_path, name=dataset_name, 
-                                     data_license=None, authors=str(authors), 
+                                     data_license=None, authors=authors, 
                                      acknowledgements=str(acknowledgements), 
                                      how_to_acknowledge=how_to_acknowledge, 
                                      funding=str(funding), 
@@ -273,11 +273,11 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     if changes_file_exist :
         overwrite_changes_file = yes_no('A CHANGES file is already exising, do you want to overwrite ? ')
     
-    if overwrite_changes_file or not changes_file_existe :
+    if overwrite_changes_file or not changes_file_exist :
         changes = yes_no('\nDo you want to create/overwrite the CHANGES file ? (y/n)')
         if changes:
             changes_input= input("Tape your text: ")
-            with open(changes_file, 'w') as fid:
+            with open(changes_file, 'w', encoding="utf-8") as fid:
                 fid.write(str(changes_input))
         
         
