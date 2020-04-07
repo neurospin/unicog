@@ -3,7 +3,7 @@ import pandas as pd
 from ast import literal_eval
 import json
 import glob as glob
-import json
+from collections import OrderedDict
 import shutil
 import subprocess
 from pathlib import Path
@@ -124,12 +124,12 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
 def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                      dataset_name=None):
     dataset_name, data_path = get_bids_default_path(data_root_path, dataset_name)
-    print(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*'))
+    #print(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*'))
     if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
         sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*',
                                              'func'))
     else:
-        print(os.path.join(data_root_path, behav_path,'sub-*', 'func'))
+        #print(os.path.join(data_root_path, behav_path,'sub-*', 'func'))
         sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
                                              'sub-*', 'func'))
 
@@ -177,8 +177,8 @@ def get_bids_path(data_root_path='', subject_id='01', folder='',
 
 
 def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
-                             acq_label=None, rec_id=None, run_id=None,
-                             file_tag=None, file_type=None):
+                             acq_label=None, dir_label=None, rec_id=None, run_id=None,
+                             run_dir=None, file_tag=None, file_type=None):
     """ Creates a filename descriptor following BIDS.
 
     subject_id refers to the subject label
@@ -191,17 +191,21 @@ def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
         descriptor = subject_id
     else:
         descriptor = 'sub-{0}'.format(subject_id)
-    if session_id is not None:
+    if (session_id is not None) and (session_id is not pd.np.nan):
         descriptor += '_ses-{0}'.format(session_id)
-    if task_id is not None:
+    if (task_id is not None) and (task_id is not pd.np.nan):
         descriptor += '_task-{0}'.format(task_id)
-    if acq_label is not None:
+    if (acq_label is not None) and (acq_label is not pd.np.nan):
         descriptor += '_acq-{0}'.format(acq_label)
-    if rec_id is not None:
+    if (dir_label is not None) and (dir_label is not pd.np.nan):
+        descriptor += '_dir-{0}'.format(dir_label)
+    if (rec_id is not None) and (rec_id is not pd.np.nan):
         descriptor += '_rec-{0}'.format(rec_id)
-    if run_id is not None:
+    if (run_dir is not None) and (run_dir is not pd.np.nan):
+        descriptor += '_dir-{0}'.format(run_dir)
+    if (run_id is not None) and (run_id is not pd.np.nan):
         descriptor += '_run-{0}'.format(run_id)
-    if file_tag is not None and file_type is not None:
+    if (file_tag is not None) and (file_type is not None):
         descriptor += '_{0}.{1}'.format(file_tag, file_type)
     return descriptor
 
@@ -271,7 +275,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     changes_file_exist = os.path.exists(changes_file)
     overwrite_changes_file = True
     if changes_file_exist :
-        overwrite_changes_file = yes_no('A CHANGES file is already exising, do you want to overwrite ? ')
+        overwrite_changes_file = yes_no('A CHANGES file is already existing, do you want to overwrite ? ')
     
     if overwrite_changes_file or not changes_file_exist :
         changes = yes_no('\nDo you want to create/overwrite the CHANGES file ? (y/n)')
@@ -286,7 +290,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     readme_file_exist = os.path.exists(readme_file)
     overwrite_readme_file = True
     if readme_file_exist:
-        overwrite_readme_file = yes_no('A README file is already exising, do you want to overwrite ? ')
+        overwrite_readme_file = yes_no('A README file is already existing, do you want to overwrite ? ')
         
     if overwrite_readme_file or not readme_file_exist:
         readme = yes_no('\nDo you want to create/complete the README file ? (y/n)')
@@ -335,6 +339,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     ### CHECK PATHS AND FILES
     
     # exp_info path where is the participants.tsv
+    # print(data_root_path)
     exp_info_path = os.path.join(data_root_path, 'exp_info')
     if not os.path.exists(exp_info_path):
         raise Exception('exp_info directory not found')
@@ -358,7 +363,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     download_report.write(report_line)
     
     # Create a dataFrame to store participant information
-    df_participant = pd.DataFrame()    
+    #df_participant = pd.DataFrame()    
+    #Dict for info participant
+    list_all_participants = []
+    cols_from_file = []
     
     # List for the bacth file for dc2nii_batch command
     infiles_dcm2nii = []
@@ -368,8 +376,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     
     #Dict of descriptors to be added
     dict_descriptors = {}
-    
-    
+
     ### GETTING FOR INFORMATION TO DOWNLOAD
     
     # Download command for each subject/session
@@ -379,12 +386,30 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Read the participants.tsv file for getting subjects/sessions to download
     pop = pd.read_csv(os.path.join(exp_info_path, 'participants.tsv'),
                       dtype=str, sep='\t', index_col=False)
+    
+    #print(df_participant)
 
     for row_idx, subject_info in pop.iterrows():
         # Fill the partcipant information for the participants.tsv
-        info_participant = json.loads(subject_info['infos_participant'])  
-        info_participant['participant_id']=subject_info['participant_id'] 
-        df_participant = df_participant.append(info_participant, ignore_index=True)
+        #print(subject_info['infos_participant'])
+        #dic_info_participant = OrderedDict()
+        list_info_participant = []
+        #print('cols',cols_from_file)
+        
+        #dic_info_participant['participant_id']=list_particpants.append(subject_info['participant_id'])
+        list_info_participant.append(subject_info['participant_id'])
+
+        if subject_info['infos_participant'] is not pd.np.nan:
+            info_participant = json.loads(subject_info['infos_participant']) 
+            for k,v in info_participant.items():
+                #dic_info_participant[k]=v 
+                if not k in cols_from_file :
+                    #print('add', k)
+                    cols_from_file.append(k)
+                list_info_participant.append(v)
+            #print('cols',cols_from_file)        
+        
+        list_all_participants.append(list_info_participant)
         
         # Determine path to files in NeuroSpin server  
         download_database = subject_info['location']        
@@ -435,6 +460,12 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         # NeuroSpin standard is yyyymmdd -> Bids standard is YYYY-MM-DD
         acq_date = subject_info['acq_date'].replace('-', '').replace('\n', '')
         
+        #acq_label
+        acq_label = subject_info['acq_label']
+
+        #dir_label
+        #dir_label = subject_info['dir_label']
+        
         # nip number
         nip = subject_info['NIP']
 
@@ -457,6 +488,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         # value[2] : part of ht file_name
         
         seqs_to_retrieve = literal_eval(subject_info['to_import'])
+        #Convert the first element id there is only one sequence, otherwise
+        #each value will be used as str and note tuple).
+        if isinstance(seqs_to_retrieve[0], str) :
+            seqs_to_retrieve = [seqs_to_retrieve]
 
         # clean directories, in case a previous download failed
         for value in seqs_to_retrieve:
@@ -475,8 +510,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                     return None
 
             run_task = get_value('task', value[2])
-            run_id = get_value('run', value[2])            
+            run_id = get_value('run', value[2])  
+            run_dir = get_value('dir', value[2])
             run_session = session_id
+            
             
             tag = value[2].split('_')[-1]
 
@@ -500,8 +537,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 print(meg_file)
                 filename = get_bids_file_descriptor(subject_id, task_id=run_task,
                                                     run_id=run_id,
+                                                    run_dir=run_dir,
                                                     session_id=run_session,
                                                     file_tag=tag,
+                                                    acq_label=acq_label,
                                                     file_type='tif')
                 #output_path = os.path.join(target_path, filename)
                 #print(output_path)
@@ -515,9 +554,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 #copy the subject emptyroom
                 
             # ANAT and FUNC case    
-            elif (value[1] == 'anat') or (value[1] == 'func'):
-                nip_dirs = glob.glob(os.path.join(db_path, str(acq_date), str(nip) + '-*'))
-                
+            elif (value[1] == 'anat') or (value[1] == 'func') or (value[1] == 'fmap'):
+                nip_dirs = glob.glob(os.path.join(db_path, str(acq_date), str(nip) + '*'))
                 if len(nip_dirs) < 1:
                     raise Exception('****  BIDS IMPORTATION WARMING: \
                             No directory found for given NIP %s SESSION %s' %
@@ -537,8 +575,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 filename = get_bids_file_descriptor(subject_id, 
                                                     task_id=run_task,
                                                     run_id=run_id,
+                                                    run_dir=run_dir,
                                                     session_id=run_session,
                                                     file_tag=tag,
+                                                    acq_label=acq_label,
                                                     file_type='nii')
                                
                 if value[1] == 'anat' and deface :
@@ -549,12 +589,23 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 file_to_convert = {'in_dir': dicom_path, 
                                    'out_dir': target_path, 
                                    'filename': os.path.splitext(filename)[0]}
-                infiles_dcm2nii.append(file_to_convert)
-          
+                is_file_to_import = os.path.join( os.getcwd(), target_path, filename)
+                os.path.isfile(check_file)
+                if not os.path.exists(is_file_to_import):
+                    infiles_dcm2nii.append(file_to_convert)
+                else :
+                    print('\n', is_file_to_import, 'is ALREADY IMPORTED\n')
+                    
                 # Add descriptor into the json file
                 if run_task:
                     filename_json = os.path.join(target_path, filename[:-3] + 'json')
                     dict_descriptors.update({filename_json: {'TaskName':run_task}})
+                
+                
+                if len(value)==4 :
+                    #print('value[3]', value[3] )
+                    filename_json = os.path.join(target_path, filename[:-3] + 'json')
+                    dict_descriptors.update({filename_json: value[3] })                   
                 
         #Importation and conversion of dicom files        
         dcm2nii_batch = dict(Options=dict(isGz='false', 
@@ -583,10 +634,15 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     #print(files_for_pydeface)
     if files_for_pydeface :
         template = resource_filename(Requirement.parse("unicog"),
-                        "bids/template_deface//mean_reg2mean.nii.gz")
+                        "bids/template_deface/mean_reg2mean.nii.gz")
         facemask = resource_filename(Requirement.parse("unicog"),
                         "bids/template_deface/facemask.nii.gz")
-        
+        if not os.path.exists(template):
+            template = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
+                        "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
+            facemask = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
+                        "unicog-dev/bids/template_deface/facemask.nii.gz")
+
         os.environ['FSLDIR'] = "/i2bm/local/fsl/bin/"
         os.environ['FSLOUTPUTTYPE'] = "NIFTI_PAIR"
         os.environ['PATH'] = os.environ['FSLDIR']+":"+os.environ['PATH']
@@ -602,10 +658,18 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
     # Create participants.tsv in dataset folder (take out NIP column)
     participants_path = os.path.join(target_root_path, 'participants.tsv')
+    #list_all_participants
+    col_participant = ['participant_id']
+    #cols_names = [cols_names.append(col) for col in cols_from_file]
+    cols_names = col_participant + cols_from_file
+    #df_participant = pd.DataFrame.from_dict(dic_info_participant, orient='columns', columns=dic_info_participant.keys() )
+    df_participant = pd.DataFrame.from_dict(list_all_participants)
+    df_participant.columns = cols_names
+    #columns=dic_info_participant.keys()
     df_participant.to_csv(participants_path, sep='\t', index=False)
 
     if dict_descriptors:
-        print(dict_descriptors)
+        #print(dict_descriptors)
         # Adding a new key value pair in a json file such as taskname
         for k, v in dict_descriptors.items():
             with open(k, 'r+') as json_file:
@@ -676,7 +740,7 @@ if __name__ == "__main__":
       
 #    data_root_path='/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/test_demo'
 #    bids_acquisition_download(data_root_path, deface=False)
-    print(args.root_path[0])
+#    print(args.root_path[0])
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
                               force_download=False,

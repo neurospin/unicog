@@ -6,6 +6,11 @@ modalities can be added (diffusion imaging, behavioral, ...). For a full
 description, please consult the
 [BIDS specifications](http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
+This script import data, but also:
+* all files such as README, CHANGES, dataset_descrption.json ...
+* deface anatomical data if you need
+* use the Bids-validator
+
 # Dependencies (can simply pip install packages):
 
         pip install pydicom --user
@@ -107,10 +112,20 @@ There are plenty more optional fields to include in the file names depending
 on your needs. For more details on that please check directly the
 [BIDS specifications](http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
+Fmap:
+This script has an implementation of **case 4: Multiple phase encoded directions** of the BIDS specification.
+
+        sub­-<participant_label>/
+            [ses-<session_label>/]
+                fmap/
+                    sub­<participant_label>[_ses-<session_label>][_acq-<label>]_dir-<label>[_run-<index>]_epi.nii[.gz]
+                    sub­<participant_label>[_ses-<session_label>][_acq-<label>]_dir-<label>[_run-<index>]_epi.json
+					
+					
+
 ## Files in the `exp_info` folder specifying the data download
 
-Only one file is mandatory in the `exp_info` directory: `participants.tsv`
-and `[sub-<participant_label>_][ses-<session_label>_]download.tsv`.
+Only one file is mandatory in the `exp_info` directory: `participants.tsv`.
 Note that this file is not part of the BIDS standard. It is defined to contain
 the minimum information needed to simplify creating a BIDS dataset with the
 data from the NeuroSpin server.
@@ -122,9 +137,9 @@ When there are multiple sessions per subject (with different acquisition
 dates), then the _session_label_ column is mandatory. 
 
 
-        participant_id	NIP		infos_participant		session_label	acq_date	location	to_import
-        sub-01		tr070015	{"sex":"F", "age":"45"}		01		2010-06-28	trio		[['2','anat','T1w'],['9','func','task-loc_std_run-01_bold'],('10','func','task-loc_std_run-02_bold']]
-        sub-02		ap100009	{"sex":"M", "age":"35"}				2010-07-01	trio		[['2','anat','T1w'],['9','func','task-loc_std_bold']]
+        participant_id	NIP		infos_participant		session_label	acq_date	acq_label	location	to_import
+        sub-01		tr070015	{"sex":"F", "age":"45"}		01		2010-06-28		trio		[['2','anat','T1w'],['9','func','task-loc_std_run-01_bold'],('10','func','task-loc_std_run-02_bold']]
+        sub-02		ap100009	{"sex":"M", "age":"35"}				2010-07-01		trio		[['2','anat','T1w'],['9','func','task-loc_std_bold']]
 
 The _NIP_ column will only be used to identify subjects in the NeuroSpin
 database and will not be included in any way on the BIDS dataset to ensure
@@ -147,9 +162,26 @@ the automatic number.
 Here is an example for the `participants.tsv` file:
 
 
-        participant_id  NIP             infos_participant               session_label   acq_date        location        to_import
-        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28      trio            [['2','anat','T1w'],['9','func','task-loc_std_run-01_bold']]
-        sub-01          tt989898_6405                                	02 		2010-06-28      trio            [['9','func','task-loc_std_bold']]
+        participant_id  NIP             infos_participant               session_label   acq_date	acq_label        location        to_import
+        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28	      trio            [['2','anat','T1w'],['9','func','task-loc_std_run-01_bold']]
+        sub-01          tt989898_6405                                	02 		2010-06-28	      trio            [['9','func','task-loc_std_bold']]
+
+#### User case for fmap importation (Multiple phase encoded directions):
+
+Here is an example for the `participants.tsv` file:
+
+
+        participant_id  NIP             infos_participant               session_label   acq_date	acq_label        location        to_import
+        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28	      prisma            (('24','anat','T1w'),('13','func','task-number_dir-ap_run-01
+_bold'),('14','func','task-number_dir-ap_run-01_sbref'),('5','fmap','dir-ap_epi',{'intendedFor':'/fmri/sub-301_task-number_dir-ap_run-01_bold'}))
+
+#### User case for adding a field into the json file:
+Here we are adding the IndendedFor field into the **fmap/sub-301_dir-ap_epi.json**. This field is not mandatory, but recommended. It seems 
+if you use fmriprep, this field is not directly read and fmriprep use the **PhaseEncodingDirection" information which give by the scanner.
+
+		participant_id  NIP     infos_participant       session_label   acq_date        acq_label       location        to_import
+		sub-301 jj140402        "{""sex"":""F"", ""age"":""6""}"                2020-01-15          prisma  (('24','anat','T1w'),('13','func','task-number_dir-ap_run-01_bold')
+		,('5','fmap','sub-301_dir-ap_epi',{'IntendedFor':'/func/task-number_dir-ap_run-01_bold'}))
 
 
 
