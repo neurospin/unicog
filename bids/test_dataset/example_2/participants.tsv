@@ -1,0 +1,3 @@
+participant_id	NIP	infos_participant	session_label	acq_date	acq_label	location	to_import
+sub-301	jj140004	"{""sex"":""F"", ""age"":""6""}"		2019-01-15		prisma	(('24','anat','T1w'),('13','func','task-number_dir-ap_run-01_bold'),('14','func','task-number_run-01_sbref'),('5','fmap','dir-ap_epi',{'IntendedFor':'/fmri/sub-301_task-number_dir-ap_run-01_bold'}))
+sub-31	ju140333	"{""sex"":""F"", ""age"":""6""}"		2020-06-15		prisma	(('24','anat','T1w'),('13','func','task-number_dir-ap_run-01_bold'),('14','func','task-number_run-01_sbref'),('5','fmap','dir-ap_epi'))
