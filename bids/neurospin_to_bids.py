@@ -24,6 +24,7 @@ import re
 NEUROSPIN_DATABASES = {
     'prisma': '/neurospin/acquisition/database/Prisma_fit',
     'trio': '/neurospin/acquisition/database/TrioTim',
+    '7T' : '/neurospin/acquisition/database/Investigational_Device_7T',
     'meg' : '/neurospin/acquisition/neuromag/data',
 }
 
@@ -555,7 +556,10 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 
             # ANAT and FUNC case    
             elif (value[1] == 'anat') or (value[1] == 'func') or (value[1] == 'fmap'):
+                if run_session:
+                    nip = nip + '*' + run_session
                 nip_dirs = glob.glob(os.path.join(db_path, str(acq_date), str(nip) + '*'))
+                #print(os.path.join(db_path, str(acq_date), str(nip), '*'))
                 if len(nip_dirs) < 1:
                     raise Exception('****  BIDS IMPORTATION WARMING: \
                             No directory found for given NIP %s SESSION %s' %
@@ -589,12 +593,19 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 file_to_convert = {'in_dir': dicom_path, 
                                    'out_dir': target_path, 
                                    'filename': os.path.splitext(filename)[0]}
-                is_file_to_import = os.path.join( os.getcwd(), target_path, filename)
-                os.path.isfile(check_file)
-                if not os.path.exists(is_file_to_import):
-                    infiles_dcm2nii.append(file_to_convert)
-                else :
+                is_file_to_import = os.path.join(os.getcwd(), target_path, filename)
+                print(is_file_to_import)
+                #os.path.isfile(check_file)
+
+                if os.path.isfile(os.path.join(os.getcwd(), target_path, filename)):
                     print('\n', is_file_to_import, 'is ALREADY IMPORTED\n')
+                else :
+                    infiles_dcm2nii.append(file_to_convert)
+                
+#                if not os.path.exists(is_file_to_import):
+#                    infiles_dcm2nii.append(file_to_convert)
+#                else :
+#                    print('\n', is_file_to_import, 'is ALREADY IMPORTED\n')
                     
                 # Add descriptor into the json file
                 if run_task:
