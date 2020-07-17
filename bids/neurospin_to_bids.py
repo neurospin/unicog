@@ -553,7 +553,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 if run_session:
                     nip = nip + '*' + run_session
                 nip_dirs = glob.glob(os.path.join(db_path, str(acq_date), str(nip) + '*'))
-                #print(os.path.join(db_path, str(acq_date), str(nip), '*'))
+                print(os.path.join(db_path, str(acq_date), str(nip) + '*'))
                 if len(nip_dirs) < 1:
                     raise Exception('****  BIDS IMPORTATION WARMING: \
                             No directory found for given NIP %s SESSION %s' %
@@ -587,7 +587,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 file_to_convert = {'in_dir': dicom_path, 
                                    'out_dir': target_path, 
                                    'filename': os.path.splitext(filename)[0]}
-                is_file_to_import = os.path.join('/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/test/test_7T_pydeface', target_path, filename)
+                is_file_to_import = os.path.join(os.path.join(os.getcwd(), target_path, filename))
                 
                 if (os.path.isfile( is_file_to_import )):
                     print('\n', is_file_to_import, 'is ALREADY IMPORTED\n')
