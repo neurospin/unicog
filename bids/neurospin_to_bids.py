@@ -494,12 +494,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         if isinstance(seqs_to_retrieve[0], str) :
             seqs_to_retrieve = [seqs_to_retrieve]
 
-        # clean directories, in case a previous download failed
-        for value in seqs_to_retrieve:
-            toclean = os.path.join(sub_path, value[1])
-        if os.path.exists(toclean):
-            shutil.rmtree(toclean)
-
         # download data, store information in batch files for anat/fmri
         # download data for meg data
         for value in seqs_to_retrieve:
@@ -593,19 +587,12 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 file_to_convert = {'in_dir': dicom_path, 
                                    'out_dir': target_path, 
                                    'filename': os.path.splitext(filename)[0]}
-                is_file_to_import = os.path.join(os.getcwd(), target_path, filename)
-                print(is_file_to_import)
-                #os.path.isfile(check_file)
-
-                if os.path.isfile(os.path.join(os.getcwd(), target_path, filename)):
+                is_file_to_import = os.path.join('/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/test/test_7T_pydeface', target_path, filename)
+                
+                if (os.path.isfile( is_file_to_import )):
                     print('\n', is_file_to_import, 'is ALREADY IMPORTED\n')
                 else :
                     infiles_dcm2nii.append(file_to_convert)
-                
-#                if not os.path.exists(is_file_to_import):
-#                    infiles_dcm2nii.append(file_to_convert)
-#                else :
-#                    print('\n', is_file_to_import, 'is ALREADY IMPORTED\n')
                     
                 # Add descriptor into the json file
                 if run_task:
