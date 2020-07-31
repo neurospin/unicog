@@ -1,3 +1,15 @@
-participant_label	NIP	acq_date
-01	tr070015	2010-06-28
-02	ap100009	2010-07-01
+participant_id	NIP	infos_participant	session_label	acq_date	acq_label	location	to_import
+sub-01	tr070015			2010-06-28		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-02	ap100009			2010-07-01		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-03	bd090157			2010-06-07		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-04	cj100142			2010-06-21		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-05	cm100138			2010-06-10		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-06	ev070110			2010-06-14		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-07	me070045			2010-06-07		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-08	hr090062			2010-06-14		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-09	jc090254			2010-06-21		trio	[['2','anat','T1w'],['11','func','task-localizer_bold']]
+sub-10	jc100129			2010-06-10		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-11	js070087			2010-06-17		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-12	me070045			2010-06-07		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-13	va100099			2010-06-28		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
+sub-14	vp100126			2010-07-01		trio	[['2','anat','T1w'],['9','func','task-localizer_bold']]
