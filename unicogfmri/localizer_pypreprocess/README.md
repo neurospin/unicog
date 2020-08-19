@@ -84,9 +84,15 @@ We are now going to use the script for the preprocessing. The configuration of a
 use the MCR (Matlab Compiled Runtime) .... ) are described in the config.ini file.
 Check and set up the paths "dataset_dir" and 'output_dir" into the config.ini if needed.
 
+If it is possible, pypreprocess will use the standalone version of SPM (instead of lauching a
+matlab instance). So, check the following environment variables from your bashrc file :
+
+        SPM_DIR="/i2bm/local/spm12-standalone/spm12_mcr/spm12"
+        SPM_MCR="/i2bm/local/bin/spm12"
+
 To launch the analysis:
 
-    python preproc_and_firstlevel.py
+        python preproc_and_firstlevel.py
 
 
 #### For further analysis
