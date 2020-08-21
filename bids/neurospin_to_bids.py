@@ -631,11 +631,14 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     #Data to deface
     #print(files_for_pydeface)
     if files_for_pydeface :
-        template = resource_filename(Requirement.parse("unicog"),
-                        "bids/template_deface/mean_reg2mean.nii.gz")
-        facemask = resource_filename(Requirement.parse("unicog"),
-                        "bids/template_deface/facemask.nii.gz")
-        if not os.path.exists(template):
+        try:
+            template = resource_filename(Requirement.parse("unicog"),
+                            "bids/template_deface/mean_reg2mean.nii.gz")
+            facemask = resource_filename(Requirement.parse("unicog"),
+                            "bids/template_deface/facemask.nii.gz")
+        except OSError:
+            print('not unicog module')
+        else:
             template = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
                         "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
             facemask = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
