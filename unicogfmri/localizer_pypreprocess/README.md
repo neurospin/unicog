@@ -15,6 +15,8 @@ while the statistic analyses rely on [http://nipy.org](http://nipy.org).
 To run the tutorial, you will need:
 
 * pypreprocess ([pypreprocess](https://github.com/neurospin/pypreprocess))
+* nistats ([nistats](https://nistats.github.io/)) (last release in April 2020 - module will no longer updated - See nilearn and ([nipy](https://nipy.org/))
+* nilearn ([nilearn](http://nilearn.github.io/))
 * the 'unicog' toolbox ([https://github.com/neurospin/unicog](https://github.com/neurospin/unicog))  
 
 They may already be installed on your computer. You can check that by starting a Python interpreter:
@@ -25,6 +27,8 @@ and typing:
 
      import unicogfmri
      import pypreprocess
+     import nilearn
+     import nistats
 
 If you see any error message, you will need to install the module(s) with issue. If you are in a hurry, here is how to quickly install unicogfmri and pypreprocess:
 
@@ -48,27 +52,19 @@ Let us create a directory to run this tutorial, by issuing the following command
        cd $ROOTDIR
 
 ###  Data importation 
-Please the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](https://github.com/neurospin/unicog/tree/master/bids).
+See more information on the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](https://github.com/neurospin/unicog/tree/master/bids).
 
-Let us create a directory to import data:
-
-       mkdir -p $ROOTDIR/dataset/exp_info
-       cd $ROOTDIR/dataset
-
-
-Copy the *.tsv file to select data (from neurospin):
-
-       cp -a /tmp/unicog/unicogfmri/localizer_pypreprocess/scripts/exp_info/*tsv $ROOTDIR/dataset/exp_info
-
+Here we have an example with 14 subjects from the localizer project.
 
 Launch the importation:
 
-      cd $ROOTDIR/dataset
-      python /tmp/unicog/bids/neurospin_to_bids.py -root_path $ROOTDIR/dataset -neurospin_database trio
+      cd <where_is_the_exp_info_directory_including_the_participants.tsv>
+      python /tmp/unicog/bids/neurospin_to_bids.py
 
 
 ### Processing 
 
+You have the possibility to use a $ROOTDIR path.
 Copy the 'localizer/scripts' directory of unicogfmri
  
        cp -a /tmp/unicog/unicogfmri/localizer/scripts $ROOTDIR
@@ -82,26 +78,21 @@ Note that all the commands that follow are supposed to be executed from the *scr
        cd $ROOTDIR/scripts
 
 
-#### Preprocessing
+#### Preprocessing and first level
 
 We are now going to use the script for the preprocessing. The configuration of all steps (slice timing, normalisation, use SPM8 or SPM12, 
 use the MCR (Matlab Compiled Runtime) .... ) are described in the config.ini file.
-Check and set up the paths "dataset_dir" and 'output_dir" into the config.ini if needed. It is not possible to use $ROOTDIR inside. 
+Check and set up the paths "dataset_dir" and 'output_dir" into the config.ini if needed.
 
-To launch this step:
+If it is possible, pypreprocess will use the standalone version of SPM (instead of lauching a
+matlab instance). So, check the following environment variables from your bashrc file :
 
-    python preprocess.py config.ini
+        SPM_DIR="/i2bm/local/spm12-standalone/spm12_mcr/spm12"
+        SPM_MCR="/i2bm/local/bin/spm12"
 
-When the preprocessing is finished, you can see a report into $ROOTDIR/processed_data/report_preproc.html
+To launch the analysis:
 
-
-#### First level
-
-Now we are going to launch the first level (design matrix, fit the data, contrast of interest):
-
-      python first_level.py
-
-When the script is finished, you can see a report into $ROOTDIR/processed_data/sub*/res_stats/report_stats.html
+        python preproc_and_firstlevel.py
 
 
 #### For further analysis
@@ -113,7 +104,7 @@ Further analysis can be done with python tools. Please take a look at [https://n
 The maps can be visualized interactively with the [Anatomist Software](http://brainvisa.info/web/anatomist.html).
 
 
-     source /i2bm/local/Ubuntu-14.04-x86_64/brainvisa/bin/bv_env.sh
+     source /i2bm/local/Ubuntu-18.04-x86_64/brainvisa/bin/bv_env.sh
      python display_maps.py
 
 
