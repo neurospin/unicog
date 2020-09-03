@@ -11,10 +11,13 @@ This script import data, but also:
 * deface anatomical data if you need
 * use the Bids-validator
 
-# Dependencies (can simply pip install packages):
+# Dependencies (can simply pip install packages)
 
         pip install pydicom --user
         pip install pandas --user
+        pip install mne --user
+        pip install mne-bids --user
+        pip install pydeface --user
 
 # Installation and usage:
 ## With the installation of the module
@@ -42,8 +45,19 @@ and use as follow for instance:
 
 
 # Preparation of data
+## Basic importation
 **To import data from NeuroSpin, you have to be connected to the NeuroSpin network.** 
 The information about subjects and data to import are stored into a **exp_info** directory. For instance:
+
+        ./exp_info
+        ├── participants.tsv
+
+
+See a small example at [https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info](https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info)
+
+## Advanced importation
+The importaiton of events are also possible if the *_events.tsv files are correctly set up.
+Here is an example:
 
         ./exp_info
         ├── participants.tsv
@@ -57,9 +71,6 @@ The information about subjects and data to import are stored into a **exp_info**
                 └── func
                     └── sub-02_task-loc_events.tsv
 
-
-See a small example at [https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info](https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info)
-
 # Importation of data
 Now we set all files into **exp_info** directory, you can launch the importation:
 
@@ -70,6 +81,7 @@ Now we set all files into **exp_info** directory, you can launch the importation
 * The `neurospin_to_bids.py` script will export files from the NeuroSpin archive based on the information contained in the **exp_info** directory. The script when used as a bash command accept three optional arguments:
     * **-root_path**: specifies the target folder - by default the current directory.
     * **-dataset_name**: the folder name to export the dataset to, by default subfolder `bids_dataset` of the target folder.
+    * **-dry-run**: this mode will test the importaiton without to import data. A list of possible importation and warnings will be displayed.
 
 If instead we were to specify the target folder (the one containing an
 `exp_info` subfolder) and a name for the BIDS dataset subfolder, we would
@@ -164,28 +176,28 @@ Here is an example for the `participants.tsv` file:
 
         participant_id  NIP             infos_participant               session_label   acq_date	acq_label        location        to_import
         sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28	      trio            [['2','anat','T1w'],['9','func','task-loc_std_run-01_bold']]
-        sub-01          tt989898_6405                                	02 		2010-06-28	      trio            [['9','func','task-loc_std_bold']]
+        sub-01          tt989898_6405                                	02 		        2010-06-28	      trio            [['9','func','task-loc_std_bold']]
 
-#### User case for fmap importation (Multiple phase encoded directions):
+#### User case for fmap importation (Multiple phase encoded directions)
 
 Here is an example for the `participants.tsv` file:
 
 
         participant_id  NIP             infos_participant               session_label   acq_date	acq_label        location        to_import
-        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28	      prisma            (('24','anat','T1w'),('13','func','task-number_dir-ap_run-01
-_bold'),('14','func','task-number_dir-ap_run-01_sbref'),('5','fmap','dir-ap_epi',{'intendedFor':'/fmri/sub-301_task-number_dir-ap_run-01_bold'}))
+        sub-01          tt989898_6405   {"sex":"F", "age":"45"}         01              2010-06-28	      prisma            [['24','anat','T1w'],['13','func','task-number_dir-ap_run-01_bold'],['14','func','task-number_dir-ap_run-01_sbref'],['5','fmap','dir-ap_epi',{'intendedFor':'/fmri/sub-301_task-number_dir-ap_run-01_bold'}]]
 
-#### User case for adding a field into the json file:
+#### User case for adding a field into the json file
 Here we are adding the IndendedFor field into the **fmap/sub-301_dir-ap_epi.json**. This field is not mandatory, but recommended. It seems 
 if you use fmriprep, this field is not directly read and fmriprep use the **PhaseEncodingDirection" information which give by the scanner.
 
 		participant_id  NIP     infos_participant       session_label   acq_date        acq_label       location        to_import
-		sub-301 jj140402        "{""sex"":""F"", ""age"":""6""}"                2020-01-15          prisma  (('24','anat','T1w'),('13','func','task-number_dir-ap_run-01_bold')
-		,('5','fmap','sub-301_dir-ap_epi',{'IntendedFor':'/func/task-number_dir-ap_run-01_bold'}))
+		sub-301 jj140402        "{""sex"":""F"", ""age"":""6""}"                2020-01-15          prisma  [['24','anat','T1w'],['13','func','task-number_dir-ap_run-01_bold'),['5','fmap','sub-301_dir-ap_epi',{'IntendedFor':'/func/task-number_dir-ap_run-01_bold'}]]
 
 
 
-# Importation of events:
+# Importation of events
+The importation of events can not be automatic because very often the events have to extract from log files depending on your stimulation presentation program (expyriment for python).
+Here we propose a possible solution, but we are truly free to import yourself into the bids_datset repository the events.
 The events for functional runs will be automatically copied in the BIDS dataset if the files are available in a `recorded_events` folder that already respect the bids structure. Which means that files would have the same fields as the bold.nii files in its file name but its final name part would be events.tsv instead, for example:
 
     <data_root>/exp_info/recorded_events/sub-<sub_label>[/ses-<ses_label>]/func/sub-*_<task>_events.tsv
@@ -199,17 +211,23 @@ Here is an example of `sub-*_<task>_events.tsv` following the BIDS standard:
         11.4    1          r_hand_audio
         15.0    1          sentence_audio
 
-the onset, duration and trial_type columns are the only mandatory ones. onset and duration fields should be expressed in seconds. Other information can be added to events.tsv files such as ​response_time or other arbitrary additional columns respecting subject anonimity. See the [BIDS specification](http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
+the onset, duration and trial_type columns are the only mandatory ones. onset and duration fields should be expressed in second. Other information can be added to events.tsv files such as ​response_time or other arbitrary additional columns respecting subject anonimity. See the [BIDS specification](http://bids.neuroimaging.io/bids_spec1.0.0.pdf).
 
 
-# Deface:
+# Deface
 If you want to import data and share them with other laboratories or on an open server, you have to anonymize them. For that, the bids importation remove all fields in the header containing specific
 information such as "Patient's name" and the script of importation will propose to deface anatomical data. The pydeface python is used to propose this step.
 If you need to deface, ensure that pydeface is installed on your workstation.
 
 Please see [https://github.com/poldracklab/pydeface](https://github.com/poldracklab/pydeface)
 
+# Summary of importation
+## Files imported and warnings
+A summary will be displayed at the end of importation into the terminal. The summart is also saved into ./report/download_report_*.csv file. This file is not in the bids_dataset repository because it is not part of BIDS.
 
-# Notes:
+## BIDS validation
+If you are selected the bids validation option, the summary is saved in ./report/report_bids_valisation.txt .
+
+# Notes
 * Note 1: if the importation has been interrupted or partially then, then launch again the script. The last partially downloaded data folder will be redownloaded from scratch.
 * Note 2: the .tsv extension means "tabulation separated values", so each value must be separated by a tabulation and not commas, spaces or dots. If files in `exp_info` are not tsv, most likely the `neurospin_to_bids.py` script will fail. Please make sure your files comply with your favorite text editor.
