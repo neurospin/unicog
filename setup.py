@@ -21,6 +21,16 @@ setup(
     author_email='isabelle.denghien@cea.fr',
     url='https://github.com/neurospin/unicog',
     packages=find_packages(),
+    install_requires=[
+        'pydicom',
+        'pandas',
+        'mne',
+        'mne-bids',
+        'pydeface',
+        'PyYAML',
+        'bids-validator',
+    ],
+    python_requires='~=3.6',
     package_data=datafiles,
     scripts=['bids/neurospin_to_bids.py'],
     zip_safe=False
