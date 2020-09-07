@@ -560,8 +560,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 download = True
                 dicom_paths = []
                 path_file_glob = ""
-                if run_session:
-                    nip = nip + '*' + run_session
                 nip_dirs = glob.glob(os.path.join(db_path, str(acq_date), str(nip) + '*'))
                 #print(os.path.join(db_path, str(acq_date), str(nip) + '*'))
                 if len(nip_dirs) < 1:
@@ -570,7 +568,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                     #download_report.write(message) 
                     download = False
                 elif len(nip_dirs) > 1:
-                    list_warning.append("popo")
                     list_warning.append(f"\n  WARNING: Multiple path for given NIP {nip} \
                             SESSION {session_id} - please \
                             mention the session of the subject for this date, \

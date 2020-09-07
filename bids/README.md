@@ -81,7 +81,7 @@ Now we set all files into **exp_info** directory, you can launch the importation
 * The `neurospin_to_bids.py` script will export files from the NeuroSpin archive based on the information contained in the **exp_info** directory. The script when used as a bash command accept three optional arguments:
     * **-root_path**: specifies the target folder - by default the current directory.
     * **-dataset_name**: the folder name to export the dataset to, by default subfolder `bids_dataset` of the target folder.
-    * **-dry-run**: this mode will test the importaiton without to import data. A list of possible importation and warnings will be displayed.
+    * **-dry-run**: True/False - this mode will test the importaiton without to import data. A list of possible importation and warnings will be displayed.
 
 If instead we were to specify the target folder (the one containing an
 `exp_info` subfolder) and a name for the BIDS dataset subfolder, we would
