@@ -491,7 +491,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         # value[0] : num of seq
         # value[1] : modality
         # value[2] : part of ht file_name
-        
+        print("Scans for ", subject_info['NIP'])
+        print(subject_info['to_import'])
         seqs_to_retrieve = literal_eval(subject_info['to_import'])
         #Convert the first element id there is only one sequence, otherwise
         #each value will be used as str and note tuple).
@@ -674,18 +675,15 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         #print(files_for_pydeface)
         if files_for_pydeface :
             try:
-                template = resource_filename(Requirement.parse("unicog"),
-                                "bids/template_deface/mean_reg2mean.nii.gz")
-                facemask = resource_filename(Requirement.parse("unicog"),
-                                "bids/template_deface/facemask.nii.gz")
-            except OSError:
-                print('not unicog module')
-            else:
                 template = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
                             "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
                 facemask = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
                             "unicog-dev/bids/template_deface/facemask.nii.gz")
-    
+            except:
+                template = resource_filename(Requirement.parse("unicog"),
+                                "bids/template_deface/mean_reg2mean.nii.gz")
+                facemask = resource_filename(Requirement.parse("unicog"),
+                                "bids/template_deface/facemask.nii.gz")
             os.environ['FSLDIR'] = "/i2bm/local/fsl/bin/"
             os.environ['FSLOUTPUTTYPE'] = "NIFTI_PAIR"
             os.environ['PATH'] = os.environ['FSLDIR']+":"+os.environ['PATH']
