@@ -53,7 +53,10 @@ The information about subjects and data to import are stored into a **exp_info**
         ├── participants.tsv
 
 
-See a small example at [https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info](https://github.com/neurospin/unicog/tree/master/bids/test_dataset/exp_info)
+See a small example at [https://github.com/neurospin/unicog/tree/master/bids/test_dataset/](https://github.com/neurospin/unicog/tree/master/bids/test_dataset/)
+
+Also [https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer_pypreprocess/scripts/exp_info](https://github.com/neurospin/unicog/tree/master/unicogfmri/localizer_pypreprocess/scripts/exp_info)
+
 
 ## Advanced importation
 The importaiton of events are also possible if the *_events.tsv files are correctly set up.
