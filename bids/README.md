@@ -13,7 +13,6 @@ This script import data, but also:
 
 # Dependencies (can simply pip install packages)
 
-        pip install pydicom --user
         pip install pandas --user
         pip install mne --user
         pip install mne-bids --user

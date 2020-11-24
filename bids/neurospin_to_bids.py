@@ -16,7 +16,6 @@ from bids_validator import BIDSValidator
 import pydeface.utils as pdu
 import mne
 from mne_bids import write_raw_bids, make_dataset_description
-import pydicom
 from itertools import combinations
 import time
 import argparse
@@ -261,7 +260,7 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
             funding = input('\nList of sources of funding (e.g., grant numbers). Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] : ')
             references_and_links = input("\nList of references to publication that contain information on the dataset, or links. Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] :")
             doi = input('\nThe DOI for the dataset : ')
-            make_dataset_description(dataset_name_path, name=dataset_name, 
+            make_dataset_description(dataset_name_path, name=name, 
                                      data_license=None, authors=authors, 
                                      acknowledgements=str(acknowledgements), 
                                      how_to_acknowledge=how_to_acknowledge, 
@@ -371,8 +370,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     # Create a dataFrame to store participant information
     #df_participant = pd.DataFrame()    
     #Dict for info participant
-    list_all_participants = []
-    cols_from_file = []
+    #list_all_participants = {}
+    dic_info_participants = OrderedDict()
     
     # List for the bacth file for dc2nii_batch command
     infiles_dcm2nii = []
@@ -397,27 +396,19 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
 
     for row_idx, subject_info in pop.iterrows():
         # Fill the partcipant information for the participants.tsv
-        #print(subject_info['infos_participant'])
-        #print(subject_info)
-        #dic_info_participant = OrderedDict()
-        list_info_participant = []
-        #print('cols',cols_from_file)
-        
-        #dic_info_participant['participant_id']=list_particpants.append(subject_info['participant_id'])
-        list_info_participant.append(subject_info['participant_id'])
-
-        if subject_info['infos_participant'] is not pd.np.nan:
-            info_participant = json.loads(subject_info['infos_participant']) 
+        if subject_info[0] in dic_info_participants:
+            existing_items = dic_info_participants[subject_info[0]]
+            dico_add = {}
+            info_participant = json.loads(subject_info['infos_participant'])
             for k,v in info_participant.items():
-                #dic_info_participant[k]=v 
-                if not k in cols_from_file :
-                    #print('add', k)
-                    cols_from_file.append(k)
-                list_info_participant.append(v)
-            #print('cols',cols_from_file)        
-        
-        list_all_participants.append(list_info_participant)
-        
+                if not k in existing_items :
+                    dico_add[k] = v
+            #fusion dicos  
+            existing_items.update(dico_add)
+            dic_info_participants[subject_info[0]] = existing_items
+        else :
+            dic_info_participants[subject_info[0]] = json.loads(subject_info['infos_participant'])
+
         # Determine path to files in NeuroSpin server  
         download_database = subject_info['location']        
         if download_database in NEUROSPIN_DATABASES:
@@ -639,7 +630,6 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                           Files=infiles_dcm2nii)
 
     dcm2nii_batch_file = os.path.join(exp_info_path, 'batch_dcm2nii.yaml')
-    #dcm2nii_batch_file = "/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/test_demo/exp_info/batch_dcm2nii.yaml"
     with open(dcm2nii_batch_file, 'w') as f:
         data = yaml.dump(dcm2nii_batch, f)
   
@@ -701,15 +691,8 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     
         # Create participants.tsv in dataset folder (take out NIP column)
         participants_path = os.path.join(target_root_path, 'participants.tsv')
-        #list_all_participants
-        col_participant = ['participant_id']
-        #cols_names = [cols_names.append(col) for col in cols_from_file]
-        cols_names = col_participant + cols_from_file
-        #df_participant = pd.DataFrame.from_dict(dic_info_participant, orient='columns', columns=dic_info_participant.keys() )
-        df_participant = pd.DataFrame.from_dict(list_all_participants)
-        df_participant.columns = cols_names
-        #columns=dic_info_participant.keys()
-        df_participant.to_csv(participants_path, sep='\t', index=False)
+        df_participant = pd.DataFrame.from_dict(dic_info_participants, orient="index")
+        df_participant.to_csv(participants_path, sep='\t')
     
         if dict_descriptors:
             #print(dict_descriptors)
