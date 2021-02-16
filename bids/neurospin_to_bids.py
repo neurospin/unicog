@@ -329,7 +329,7 @@ def bids_init_dataset(data_root_path='',
             print(
                 '\nIf you do not know all information: pass and edit the file later.'
             )
-            name = input("\nTape the name of this BIDS dataset: ").capitalize()
+            name = input("\nType the name of this BIDS dataset: ").capitalize()
             authors = input("\nA list of authors like `a, b, c`: ").capitalize()
             acknowledgements = input(
                 "\nA list of acknowledgements like `a, b, c`: ").capitalize()
@@ -372,7 +372,7 @@ def bids_init_dataset(data_root_path='',
         changes = yes_no('\nDo you want to create/overwrite the CHANGES file?',
                          default="yes")
         if changes:
-            changes_input = input("Tape your text: ")
+            changes_input = input("Type your text: ")
             with open(changes_file, 'w', encoding="utf-8") as fid:
                 fid.write(str(changes_input))
 
