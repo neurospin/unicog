@@ -1,25 +1,26 @@
 #! /usr/bin/env python3
 
-import os
-import pandas as pd
-from ast import literal_eval
-import json
+import argparse
 import glob
-from collections import OrderedDict
+import json
+import os
+import re
 import shutil
 import subprocess
-from pathlib import Path
-from pkg_resources import resource_filename, Requirement
-import yaml
-
-from bids_validator import BIDSValidator
-import pydeface.utils as pdu
-import mne
-from mne_bids import write_raw_bids, make_dataset_description
-from itertools import combinations
+import sys
 import time
-import argparse
-import re
+from ast import literal_eval
+from collections import OrderedDict
+from itertools import combinations
+from pathlib import Path
+
+import mne
+import pandas as pd
+import pydeface.utils as pdu
+import yaml
+from bids_validator import BIDSValidator
+from mne_bids import make_dataset_description, write_raw_bids
+from pkg_resources import Requirement, resource_filename
 
 NEUROSPIN_DATABASES = {
     'prisma': '/neurospin/acquisition/database/Prisma_fit',
@@ -29,15 +30,41 @@ NEUROSPIN_DATABASES = {
 }
 
 
-def yes_no(question_to_be_answered):
+def yes_no(question: str, default: str = None) -> bool:
+    """A simple yes/no prompt
+
+    Args:
+        question (str): The question to be answered.
+        default (bool, optional): Default answer to `question`.
+                                  Defaults to None.
+
+    Raises:
+        ValueError: Raise `ValueError` when default answer is not
+                    `yes` or `no`.
+
+    Returns:
+        bool: Boolean answer to the yes/no question.
+    """
+    valid = {"yes": True, "y": True, "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError(f"invalid default answer: '{default}'")
+
     while True:
-        choice = input(question_to_be_answered).lower()
-        if choice[:1] == 'y':
-            return True
-        elif choice[:1] == 'n':
-            return False
+        sys.stdout.write(question + prompt)
+        choice = input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
         else:
-            print("Please respond with 'y/n'\n")
+            sys.stdout.write("Please respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
 
 
 def file_manager_default_file(main_path,
@@ -277,12 +304,12 @@ def bids_init_dataset(data_root_path='',
     overwrite_datadesc_file = True
     if description_file:
         overwrite_datadesc_file = yes_no(
-            '\nA dataset_description.json is already exising, do you want to overwrite ? '
-        )
+            '\nA dataset_description.json is already exising, do you want to overwrite?',
+            default="yes")
     if overwrite_datadesc_file or not description_file:
         data_descrip = yes_no(
-            '\nDo you want to create or overwrite the dataset_description.json ? (y/n) '
-        )
+            '\nDo you want to create or overwrite the dataset_description.json?',
+            default="yes")
         if data_descrip:
             print(
                 '\nIf you do not know all information: pass and edit the file later.'
@@ -323,11 +350,12 @@ def bids_init_dataset(data_root_path='',
     overwrite_changes_file = True
     if changes_file_exist:
         overwrite_changes_file = yes_no(
-            '\nA CHANGES file is already existing, do you want to overwrite ? ')
+            '\nA CHANGES file is already existing, do you want to overwrite ?',
+            default="yes")
 
     if overwrite_changes_file or not changes_file_exist:
-        changes = yes_no(
-            '\nDo you want to create/overwrite the CHANGES file ? (y/n) ')
+        changes = yes_no('\nDo you want to create/overwrite the CHANGES file ?',
+                         default="yes")
         if changes:
             changes_input = input("Tape your text: ")
             with open(changes_file, 'w', encoding="utf-8") as fid:
@@ -339,11 +367,12 @@ def bids_init_dataset(data_root_path='',
     overwrite_readme_file = True
     if readme_file_exist:
         overwrite_readme_file = yes_no(
-            '\nA README file is already existing, do you want to overwrite ? ')
+            '\nA README file is already existing, do you want to overwrite ?',
+            default="yes")
 
     if overwrite_readme_file or not readme_file_exist:
-        readme = yes_no(
-            '\nDo you want to create/complete the README file ? (y/n) ')
+        readme = yes_no('\nDo you want to create/complete the README file ?',
+                        default="yes")
         if not readme:
             readme_input = "TO BE COMPLETED BY THE USER"
         else:
@@ -794,7 +823,8 @@ def bids_acquisition_download(data_root_path='',
 
         #Validate paths with BIDSValidator
         #see also http://bids-standard.github.io/bids-validator/
-        validation_bids = yes_no('\nDo you want to use a bids validator? (y/n)')
+        validation_bids = yes_no('\nDo you want to use a bids validator?',
+                                 default=None)
         if validation_bids:
             bids_validation_report = os.path.join(report_path,
                                                   "report_bids_valisation.txt")
@@ -852,7 +882,7 @@ if __name__ == "__main__":
 
     # LOAD CONSOLE ARGUMENTS
     args = parser.parse_args()
-    deface = yes_no('\nDo you want deface T1? (y/n)')
+    deface = yes_no('\nDo you want deface T1?', default=None)
     bids_acquisition_download(data_root_path=args.root_path[0],
                               dataset_name=args.dataset_name[0],
                               force_download=False,
