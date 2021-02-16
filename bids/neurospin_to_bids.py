@@ -554,6 +554,7 @@ def bids_acquisition_download(data_root_path='',
                     return None
 
             run_task = get_value('task', value[2])
+            acq_label = get_value('acq', value[2])
             run_id = get_value('run', value[2])
             run_dir = get_value('dir', value[2])
             run_session = session_id
