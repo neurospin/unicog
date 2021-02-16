@@ -7,7 +7,6 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 import time
 from ast import literal_eval
 from collections import OrderedDict
@@ -56,15 +55,13 @@ def yes_no(question: str, default: str = None) -> bool:
         raise ValueError(f"invalid default answer: '{default}'")
 
     while True:
-        sys.stdout.write(question + prompt)
-        choice = input().lower()
+        choice = input(question + prompt).lower()
         if default is not None and choice == '':
             return valid[default]
         elif choice in valid:
             return valid[choice]
         else:
-            sys.stdout.write("Please respond with 'yes' or 'no' "
-                             "(or 'y' or 'n').\n")
+            print("Please respond with 'yes' or 'no' " "(or 'y' or 'n').\n")
 
 
 def file_manager_default_file(main_path,
