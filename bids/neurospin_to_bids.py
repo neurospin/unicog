@@ -454,7 +454,7 @@ def bids_acquisition_download(data_root_path='',
             dico_add = {}
             info_participant = json.loads(subject_info['infos_participant'])
             for k, v in info_participant.items():
-                if not k in existing_items:
+                if k not in existing_items:
                     dico_add[k] = v
             #fusion dicos
             existing_items.update(dico_add)
