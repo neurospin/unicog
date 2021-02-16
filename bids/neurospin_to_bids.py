@@ -159,9 +159,9 @@ def bids_copy_events(behav_path='exp_info/recorded_events',
             file_path = sub_folder
             for file_name in os.listdir(os.path.join(sub_folder)):
 
-                #                dest_directory = os.path.join(data_path, file_path)
-                #                if not os.path.exists(dest_directory):
-                #                    os.makedirs(dest_directory)
+                # dest_directory = os.path.join(data_path, file_path)
+                # if not os.path.exists(dest_directory):
+                #     os.makedirs(dest_directory)
 
                 file_ext = []
                 last = ''
