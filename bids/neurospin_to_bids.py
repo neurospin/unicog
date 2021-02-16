@@ -19,7 +19,7 @@ import pydeface.utils as pdu
 import yaml
 from bids_validator import BIDSValidator
 from mne_bids import make_dataset_description, write_raw_bids
-from pkg_resources import Requirement, resource_filename
+from pkg_resources import DistributionNotFound, Requirement, resource_filename
 
 NEUROSPIN_DATABASES = {
     'prisma': '/neurospin/acquisition/database/Prisma_fit',
@@ -27,6 +27,22 @@ NEUROSPIN_DATABASES = {
     '7T': '/neurospin/acquisition/database/Investigational_Device_7T',
     'meg': '/neurospin/acquisition/neuromag/data',
 }
+
+
+class Bcolors:
+    """Colors to improve print statements' readability
+
+    Example:
+        `print(f"{Bcolors.OKBLUE}Hello World!{Bcolors.ENDC}")`
+    """
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 def yes_no(question: str, default: str = None) -> bool:
@@ -176,7 +192,9 @@ def bids_copy_events(behav_path='exp_info/recorded_events',
 
     # raise warning if no folder is found in recorded events
     if not sub_folders:
-        print('****  BIDS IMPORTATION WARMING: NO EVENTS FILE')
+        print(
+            f'{Bcolors.WARNING}BIDS IMPORTATION WARNING: NO EVENTS FILE{Bcolors.ENDC}'
+        )
     else:
         for sub_folder in sub_folders:
             #file_path = sub_folder.replace(behav_path + '/', '')
@@ -347,11 +365,11 @@ def bids_init_dataset(data_root_path='',
     overwrite_changes_file = True
     if changes_file_exist:
         overwrite_changes_file = yes_no(
-            '\nA CHANGES file is already existing, do you want to overwrite ?',
+            '\nA CHANGES file is already existing, do you want to overwrite?',
             default="yes")
 
     if overwrite_changes_file or not changes_file_exist:
-        changes = yes_no('\nDo you want to create/overwrite the CHANGES file ?',
+        changes = yes_no('\nDo you want to create/overwrite the CHANGES file?',
                          default="yes")
         if changes:
             changes_input = input("Tape your text: ")
@@ -364,16 +382,16 @@ def bids_init_dataset(data_root_path='',
     overwrite_readme_file = True
     if readme_file_exist:
         overwrite_readme_file = yes_no(
-            '\nA README file is already existing, do you want to overwrite ?',
+            '\nA README file is already existing, do you want to overwrite?',
             default="yes")
 
     if overwrite_readme_file or not readme_file_exist:
-        readme = yes_no('\nDo you want to create/complete the README file ?',
+        readme = yes_no('\nDo you want to create/complete the README file?',
                         default="yes")
         if not readme:
             readme_input = "TO BE COMPLETED BY THE USER"
         else:
-            readme_input = input("Tape your text: ")
+            readme_input = input("Type your text: ")
         with open(readme_file, 'w') as fid:
             fid.write(readme_input)
 
@@ -512,17 +530,16 @@ def bids_acquisition_download(data_root_path='',
             ses_path = ''
         else:
             ses_path = 'ses-' + session_id
-        try:
+
+        if subject_id.isnumeric():
             int(subject_id)
             subject_id = 'sub-{0}'.format(subject_id)
-        # todo: do not use bare 'except' (E722)
-        except:
-            if 'sub-' in subject_id:
-                subject_id = subject_id
-            else:
-                subject_id = subject_id
-                print('****  BIDS IMPORTATION WARMING: SUBJECT ID PROBABLY '
-                      'NOT CONFORM')
+        else:
+            if 'sub-' not in subject_id:
+                print(
+                    f'{Bcolors.WARNING}BIDS IMPORTATION WARNING: SUBJECT ID PROBABLY NOT CONFORM{Bcolors.ENDC}'
+                )
+
         sub_path = os.path.join(target_root_path, subject_id, ses_path)
         if not os.path.exists(sub_path):
             os.makedirs(sub_path)
@@ -637,18 +654,18 @@ def bids_acquisition_download(data_root_path='',
                 #print(os.path.join(db_path, str(acq_date), str(nip) + '*'))
                 if len(nip_dirs) < 1:
                     list_warning.append(
-                        f"\n WARNING: No directory found for given NIP {nip} and SESSION {session_id}"
+                        f"\n {Bcolors.WARNING}WARNING: No directory found for given NIP {nip} and SESSION {session_id}{Bcolors.ENDC}"
                     )
                     #print(message)
                     #download_report.write(message)
                     download = False
                 elif len(nip_dirs) > 1:
                     list_warning.append(
-                        f"\n  WARNING: Multiple path for given NIP {nip} \
+                        f"\n  {Bcolors.WARNING}WARNING: Multiple path for given NIP {nip} \
                             SESSION {session_id} - please \
                             mention the session of the subject for this date, \
                             2 sessions for the same subject the same day are \
-                            possible")
+                            possible{Bcolors.ENDC}")
                     #print(message)
                     #download_report.write(message)
                     download = False
@@ -772,18 +789,19 @@ def bids_acquisition_download(data_root_path='',
         #print(files_for_pydeface)
         if files_for_pydeface:
             try:
-                template = (
-                    "/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
-                    "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
-                facemask = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
-                            "unicog-dev/bids/template_deface/facemask.nii.gz")
-            except:
+                # warning: Isn't that too restrictive?
                 template = resource_filename(
                     Requirement.parse("unicog"),
                     "bids/template_deface/mean_reg2mean.nii.gz")
                 facemask = resource_filename(
                     Requirement.parse("unicog"),
                     "bids/template_deface/facemask.nii.gz")
+            except DistributionNotFound:
+                template = (
+                    "/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
+                    "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
+                facemask = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
+                            "unicog-dev/bids/template_deface/facemask.nii.gz")
             os.environ['FSLDIR'] = "/i2bm/local/fsl/bin/"
             os.environ['FSLOUTPUTTYPE'] = "NIFTI_PAIR"
             os.environ['PATH'] = os.environ['FSLDIR'] + ":" + os.environ['PATH']
@@ -831,7 +849,7 @@ def bids_acquisition_download(data_root_path='',
                 cmd = f"cat < {bids_validation_report}"
                 subprocess.call(cmd, shell=True)
                 print(
-                    '\n\nSee the summary of bids validator at {bids_validation_report}'
+                    f'\n\nSee the summary of bids validator at {bids_validation_report}'
                 )
             else:
                 validator = BIDSValidator()
@@ -840,8 +858,8 @@ def bids_acquisition_download(data_root_path='',
                     if file_to_test.is_file():
                         file_to_test = '/' + str(file_to_test)
                         print(
-                            '\nTest the following name of file : {name} with BIDSValidator'
-                            .format(name=file_to_test))
+                            f'\nTest the following name of file : {file_to_test} with BIDSValidator'
+                        )
                         print(validator.is_bids(file_to_test))
 
     print('\n')
