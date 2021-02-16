@@ -287,21 +287,20 @@ def bids_init_dataset(data_root_path='',
             print(
                 '\nIf you do not know all information: pass and edit the file later.'
             )
-            name = input("\nTape the name of this BIDS dataset: ").lower()
-            authors = input(
-                "\nA list of authors like [‘a’, ‘b’, ‘c’]: ").lower()
+            name = input("\nTape the name of this BIDS dataset: ").capitalize()
+            authors = input("\nA list of authors like `a, b, c`: ").capitalize()
             acknowledgements = input(
-                "\nA list of acknowledgements like [‘a’, ‘b’, ‘c’]: ").lower()
+                "\nA list of acknowledgements like `a, b, c`: ").capitalize()
             how_to_acknowledge = input(
-                "\nEither a str describing how to  acknowledge this dataset OR a list of publications that should be cited : "
+                "\nEither a str describing how to  acknowledge this dataset OR a list of publications that should be cited: "
             )
             funding = input(
-                '\nList of sources of funding (e.g., grant numbers). Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] : '
+                '\nList of sources of funding (e.g., grant numbers). Must be a list of strings or a single comma separated string like `a, b, c`: '
             )
             references_and_links = input(
-                "\nList of references to publication that contain information on the dataset, or links. Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] :"
+                "\nList of references to publication that contain information on the dataset, or links. Must be a list of strings or a single comma separated string like `a, b, c`: "
             )
-            doi = input('\nThe DOI for the dataset : ')
+            doi = input('\nThe DOI for the dataset: ')
             make_dataset_description(dataset_name_path,
                                      name=name,
                                      data_license=None,
