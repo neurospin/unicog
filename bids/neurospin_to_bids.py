@@ -9,7 +9,7 @@ from collections import OrderedDict
 import shutil
 import subprocess
 from pathlib import Path
-from pkg_resources import resource_filename, Requirement  
+from pkg_resources import resource_filename, Requirement
 import yaml
 
 from bids_validator import BIDSValidator
@@ -21,28 +21,30 @@ import time
 import argparse
 import re
 
-
 NEUROSPIN_DATABASES = {
     'prisma': '/neurospin/acquisition/database/Prisma_fit',
     'trio': '/neurospin/acquisition/database/TrioTim',
-    '7T' : '/neurospin/acquisition/database/Investigational_Device_7T',
-    'meg' : '/neurospin/acquisition/neuromag/data',
+    '7T': '/neurospin/acquisition/database/Investigational_Device_7T',
+    'meg': '/neurospin/acquisition/neuromag/data',
 }
-
 
 
 def yes_no(question_to_be_answered):
     while True:
         choice = input(question_to_be_answered).lower()
-        if choice[:1] == 'y': 
+        if choice[:1] == 'y':
             return True
         elif choice[:1] == 'n':
             return False
         else:
             print("Please respond with 'y/n'\n")
 
-def file_manager_default_file(main_path, filter_list, file_tag,
-                              file_type='*', allow_other_fields=True):
+
+def file_manager_default_file(main_path,
+                              filter_list,
+                              file_tag,
+                              file_type='*',
+                              allow_other_fields=True):
     """Path to the most specific file with respect to optional filters.
 
     Each filter is a list [key, value]. Like [sub, 01] or [ses, 02].
@@ -56,8 +58,10 @@ def file_manager_default_file(main_path, filter_list, file_tag,
     filters += [[]]
     for filt in filters:
         found = get_bids_files(main_path,
-                               sub_folder=False, file_type=file_type,
-                               file_tag=file_tag, filters=filt,
+                               sub_folder=False,
+                               file_type=file_type,
+                               file_tag=file_tag,
+                               filters=filt,
                                allow_other_fields=allow_other_fields)
         if found:
             return found[0]
@@ -82,8 +86,14 @@ def file_reference(img_path):
     return reference
 
 
-def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
-                   file_folder='*', filters=[], ref=False, sub_folder=True,
+def get_bids_files(main_path,
+                   file_tag='*',
+                   file_type='*',
+                   sub_id='*',
+                   file_folder='*',
+                   filters=[],
+                   ref=False,
+                   sub_folder=True,
                    allow_other_fields=True):
     """Return files following bids spec
 
@@ -93,13 +103,13 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
     if sub_folder:
         files = os.path.join(main_path, 'sub-*', 'ses-*')
         if glob.glob(files):
-            files = os.path.join(main_path, 'sub-%s' % sub_id, 'ses-*',
-                                 file_folder, 'sub-%s*_%s.%s' %
-                                 (sub_id, file_tag, file_type))
+            files = os.path.join(
+                main_path, 'sub-%s' % sub_id, 'ses-*', file_folder,
+                'sub-%s*_%s.%s' % (sub_id, file_tag, file_type))
         else:
-            files = os.path.join(main_path, 'sub-%s' % sub_id, file_folder,
-                                 'sub-%s*_%s.%s' %
-                                 (sub_id, file_tag, file_type))
+            files = os.path.join(
+                main_path, 'sub-%s' % sub_id, file_folder,
+                'sub-%s*_%s.%s' % (sub_id, file_tag, file_type))
     else:
         files = os.path.join(main_path, '*%s.%s' % (file_tag, file_type))
 
@@ -107,13 +117,16 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
     files.sort()
     if filters:
         if not allow_other_fields:
-            files = [file_ for file_ in files if
-                     len(os.path.basename(file_).split('_')) <=
-                     len(filters) + 1]
+            files = [
+                file_ for file_ in files
+                if len(os.path.basename(file_).split('_')) <= len(filters) + 1
+            ]
         files = [file_reference(file_) for file_ in files]
         for key, value in filters:
-            files = [file_ for file_ in files if (key in file_ and
-                                                  file_[key] == value)]
+            files = [
+                file_ for file_ in files
+                if (key in file_ and file_[key] == value)
+            ]
     else:
         files = [file_reference(file_) for file_ in files]
 
@@ -123,17 +136,19 @@ def get_bids_files(main_path, file_tag='*', file_type='*', sub_id='*',
         return [ref_file['file_path'] for ref_file in files]
 
 
-def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
+def bids_copy_events(behav_path='exp_info/recorded_events',
+                     data_root_path='',
                      dataset_name=None):
-    dataset_name, data_path = get_bids_default_path(data_root_path, dataset_name)
+    dataset_name, data_path = get_bids_default_path(data_root_path,
+                                                    dataset_name)
     #print(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*'))
     if glob.glob(os.path.join(data_root_path, behav_path, 'sub-*', 'ses-*')):
-        sub_folders = glob.glob(os.path.join(behav_path, 'sub-*', 'ses-*',
-                                             'func'))
+        sub_folders = glob.glob(
+            os.path.join(behav_path, 'sub-*', 'ses-*', 'func'))
     else:
         #print(os.path.join(data_root_path, behav_path,'sub-*', 'func'))
-        sub_folders = glob.glob(os.path.join(data_root_path, behav_path,
-                                             'sub-*', 'func'))
+        sub_folders = glob.glob(
+            os.path.join(data_root_path, behav_path, 'sub-*', 'func'))
 
     # raise warning if no folder is found in recorded events
     if not sub_folders:
@@ -144,9 +159,9 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
             file_path = sub_folder
             for file_name in os.listdir(os.path.join(sub_folder)):
 
-#                dest_directory = os.path.join(data_path, file_path)
-#                if not os.path.exists(dest_directory):
-#                    os.makedirs(dest_directory)
+                #                dest_directory = os.path.join(data_path, file_path)
+                #                if not os.path.exists(dest_directory):
+                #                    os.makedirs(dest_directory)
 
                 file_ext = []
                 last = ''
@@ -168,19 +183,27 @@ def bids_copy_events(behav_path='exp_info/recorded_events', data_root_path='',
                                 os.path.join(data_path, ext, file_name))
 
 
-def get_bids_path(data_root_path='', subject_id='01', folder='',
+def get_bids_path(data_root_path='',
+                  subject_id='01',
+                  folder='',
                   session_id=None):
     if session_id is None:
         session_id = ''
     else:
         session_id = 'ses-' + session_id
-    return os.path.join(data_root_path, 'sub-' + subject_id,
-                        session_id, folder)
+    return os.path.join(data_root_path, 'sub-' + subject_id, session_id, folder)
 
 
-def get_bids_file_descriptor(subject_id, task_id=None, session_id=None,
-                             acq_label=None, dir_label=None, rec_id=None, run_id=None,
-                             run_dir=None, file_tag=None, file_type=None):
+def get_bids_file_descriptor(subject_id,
+                             task_id=None,
+                             session_id=None,
+                             acq_label=None,
+                             dir_label=None,
+                             rec_id=None,
+                             run_id=None,
+                             run_dir=None,
+                             file_tag=None,
+                             file_type=None):
     """ Creates a filename descriptor following BIDS.
 
     subject_id refers to the subject label
@@ -216,11 +239,14 @@ def get_bids_default_path(data_root_path='', dataset_name=None):
     """Default experiment raw dataset folder name"""
     if dataset_name is None:
         dataset_name = 'bids_dataset'
-    return(dataset_name, os.path.join(data_root_path, dataset_name))
+    return (dataset_name, os.path.join(data_root_path, dataset_name))
 
 
-def bids_init_dataset(data_root_path='', dataset_name=None,
-                      dataset_description=dict(), readme='', changes=''):
+def bids_init_dataset(data_root_path='',
+                      dataset_name=None,
+                      dataset_description=dict(),
+                      readme='',
+                      changes=''):
     """Create directories and files missing to follow bids.
 
     Files and folders already created will be left untouched.
@@ -238,74 +264,97 @@ def bids_init_dataset(data_root_path='', dataset_name=None,
     CHANGES follow CPAN standards
 
     """
-    
+
     # CHECK DATASET RESPOSITORY
-    dataset_name, dataset_name_path = get_bids_default_path(data_root_path, dataset_name)
+    dataset_name, dataset_name_path = get_bids_default_path(
+        data_root_path, dataset_name)
     if not os.path.exists(dataset_name_path):
-        os.makedirs(dataset_name_path)     
-  
-    # CHECK dataset_description.json FILE   
-    description_file = os.path.exists(os.path.join(dataset_name_path, 'dataset_description.json'))
+        os.makedirs(dataset_name_path)
+
+    # CHECK dataset_description.json FILE
+    description_file = os.path.exists(
+        os.path.join(dataset_name_path, 'dataset_description.json'))
     overwrite_datadesc_file = True
     if description_file:
-        overwrite_datadesc_file = yes_no('\nA dataset_description.json is already exising, do you want to overwrite ? ')
+        overwrite_datadesc_file = yes_no(
+            '\nA dataset_description.json is already exising, do you want to overwrite ? '
+        )
     if overwrite_datadesc_file or not description_file:
-        data_descrip = yes_no('\nDo you want to create or overwrite the dataset_description.json ? (y/n)')
-        if data_descrip :
-            print('\nIf you do not know all information: pass and edit the file later.')
+        data_descrip = yes_no(
+            '\nDo you want to create or overwrite the dataset_description.json ? (y/n)'
+        )
+        if data_descrip:
+            print(
+                '\nIf you do not know all information: pass and edit the file later.'
+            )
             name = input("\nTape the name of this BIDS dataset: ").lower()
-            authors = input("\nA list of authors like [‘a’, ‘b’, ‘c’]: ").lower()
-            acknowledgements = input("\nA list of acknowledgements like [‘a’, ‘b’, ‘c’]: ").lower()
-            how_to_acknowledge = input("\nEither a str describing how to  acknowledge this dataset OR a list of publications that should be cited : ")
-            funding = input('\nList of sources of funding (e.g., grant numbers). Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] : ')
-            references_and_links = input("\nList of references to publication that contain information on the dataset, or links. Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] :")
+            authors = input(
+                "\nA list of authors like [‘a’, ‘b’, ‘c’]: ").lower()
+            acknowledgements = input(
+                "\nA list of acknowledgements like [‘a’, ‘b’, ‘c’]: ").lower()
+            how_to_acknowledge = input(
+                "\nEither a str describing how to  acknowledge this dataset OR a list of publications that should be cited : "
+            )
+            funding = input(
+                '\nList of sources of funding (e.g., grant numbers). Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] : '
+            )
+            references_and_links = input(
+                "\nList of references to publication that contain information on the dataset, or links. Must be a list of strings or a single comma separated string like [‘a’, ‘b’, ‘c’] :"
+            )
             doi = input('\nThe DOI for the dataset : ')
-            make_dataset_description(dataset_name_path, name=name, 
-                                     data_license=None, authors=authors, 
-                                     acknowledgements=str(acknowledgements), 
-                                     how_to_acknowledge=how_to_acknowledge, 
-                                     funding=str(funding), 
-                                     references_and_links=references_and_links, 
-                                     doi=doi, verbose=False)
+            make_dataset_description(dataset_name_path,
+                                     name=name,
+                                     data_license=None,
+                                     authors=authors,
+                                     acknowledgements=str(acknowledgements),
+                                     how_to_acknowledge=how_to_acknowledge,
+                                     funding=str(funding),
+                                     references_and_links=references_and_links,
+                                     doi=doi,
+                                     verbose=False)
         else:
-            print("\nYou may update the README file later on. A README file by default has been created.")
+            print(
+                "\nYou may update the README file later on. A README file by default has been created."
+            )
             make_dataset_description(dataset_name_path, name=dataset_name)
-    
-    
+
     # CHECK CHANGES FILE / TEXT FILE CPAN CONVENTION
     changes_file = os.path.join(dataset_name_path, 'CHANGES')
     changes_file_exist = os.path.exists(changes_file)
     overwrite_changes_file = True
-    if changes_file_exist :
-        overwrite_changes_file = yes_no('\nA CHANGES file is already existing, do you want to overwrite ? ')
-    
-    if overwrite_changes_file or not changes_file_exist :
-        changes = yes_no('\nDo you want to create/overwrite the CHANGES file ? (y/n)')
+    if changes_file_exist:
+        overwrite_changes_file = yes_no(
+            '\nA CHANGES file is already existing, do you want to overwrite ? ')
+
+    if overwrite_changes_file or not changes_file_exist:
+        changes = yes_no(
+            '\nDo you want to create/overwrite the CHANGES file ? (y/n)')
         if changes:
-            changes_input= input("Tape your text: ")
+            changes_input = input("Tape your text: ")
             with open(changes_file, 'w', encoding="utf-8") as fid:
                 fid.write(str(changes_input))
-        
-        
+
     # CHECK README FILE / TEXT FILE
     readme_file = os.path.join(os.path.join(dataset_name_path, 'README'))
     readme_file_exist = os.path.exists(readme_file)
     overwrite_readme_file = True
     if readme_file_exist:
-        overwrite_readme_file = yes_no('\nA README file is already existing, do you want to overwrite ? ')
-        
+        overwrite_readme_file = yes_no(
+            '\nA README file is already existing, do you want to overwrite ? ')
+
     if overwrite_readme_file or not readme_file_exist:
-        readme = yes_no('\nDo you want to create/complete the README file ? (y/n)')
+        readme = yes_no(
+            '\nDo you want to create/complete the README file ? (y/n)')
         if not readme:
             readme_input = "TO BE COMPLETED BY THE USER"
         else:
-            readme_input= input("Tape your text: ")
+            readme_input = input("Tape your text: ")
         with open(readme_file, 'w') as fid:
-            fid.write('test')
+            fid.write(readme_input)
 
 
-
-def bids_acquisition_download(data_root_path='', dataset_name=None,
+def bids_acquisition_download(data_root_path='',
+                              dataset_name=None,
                               force_download=False,
                               behav_path='exp_info/recorded_events',
                               copy_events='n',
@@ -339,7 +388,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     """
 
     ### CHECK PATHS AND FILES
-    
+
     # exp_info path where is the participants.tsv
     # print(data_root_path)
     exp_info_path = os.path.join(data_root_path, 'exp_info')
@@ -348,15 +397,17 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     if not os.path.isfile(os.path.join(exp_info_path, 'participants.tsv')):
         raise Exception('exp_info/participants.tsv not found')
 
-    # Determine target path with the name of dataset 
-    dataset_name, target_root_path = get_bids_default_path(data_root_path, dataset_name)
+    # Determine target path with the name of dataset
+    dataset_name, target_root_path = get_bids_default_path(
+        data_root_path, dataset_name)
 
     # Create dataset directories and files if necessary
     bids_init_dataset(data_root_path, dataset_name)
 
     # Manage the report and download information
-    download_report = ('download_report_' + time.strftime("%d-%b-%Y-%H:%M:%S", 
-                        time.gmtime()) + '.csv')
+    download_report = ('download_report_' +
+                       time.strftime("%d-%b-%Y-%H:%M:%S", time.gmtime()) +
+                       '.csv')
     report_path = os.path.join(data_root_path, 'report')
     if not os.path.exists(report_path):
         os.makedirs(report_path)
@@ -366,32 +417,34 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
     list_imported = []
     list_already_imported = []
     list_warning = []
-    
+
     # Create a dataFrame to store participant information
-    #df_participant = pd.DataFrame()    
+    #df_participant = pd.DataFrame()
     #Dict for info participant
     #list_all_participants = {}
     dic_info_participants = OrderedDict()
-    
+
     # List for the bacth file for dc2nii_batch command
     infiles_dcm2nii = []
-    
+
     # List for data to deface
     files_for_pydeface = []
-    
+
     #Dict of descriptors to be added
     dict_descriptors = {}
 
     ### GETTING FOR INFORMATION TO DOWNLOAD
-    
+
     # Download command for each subject/session
     # one line has the following information
     # participant_id / NIP / infos_participant / session_label / acq_date / location / to_import
 
     # Read the participants.tsv file for getting subjects/sessions to download
     pop = pd.read_csv(os.path.join(exp_info_path, 'participants.tsv'),
-                      dtype=str, sep='\t', index_col=False)
-    
+                      dtype=str,
+                      sep='\t',
+                      index_col=False)
+
     #print(df_participant)
 
     for row_idx, subject_info in pop.iterrows():
@@ -400,25 +453,26 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
             existing_items = dic_info_participants[subject_info[0]]
             dico_add = {}
             info_participant = json.loads(subject_info['infos_participant'])
-            for k,v in info_participant.items():
-                if not k in existing_items :
+            for k, v in info_participant.items():
+                if not k in existing_items:
                     dico_add[k] = v
-            #fusion dicos  
+            #fusion dicos
             existing_items.update(dico_add)
             dic_info_participants[subject_info[0]] = existing_items
-        else :
-            dic_info_participants[subject_info[0]] = json.loads(subject_info['infos_participant'])
+        else:
+            dic_info_participants[subject_info[0]] = json.loads(
+                subject_info['infos_participant'])
 
-        # Determine path to files in NeuroSpin server  
-        download_database = subject_info['location']        
+        # Determine path to files in NeuroSpin server
+        download_database = subject_info['location']
         if download_database in NEUROSPIN_DATABASES:
             db_path = NEUROSPIN_DATABASES[download_database]
         else:
-            db_path = download_database         
-        
+            db_path = download_database
+
         # the row_idx for giving either participant_label or participant_id
         subject_id = subject_info[0]
-         
+
         # sub_path = target_root_path + subject_id + ses_path
         # Mange the optional filters
         # optional_filters = [('sub', subject_id)]
@@ -432,7 +486,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         if session_id is None:
             ses_path = ''
         else:
-            ses_path = 'ses-' + session_id     
+            ses_path = 'ses-' + session_id
         try:
             int(subject_id)
             subject_id = 'sub-{0}'.format(subject_id)
@@ -446,27 +500,25 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         sub_path = os.path.join(target_root_path, subject_id, ses_path)
         if not os.path.exists(sub_path):
             os.makedirs(sub_path)
-            
+
         # Avoid redownloading subjects/sessions
         if not force_download:
             check_file = os.path.join(sub_path, 'downloaded')
             if os.path.isfile(check_file):
                 continue
 
-
         # DATE has to be transformed from BIDS to NeuroSpin server standard
         # NeuroSpin standard is yyyymmdd -> Bids standard is YYYY-MM-DD
         acq_date = subject_info['acq_date'].replace('-', '').replace('\n', '')
-        
+
         #acq_label
         acq_label = subject_info['acq_label']
 
         #dir_label
         #dir_label = subject_info['dir_label']
-        
+
         # nip number
         nip = subject_info['NIP']
-
 
         # Get appropriate download file. As specific as possible
         # specs_path = file_manager_default_file(exp_info_path,
@@ -477,10 +529,9 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         #download_report.write(report_line)
 
         #specs = pd.read_csv(specs_path, dtype=str, sep='\t', index_col=False)
-        
-        
+
         # Retrieve list of list for seqs to import
-        # One tuple is configured as :(file_to_import;acq_folder;acq_name) 
+        # One tuple is configured as :(file_to_import;acq_folder;acq_name)
         # value[0] : num of seq
         # value[1] : modality
         # value[2] : part of ht file_name
@@ -489,7 +540,7 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
         seqs_to_retrieve = literal_eval(subject_info['to_import'])
         #Convert the first element id there is only one sequence, otherwise
         #each value will be used as str and note tuple).
-        if isinstance(seqs_to_retrieve[0], str) :
+        if isinstance(seqs_to_retrieve[0], str):
             seqs_to_retrieve = [seqs_to_retrieve]
 
         # download data, store information in batch files for anat/fmri
@@ -504,33 +555,31 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                     return None
 
             run_task = get_value('task', value[2])
-            run_id = get_value('run', value[2])  
+            run_id = get_value('run', value[2])
             run_dir = get_value('dir', value[2])
             run_session = session_id
-            
-            
+
             tag = value[2].split('_')[-1]
 
             target_path = os.path.join(sub_path, value[1])
             if not os.path.exists(target_path):
-                    os.makedirs(target_path)
-            
-            
+                os.makedirs(target_path)
+
             # MEG CASE
             if value[1] == 'meg':
                 # Create subject path if necessary
                 meg_path = os.path.join(sub_path, 'meg')
                 if not os.path.exists(meg_path):
                     os.makedirs(meg_path)
-                    
+
                 # Create the sub-emptyroom
                 #sub-emptyroom_path = os.path.join(data_root_path, 'sub_emptyroom')
                 #if not os.path.exists(sub-emptyroom_path):
                 #    os.makedirs(sub-emptyroom_path)
-                
+
                 meg_file = os.path.join(db_path, nip, acq_date, value[0])
                 print(meg_file)
-                filename = get_bids_file_descriptor(subject_id, 
+                filename = get_bids_file_descriptor(subject_id,
                                                     task_id=run_task,
                                                     run_id=run_id,
                                                     run_dir=run_dir,
@@ -543,50 +592,56 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                 #shutil.copyfile(meg_file, output_path)
                 raw = mne.io.read_raw_fif(meg_file, allow_maxshield=True)
 
-                write_raw_bids(raw, filename, target_path,
-                                overwrite=True)
-                # add event 
+                write_raw_bids(raw, filename, target_path, overwrite=True)
+                # add event
                 # create json file
                 #copy the subject emptyroom
-                
-            # ANAT and FUNC case    
-            elif (value[1] == 'anat') or (value[1] == 'func') or (value[1] == 'fmap'):
+
+            # ANAT and FUNC case
+            elif (value[1] == 'anat') or (value[1] == 'func') or (value[1]
+                                                                  == 'fmap'):
                 download = True
                 dicom_paths = []
                 path_file_glob = ""
-                nip_dirs = glob.glob(os.path.join(db_path, str(acq_date), str(nip) + '*'))
+                nip_dirs = glob.glob(
+                    os.path.join(db_path, str(acq_date),
+                                 str(nip) + '*'))
                 #print(os.path.join(db_path, str(acq_date), str(nip) + '*'))
                 if len(nip_dirs) < 1:
-                    list_warning.append(f"\n WARNING: No directory found for given NIP {nip} and SESSION {session_id}")
+                    list_warning.append(
+                        f"\n WARNING: No directory found for given NIP {nip} and SESSION {session_id}"
+                    )
                     #print(message)
-                    #download_report.write(message) 
+                    #download_report.write(message)
                     download = False
                 elif len(nip_dirs) > 1:
-                    list_warning.append(f"\n  WARNING: Multiple path for given NIP {nip} \
+                    list_warning.append(
+                        f"\n  WARNING: Multiple path for given NIP {nip} \
                             SESSION {session_id} - please \
                             mention the session of the subject for this date, \
                             2 sessions for the same subject the same day are \
                             possible")
                     #print(message)
-                    #download_report.write(message) 
+                    #download_report.write(message)
                     download = False
                 else:
-                    path_file_glob = os.path.join(nip_dirs[0], '{0:06d}_*'.
-                                                  format(int(value[0])))
+                    path_file_glob = os.path.join(
+                        nip_dirs[0], '{0:06d}_*'.format(int(value[0])))
                     #print(path_file_glob)
                     dicom_paths = glob.glob(path_file_glob)
-                    
+
                 if not dicom_paths and download:
-                    list_warning.append("\n WARNING: file not found " + path_file_glob)
+                    list_warning.append("\n WARNING: file not found " +
+                                        path_file_glob)
                     #print(message)
-                    #download_report.write(message) 
+                    #download_report.write(message)
                 elif download:
                     dicom_path = dicom_paths[0]
                     list_imported.append("\n IMPORTATION OF " + dicom_path)
                     #print(message)
                     #download_report.write(message)
                     # Expecting page 10 bids specification file name
-                    filename = get_bids_file_descriptor(subject_id, 
+                    filename = get_bids_file_descriptor(subject_id,
                                                         task_id=run_task,
                                                         run_id=run_id,
                                                         run_dir=run_dir,
@@ -594,150 +649,178 @@ def bids_acquisition_download(data_root_path='', dataset_name=None,
                                                         file_tag=tag,
                                                         acq_label=acq_label,
                                                         file_type='nii')
-                                   
-                    if value[1] == 'anat' and deface :
+
+                    if value[1] == 'anat' and deface:
                         print("\n Deface with pydeface")
-                        files_for_pydeface.append(os.path.join(target_path, filename))
-    
+                        files_for_pydeface.append(
+                            os.path.join(target_path, filename))
+
                     # append list for preparing the batch importation
-                    file_to_convert = {'in_dir': dicom_path, 
-                                       'out_dir': target_path, 
-                                       'filename': os.path.splitext(filename)[0]}
-                    is_file_to_import = os.path.join(os.path.join(os.getcwd(), target_path, filename))
-                    
-                    if (os.path.isfile( is_file_to_import )):
-                        list_already_imported.append(f" ALREADY IMPORTED: {is_file_to_import}")
-                    else :
+                    file_to_convert = {
+                        'in_dir': dicom_path,
+                        'out_dir': target_path,
+                        'filename': os.path.splitext(filename)[0]
+                    }
+                    is_file_to_import = os.path.join(
+                        os.path.join(os.getcwd(), target_path, filename))
+
+                    if (os.path.isfile(is_file_to_import)):
+                        list_already_imported.append(
+                            f" ALREADY IMPORTED: {is_file_to_import}")
+                    else:
                         infiles_dcm2nii.append(file_to_convert)
-                        
+
                     # Add descriptor into the json file
                     if run_task:
-                        filename_json = os.path.join(target_path, filename[:-3] + 'json')
-                        dict_descriptors.update({filename_json: {'TaskName':run_task}})
-                    
-                    
-                    if len(value)==4 :
+                        filename_json = os.path.join(target_path,
+                                                     filename[:-3] + 'json')
+                        dict_descriptors.update(
+                            {filename_json: {
+                                'TaskName': run_task
+                            }})
+
+                    if len(value) == 4:
                         #print('value[3]', value[3] )
-                        filename_json = os.path.join(target_path, filename[:-3] + 'json')
-                        dict_descriptors.update({filename_json: value[3] })                   
-                
-        #Importation and conversion of dicom files        
-        dcm2nii_batch = dict(Options=dict(isGz='false', 
-                                          isFlipY='false', 
-                                          isVerbose='false', 
+                        filename_json = os.path.join(target_path,
+                                                     filename[:-3] + 'json')
+                        dict_descriptors.update({filename_json: value[3]})
+
+        #Importation and conversion of dicom files
+        dcm2nii_batch = dict(Options=dict(isGz='false',
+                                          isFlipY='false',
+                                          isVerbose='false',
                                           isCreateBIDS='true',
-                                          isOnlySingleFile='false'), 
-                                          Files=infiles_dcm2nii)
+                                          isOnlySingleFile='false'),
+                             Files=infiles_dcm2nii)
 
     dcm2nii_batch_file = os.path.join(exp_info_path, 'batch_dcm2nii.yaml')
     with open(dcm2nii_batch_file, 'w') as f:
         data = yaml.dump(dcm2nii_batch, f)
-  
-    print("\n------------------------------------------------------------------------------------")
-    print("-------------------    SUMMARY OF IMPORTATION   --------------------------------------")
-    print("--------------------------------------------------------------------------------------\n")
+
+    print(
+        "\n------------------------------------------------------------------------------------"
+    )
+    print(
+        "-------------------    SUMMARY OF IMPORTATION   --------------------------------------"
+    )
+    print(
+        "--------------------------------------------------------------------------------------\n"
+    )
     for i in list_already_imported:
         print(i)
         download_report.write(i)
-    print("\n------------------------------------------------------------------------------------")
+    print(
+        "\n------------------------------------------------------------------------------------"
+    )
     for i in list_imported:
         print(i)
         download_report.write(i)
-    print("\n------------------------------------------------------------------------------------")
+    print(
+        "\n------------------------------------------------------------------------------------"
+    )
     for i in list_warning:
         print(i)
         download_report.write(i)
-    print("\n------------------------------------------------------------------------------------")
-    print("------------------------------------------------------------------------------------\n")
+    print(
+        "\n------------------------------------------------------------------------------------"
+    )
+    print(
+        "------------------------------------------------------------------------------------\n"
+    )
     download_report.close()
-    
+
     if dry_run:
         print("\n NO IMPORTATION, DRY-RUN OPTION IS TRUE \n")
     else:
         print('\n')
-        cmd = "dcm2niibatch %s"%(dcm2nii_batch_file)
-        subprocess.call(cmd, shell=True)  
-    
+        cmd = "dcm2niibatch %s" % (dcm2nii_batch_file)
+        subprocess.call(cmd, shell=True)
+
         # loop for checking if downloaded are ok and create the downloaded files
-    #    done_file = open(os.path.join(sub_path, 'downloaded'), 'w')
-    #    done_file.close()
-        
-        
+        #    done_file = open(os.path.join(sub_path, 'downloaded'), 'w')
+        #    done_file.close()
+
         #Data to deface
         #print(files_for_pydeface)
-        if files_for_pydeface :
+        if files_for_pydeface:
             try:
-                template = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
-                            "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
+                template = (
+                    "/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
+                    "unicog-dev/bids/template_deface/mean_reg2mean.nii.gz")
                 facemask = ("/neurospin/unicog/protocols/IRMf/Unicogfmri/BIDS/"
                             "unicog-dev/bids/template_deface/facemask.nii.gz")
             except:
-                template = resource_filename(Requirement.parse("unicog"),
-                                "bids/template_deface/mean_reg2mean.nii.gz")
-                facemask = resource_filename(Requirement.parse("unicog"),
-                                "bids/template_deface/facemask.nii.gz")
+                template = resource_filename(
+                    Requirement.parse("unicog"),
+                    "bids/template_deface/mean_reg2mean.nii.gz")
+                facemask = resource_filename(
+                    Requirement.parse("unicog"),
+                    "bids/template_deface/facemask.nii.gz")
             os.environ['FSLDIR'] = "/i2bm/local/fsl/bin/"
             os.environ['FSLOUTPUTTYPE'] = "NIFTI_PAIR"
-            os.environ['PATH'] = os.environ['FSLDIR']+":"+os.environ['PATH']
-            
-            
+            os.environ['PATH'] = os.environ['FSLDIR'] + ":" + os.environ['PATH']
+
             for file_to_deface in files_for_pydeface:
-                print(f"\nDeface with pydeface {file_to_deface}") 
-                pdu.deface_image(infile=file_to_deface, 
-                                     outfile=file_to_deface, 
-                                     facemask=facemask,
-                                     template=template,
-                                     force=True)  
-    
+                print(f"\nDeface with pydeface {file_to_deface}")
+                pdu.deface_image(infile=file_to_deface,
+                                 outfile=file_to_deface,
+                                 facemask=facemask,
+                                 template=template,
+                                 force=True)
+
         # Create participants.tsv in dataset folder (take out NIP column)
         participants_path = os.path.join(target_root_path, 'participants.tsv')
-        df_participant = pd.DataFrame.from_dict(dic_info_participants, orient="index")
+        df_participant = pd.DataFrame.from_dict(dic_info_participants,
+                                                orient="index")
         df_participant.to_csv(participants_path, sep='\t')
-    
+
         if dict_descriptors:
             #print(dict_descriptors)
             # Adding a new key value pair in a json file such as taskname
             for k, v in dict_descriptors.items():
                 with open(k, 'r+') as json_file:
-                    for key, val in v.items() :
+                    for key, val in v.items():
                         temp_json = json.load(json_file)
                         temp_json[key] = val
                         json_file.seek(0)
                         json.dump(temp_json, json_file)
                         json_file.truncate()
-    
-    
+
         # Copy recorded event files
-        if copy_events == "y" :
+        if copy_events == "y":
             bids_copy_events(behav_path, data_root_path, dataset_name)
-     
-     
+
         #Validate paths with BIDSValidator
         #see also http://bids-standard.github.io/bids-validator/
         validation_bids = yes_no('\nDo you want to use a bids validator? (y/n)')
         if validation_bids:
-            bids_validation_report = os.path.join(report_path, "report_bids_valisation.txt")
+            bids_validation_report = os.path.join(report_path,
+                                                  "report_bids_valisation.txt")
             if shutil.which('bids-validator'):
                 cmd = f"bids-validator {target_root_path} > {bids_validation_report}"
-                subprocess.call(cmd, shell=True)  
+                subprocess.call(cmd, shell=True)
                 cmd = f"cat < {bids_validation_report}"
-                subprocess.call(cmd, shell=True) 
-                print('\n\nSee the summary of bids validator at {bids_validation_report}')
+                subprocess.call(cmd, shell=True)
+                print(
+                    '\n\nSee the summary of bids validator at {bids_validation_report}'
+                )
             else:
                 validator = BIDSValidator()
                 os.chdir(target_root_path)
-                for file_to_test in  Path('.').glob('./**/*'):
-                    if file_to_test .is_file():
-                        file_to_test  = '/'+str(file_to_test )
-                        print('\nTest the following name of file : {name} with BIDSValidator'.format(name=file_to_test))
+                for file_to_test in Path('.').glob('./**/*'):
+                    if file_to_test.is_file():
+                        file_to_test = '/' + str(file_to_test)
+                        print(
+                            '\nTest the following name of file : {name} with BIDSValidator'
+                            .format(name=file_to_test))
                         print(validator.is_bids(file_to_test))
-                        
-    print('\n')                       
+
+    print('\n')
+
 
 if __name__ == "__main__":
     # Parse arguments from console
-    parser = argparse.ArgumentParser(description =
-                                     'NeuroSpin to BIDS conversion')
+    parser = argparse.ArgumentParser(description='NeuroSpin to BIDS conversion')
     parser.add_argument('-root_path',
                         type=str,
                         nargs=1,
@@ -748,11 +831,12 @@ if __name__ == "__main__":
                         nargs=1,
                         default=['bids_dataset'],
                         help='desired name for the dataset')
-    parser.add_argument('-copy_events',
-                        type=str,
-                        nargs=1,
-                        default=['n'],
-                        help='copy events from a directory with the same structure')
+    parser.add_argument(
+        '-copy_events',
+        type=str,
+        nargs=1,
+        default=['n'],
+        help='copy events from a directory with the same structure')
     parser.add_argument('-neurospin_database',
                         type=str,
                         nargs=1,
@@ -763,7 +847,7 @@ if __name__ == "__main__":
                         nargs=1,
                         default=[False],
                         help='Test without importation of data')
-    
+
     # LOAD CONSOLE ARGUMENTS
     args = parser.parse_args()
     deface = yes_no('\nDo you want deface T1? (y/n)')
@@ -772,5 +856,5 @@ if __name__ == "__main__":
                               force_download=False,
                               behav_path='exp_info/recorded_events',
                               copy_events=args.copy_events[0],
-                              deface = deface,
+                              deface=deface,
                               dry_run=args.dry_run[0])
