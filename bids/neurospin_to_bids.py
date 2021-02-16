@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from ast import literal_eval
 import json
-import glob as glob
+import glob
 from collections import OrderedDict
 import shutil
 import subprocess
@@ -281,7 +281,7 @@ def bids_init_dataset(data_root_path='',
         )
     if overwrite_datadesc_file or not description_file:
         data_descrip = yes_no(
-            '\nDo you want to create or overwrite the dataset_description.json ? (y/n)'
+            '\nDo you want to create or overwrite the dataset_description.json ? (y/n) '
         )
         if data_descrip:
             print(
@@ -327,7 +327,7 @@ def bids_init_dataset(data_root_path='',
 
     if overwrite_changes_file or not changes_file_exist:
         changes = yes_no(
-            '\nDo you want to create/overwrite the CHANGES file ? (y/n)')
+            '\nDo you want to create/overwrite the CHANGES file ? (y/n) ')
         if changes:
             changes_input = input("Tape your text: ")
             with open(changes_file, 'w', encoding="utf-8") as fid:
@@ -343,7 +343,7 @@ def bids_init_dataset(data_root_path='',
 
     if overwrite_readme_file or not readme_file_exist:
         readme = yes_no(
-            '\nDo you want to create/complete the README file ? (y/n)')
+            '\nDo you want to create/complete the README file ? (y/n) ')
         if not readme:
             readme_input = "TO BE COMPLETED BY THE USER"
         else:
@@ -489,8 +489,9 @@ def bids_acquisition_download(data_root_path='',
         try:
             int(subject_id)
             subject_id = 'sub-{0}'.format(subject_id)
+        # todo: do not use bare 'except' (E722)
         except:
-            if ('sub-') in subject_id:
+            if 'sub-' in subject_id:
                 subject_id = subject_id
             else:
                 subject_id = subject_id
@@ -665,7 +666,7 @@ def bids_acquisition_download(data_root_path='',
                     is_file_to_import = os.path.join(
                         os.path.join(os.getcwd(), target_path, filename))
 
-                    if (os.path.isfile(is_file_to_import)):
+                    if os.path.isfile(is_file_to_import):
                         list_already_imported.append(
                             f" ALREADY IMPORTED: {is_file_to_import}")
                     else:
