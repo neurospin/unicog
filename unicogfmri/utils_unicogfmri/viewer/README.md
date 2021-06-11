@@ -8,6 +8,9 @@ contrasts of interest, because you can launch many fusions at the same time.
 Note that before launching the script, it is necessary to initialize 
 correctly paths for Anatomist with the first line.
 
+Configuration from 5.0.1 : the new package use Singularity.
+Please see [https://www.neurospin-wiki.org/pmwiki/Main/BrainvisaSetup] (https://www.neurospin-wiki.org/pmwiki/Main/BrainvisaSetup)  
+For the old configuration:
     source /i2bm/local/Ubuntu-14.04-x86_64/brainvisa/bin/bv_env.sh
     cd <my_repository>/unicog/unicogfmri/utils_unicog/viewer/tests
     python view_contrasts.py
