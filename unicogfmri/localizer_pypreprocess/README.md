@@ -52,14 +52,14 @@ Let us create a directory to run this tutorial, by issuing the following command
        cd $ROOTDIR
 
 ###  Data importation 
-See more information on the importation with BIDS [https://github.com/neurospin/unicog/tree/master/bids](https://github.com/neurospin/unicog/tree/master/bids).
+See more information on the importation with BIDS [https://github.com/neurospin/neurospin_to_bids](https://github.com/neurospin/neurospin_to_bids).
 
 Here we have an example with 14 subjects from the localizer project.
 
 Launch the importation:
 
       cd <where_is_the_exp_info_directory_including_the_participants.tsv>
-      python /tmp/unicog/bids/neurospin_to_bids.py
+      neurospin_to_bids.py
 
 
 ### Processing 
